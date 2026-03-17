@@ -56,7 +56,7 @@ export class MockDataService {
       pointsMultiplier: 1.5,
       color: '#6b7280',
       bgColor: '#f3f4f6',
-      perks: ['All Bronze perks', '1.5Ã— points', 'Priority processing', 'Monthly impact report']
+      perks: ['All Bronze perks', '1.5× points', 'Priority processing', 'Monthly impact report']
     },
     {
       tier: DonorTier.Gold,
@@ -66,7 +66,7 @@ export class MockDataService {
       pointsMultiplier: 2,
       color: '#d97706',
       bgColor: '#fef3c7',
-      perks: ['All Silver perks', '2Ã— points', 'VIP events', 'Year-end recognition']
+      perks: ['All Silver perks', '2× points', 'VIP events', 'Year-end recognition']
     },
     {
       tier: DonorTier.Platinum,
@@ -76,7 +76,7 @@ export class MockDataService {
       pointsMultiplier: 3,
       color: '#7c3aed',
       bgColor: '#ede9fe',
-      perks: ['All Gold perks', '3Ã— points', 'Dedicated contact', 'Advisory board invitation']
+      perks: ['All Gold perks', '3× points', 'Dedicated contact', 'Advisory board invitation']
     }
   ];
 
@@ -84,50 +84,50 @@ export class MockDataService {
     {
       key: 'clothing',
       name: 'Clothing',
-      icon: 'ðŸ‘”',
+      icon: '👔',
       color: '#0066ff',
       estimatedValue: 12,
       active: true,
       sortOrder: 1,
       subCategories: [
-        { key: 'womens', name: "Women's", icon: 'ðŸ‘—', estimatedValue: 12 },
-        { key: 'mens', name: "Men's", icon: 'ðŸ‘”', estimatedValue: 12 },
-        { key: 'childrens', name: "Children's", icon: 'ðŸ§’', estimatedValue: 8 }
+        { key: 'womens', name: "Women's", icon: '👗', estimatedValue: 12 },
+        { key: 'mens', name: "Men's", icon: '👔', estimatedValue: 12 },
+        { key: 'childrens', name: "Children's", icon: '🧒', estimatedValue: 8 }
       ]
     },
-    { key: 'shoes', name: 'Shoes', icon: 'ðŸ‘Ÿ', color: '#10b981', estimatedValue: 15, active: true, sortOrder: 2 },
+    { key: 'shoes', name: 'Shoes', icon: '👟', color: '#10b981', estimatedValue: 15, active: true, sortOrder: 2 },
     {
       key: 'books',
       name: 'Books & Media',
-      icon: 'ðŸ“š',
+      icon: '📚',
       color: '#f59e0b',
       estimatedValue: 5,
       active: true,
       sortOrder: 3,
       subCategories: [
-        { key: 'books', name: 'Books', icon: 'ðŸ“–', estimatedValue: 5 },
-        { key: 'dvds', name: 'DVDs/CDs', icon: 'ðŸ’¿', estimatedValue: 3 },
-        { key: 'games', name: 'Video Games', icon: 'ðŸŽ®', estimatedValue: 15 }
+        { key: 'books', name: 'Books', icon: '📖', estimatedValue: 5 },
+        { key: 'dvds', name: 'DVDs/CDs', icon: '💿', estimatedValue: 3 },
+        { key: 'games', name: 'Video Games', icon: '🎮', estimatedValue: 15 }
       ]
     },
     {
       key: 'electronics',
       name: 'Electronics',
-      icon: 'ðŸ“±',
+      icon: '📱',
       color: '#8b5cf6',
       estimatedValue: 50,
       active: true,
       sortOrder: 4,
       subCategories: [
-        { key: 'phones', name: 'Phones/Tablets', icon: 'ðŸ“±', estimatedValue: 80 },
-        { key: 'appliances', name: 'Appliances', icon: 'ðŸ”Œ', estimatedValue: 25 },
-        { key: 'cables', name: 'Cables', icon: 'ðŸ”‹', estimatedValue: 5 }
+        { key: 'phones', name: 'Phones/Tablets', icon: '📱', estimatedValue: 80 },
+        { key: 'appliances', name: 'Appliances', icon: '🔌', estimatedValue: 25 },
+        { key: 'cables', name: 'Cables', icon: '🔋', estimatedValue: 5 }
       ]
     },
     {
       key: 'furniture',
       name: 'Furniture',
-      icon: 'ðŸª‘',
+      icon: '🪑',
       color: '#ef4444',
       estimatedValue: 125,
       active: true,
@@ -136,30 +136,30 @@ export class MockDataService {
     {
       key: 'housewares',
       name: 'Housewares',
-      icon: 'ðŸ³',
+      icon: '🍳',
       color: '#06b6d4',
       estimatedValue: 8,
       active: true,
       sortOrder: 6,
       subCategories: [
-        { key: 'kitchen', name: 'Kitchen', icon: 'ðŸ³', estimatedValue: 8 },
-        { key: 'glassware', name: 'Glassware', icon: 'ðŸ¥‚', estimatedValue: 6 }
+        { key: 'kitchen', name: 'Kitchen', icon: '🍳', estimatedValue: 8 },
+        { key: 'glassware', name: 'Glassware', icon: '🥂', estimatedValue: 6 }
       ]
     },
     {
       key: 'home_decor',
-      name: 'Home DÃ©cor',
-      icon: 'ðŸ–¼ï¸',
+      name: 'Home Décor',
+      icon: '🖼️',
       color: '#ec4899',
       estimatedValue: 15,
       active: true,
       sortOrder: 7
     },
-    { key: 'toys', name: 'Toys & Games', icon: 'ðŸ§¸', color: '#f97316', estimatedValue: 10, active: true, sortOrder: 8 },
+    { key: 'toys', name: 'Toys & Games', icon: '🧸', color: '#f97316', estimatedValue: 10, active: true, sortOrder: 8 },
     {
       key: 'linens',
       name: 'Linens & Textiles',
-      icon: 'ðŸ›ï¸',
+      icon: '🛏️',
       color: '#14b8a6',
       estimatedValue: 7,
       active: true,
@@ -168,7 +168,7 @@ export class MockDataService {
     {
       key: 'accessories',
       name: 'Accessories/Jewelry',
-      icon: 'ðŸ‘œ',
+      icon: '👜',
       color: '#a855f7',
       estimatedValue: 20,
       active: true,
@@ -177,7 +177,7 @@ export class MockDataService {
     {
       key: 'sporting',
       name: 'Sporting Goods',
-      icon: 'âš½',
+      icon: '⚽',
       color: '#22c55e',
       estimatedValue: 25,
       active: true,
@@ -186,7 +186,7 @@ export class MockDataService {
     {
       key: 'seasonal',
       name: 'Seasonal/Holiday',
-      icon: 'ðŸŽ„',
+      icon: '🎄',
       color: '#dc2626',
       estimatedValue: 12,
       active: true,
@@ -207,7 +207,7 @@ export class MockDataService {
     {
       key: 'clothes',
       name: 'Clothing & Accessories',
-      icon: 'ðŸ‘”',
+      icon: '👔',
       color: '#0066ff',
       estimatedValue: 12,
       active: true,
@@ -216,9 +216,9 @@ export class MockDataService {
         {
           key: 'clothing', name: 'Clothing', estimatedValue: 12,
           subCategories: [
-            { key: 'womens',    name: "Women's",    icon: 'ðŸ‘—', estimatedValue: 12 },
-            { key: 'mens',      name: "Men's",      icon: 'ðŸ‘”', estimatedValue: 12 },
-            { key: 'childrens', name: "Children's", icon: 'ðŸ§’', estimatedValue: 8  }
+            { key: 'womens',    name: "Women's",    icon: '👗', estimatedValue: 12 },
+            { key: 'mens',      name: "Men's",      icon: '👔', estimatedValue: 12 },
+            { key: 'childrens', name: "Children's", icon: '🧒', estimatedValue: 8  }
           ]
         },
         { key: 'shoes',       name: 'Shoes',               estimatedValue: 15 },
@@ -228,7 +228,7 @@ export class MockDataService {
     {
       key: 'media',
       name: 'Electronics & Media',
-      icon: 'ðŸ“±',
+      icon: '📱',
       color: '#8b5cf6',
       estimatedValue: 20,
       active: true,
@@ -237,17 +237,17 @@ export class MockDataService {
         {
           key: 'electronics', name: 'Electronics', estimatedValue: 50,
           subCategories: [
-            { key: 'phones',     name: 'Phones/Tablets', icon: 'ðŸ“±', estimatedValue: 80 },
-            { key: 'appliances', name: 'Appliances',      icon: 'ðŸ”Œ', estimatedValue: 25 },
-            { key: 'cables',     name: 'Cables',          icon: 'ðŸ”‹', estimatedValue: 5  }
+            { key: 'phones',     name: 'Phones/Tablets', icon: '📱', estimatedValue: 80 },
+            { key: 'appliances', name: 'Appliances',      icon: '🔌', estimatedValue: 25 },
+            { key: 'cables',     name: 'Cables',          icon: '🔋', estimatedValue: 5  }
           ]
         },
         {
           key: 'books', name: 'Books & Media', estimatedValue: 5,
           subCategories: [
-            { key: 'books', name: 'Books',       icon: 'ðŸ“–', estimatedValue: 5  },
-            { key: 'dvds',  name: 'DVDs/CDs',    icon: 'ðŸ’¿', estimatedValue: 3  },
-            { key: 'games', name: 'Video Games', icon: 'ðŸŽ®', estimatedValue: 15 }
+            { key: 'books', name: 'Books',       icon: '📖', estimatedValue: 5  },
+            { key: 'dvds',  name: 'DVDs/CDs',    icon: '💿', estimatedValue: 3  },
+            { key: 'games', name: 'Video Games', icon: '🎮', estimatedValue: 15 }
           ]
         }
       ]
@@ -255,7 +255,7 @@ export class MockDataService {
     {
       key: 'home',
       name: 'Home & Living',
-      icon: 'ðŸ ',
+      icon: '🏠',
       color: '#06b6d4',
       estimatedValue: 15,
       active: true,
@@ -265,18 +265,18 @@ export class MockDataService {
         {
           key: 'housewares', name: 'Housewares', estimatedValue: 8,
           subCategories: [
-            { key: 'kitchen',   name: 'Kitchen',    icon: 'ðŸ³', estimatedValue: 8 },
-            { key: 'glassware', name: 'Glassware',  icon: 'ðŸ¥‚', estimatedValue: 6 }
+            { key: 'kitchen',   name: 'Kitchen',    icon: '🍳', estimatedValue: 8 },
+            { key: 'glassware', name: 'Glassware',  icon: '🥂', estimatedValue: 6 }
           ]
         },
-        { key: 'home_decor', name: 'Home DÃ©cor',        estimatedValue: 15 },
+        { key: 'home_decor', name: 'Home Décor',        estimatedValue: 15 },
         { key: 'linens',     name: 'Linens & Textiles', estimatedValue: 7  }
       ]
     },
     {
       key: 'recreation',
       name: 'Toys & Recreation',
-      icon: 'ðŸ§¸',
+      icon: '🧸',
       color: '#f97316',
       estimatedValue: 10,
       active: true,
@@ -290,7 +290,7 @@ export class MockDataService {
     {
       key: 'salvage',
       name: 'Salvage & Recycling',
-      icon: 'â™»ï¸',
+      icon: '♻️',
       color: '#6b7280',
       estimatedValue: 0,
       active: true,
@@ -310,7 +310,7 @@ export class MockDataService {
       managerName: 'Jane Smith',
       staffCount: 5,
       status: LocationStatus.Open,
-      hours: 'Monâ€“Sat 9AMâ€“6PM',
+      hours: 'Mon–Sat 9AM–6PM',
       donationsToday: 15,
       itemsToday: 142,
       revenueToday: 2840
@@ -323,7 +323,7 @@ export class MockDataService {
       managerName: 'John Doe',
       staffCount: 4,
       status: LocationStatus.Open,
-      hours: 'Monâ€“Sat 9AMâ€“6PM',
+      hours: 'Mon–Sat 9AM–6PM',
       donationsToday: 12,
       itemsToday: 98,
       revenueToday: 1960
@@ -336,7 +336,7 @@ export class MockDataService {
       managerName: 'Anna Roberts',
       staffCount: 3,
       status: LocationStatus.Busy,
-      hours: 'Monâ€“Fri 10AMâ€“5PM',
+      hours: 'Mon–Fri 10AM–5PM',
       donationsToday: 8,
       itemsToday: 64,
       revenueToday: 1280
@@ -349,7 +349,7 @@ export class MockDataService {
       managerName: 'Mark Lee',
       staffCount: 2,
       status: LocationStatus.Closed,
-      hours: 'Monâ€“Fri 10AMâ€“5PM (Reduced)',
+      hours: 'Mon–Fri 10AM–5PM (Reduced)',
       donationsToday: 2,
       itemsToday: 18,
       revenueToday: 360
@@ -679,7 +679,7 @@ export class MockDataService {
           id: 'i-007',
           donationId: 'don-003',
           categoryKey: 'home_decor',
-          categoryName: 'Home DÃ©cor',
+          categoryName: 'Home Décor',
           quantity: 8,
           estimatedValuePerItem: 15,
           totalEstimatedValue: 120
@@ -781,7 +781,7 @@ export class MockDataService {
           id: 'i-012',
           donationId: 'don-006',
           categoryKey: 'home_decor',
-          categoryName: 'Home DÃ©cor',
+          categoryName: 'Home Décor',
           quantity: 5,
           estimatedValuePerItem: 15,
           totalEstimatedValue: 75
@@ -1067,7 +1067,7 @@ export class MockDataService {
           id: 'i-029',
           donationId: 'don-013',
           categoryKey: 'home_decor',
-          categoryName: 'Home DÃ©cor',
+          categoryName: 'Home Décor',
           quantity: 6,
           estimatedValuePerItem: 15,
           totalEstimatedValue: 90
@@ -1191,7 +1191,7 @@ export class MockDataService {
       createdAt: new Date('2026-03-16T09:00:00'),
       updatedAt: new Date('2026-03-16T09:00:00'),
       totalItems: 0, totalEstimatedValue: 0,
-      notes: 'Textile bale â€” scheduled for pickup'
+      notes: 'Textile bale — scheduled for pickup'
     },
     {
       id: 'c-007',
@@ -1211,7 +1211,7 @@ export class MockDataService {
       id: 'c-008',
       barcode: 'BRJ-2026-001241',
       donationReceiptNumber: 'DN-001237',
-      donorVisitLabel: 'Robert Martinez Â· DN-001237',
+      donorVisitLabel: 'Robert Martinez · DN-001237',
       containerType: ContainerType.Pallet,
       presortMethod: PresortMethod.Batch,
       deptKey: 'home', deptName: 'Home & Living',
@@ -1262,7 +1262,7 @@ export class MockDataService {
     ]
   };
 
-  /** Live presort queue â€” derived from containers with status 'ready_for_sorting' */
+  /** Live presort queue — derived from containers with status 'ready_for_sorting' */
   get presortQueue(): PresortQueueItem[] {
     return this.containers
       .filter(c => c.status === ContainerStatus.ReadyForSorting)
@@ -1362,7 +1362,7 @@ export class MockDataService {
     return `BRJ-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 999999)).padStart(6, '0')}`;
   }
 
-  // â”€â”€â”€ Helper Methods â”€â”€â”€
+  // ─── Helper Methods ───
 
   getDonorById(id: string): Donor | undefined {
     return this.donors.find(d => d.id === id);
@@ -1477,14 +1477,14 @@ export class MockDataService {
   // Simulated rewards/points
   getAvailableRewards() {
     return [
-      { id: 'r-001', name: '$5 Gift Card', pointsRequired: 500, icon: 'ðŸ’³', category: 'gift-card' },
-      { id: 'r-002', name: '$10 Gift Card', pointsRequired: 1000, icon: 'ðŸ’³', category: 'gift-card' },
-      { id: 'r-003', name: '$25 Gift Card', pointsRequired: 2500, icon: 'ðŸ’³', category: 'gift-card' },
-      { id: 'r-004', name: 'Free Pickup Service', pointsRequired: 300, icon: 'ðŸšš', category: 'service' },
-      { id: 'r-005', name: 'Priority Processing', pointsRequired: 150, icon: 'âš¡', category: 'service' },
-      { id: 'r-006', name: 'Thank You Mug', pointsRequired: 800, icon: 'â˜•', category: 'merchandise' },
-      { id: 'r-007', name: 'Tote Bag', pointsRequired: 600, icon: 'ðŸ‘œ', category: 'merchandise' },
-      { id: 'r-008', name: 'Branded T-Shirt', pointsRequired: 1200, icon: 'ðŸ‘•', category: 'merchandise' }
+      { id: 'r-001', name: '$5 Gift Card', pointsRequired: 500, icon: '💳', category: 'gift-card' },
+      { id: 'r-002', name: '$10 Gift Card', pointsRequired: 1000, icon: '💳', category: 'gift-card' },
+      { id: 'r-003', name: '$25 Gift Card', pointsRequired: 2500, icon: '💳', category: 'gift-card' },
+      { id: 'r-004', name: 'Free Pickup Service', pointsRequired: 300, icon: '🚚', category: 'service' },
+      { id: 'r-005', name: 'Priority Processing', pointsRequired: 150, icon: '⚡', category: 'service' },
+      { id: 'r-006', name: 'Thank You Mug', pointsRequired: 800, icon: '☕', category: 'merchandise' },
+      { id: 'r-007', name: 'Tote Bag', pointsRequired: 600, icon: '👜', category: 'merchandise' },
+      { id: 'r-008', name: 'Branded T-Shirt', pointsRequired: 1200, icon: '👕', category: 'merchandise' }
     ];
   }
 
@@ -1508,9 +1508,9 @@ export class MockDataService {
         timeSlot: '9:00 AM',
         status: AppointmentStatus.Scheduled,
         itemCount: 12,
-        categories: ['Furniture', 'Home DÃ©cor'],
+        categories: ['Furniture', 'Home Décor'],
         recurring: 'One-time',
-        notes: 'Large furniture items â€” needs loading dock',
+        notes: 'Large furniture items — needs loading dock',
         createdAt: new Date('2026-03-12')
       },
       {
@@ -1529,7 +1529,7 @@ export class MockDataService {
         itemCount: 8,
         categories: ['Clothing', 'Shoes'],
         recurring: 'Monthly',
-        notes: 'Clothing boxes â€” approx 8 boxes',
+        notes: 'Clothing boxes — approx 8 boxes',
         createdAt: new Date('2026-03-14')
       },
       {
@@ -1565,7 +1565,7 @@ export class MockDataService {
         timeSlot: '2:00 PM',
         status: AppointmentStatus.Scheduled,
         itemCount: 20,
-        categories: ['Books', 'Home DÃ©cor', 'Toys & Games'],
+        categories: ['Books', 'Home Décor', 'Toys & Games'],
         recurring: 'One-time',
         notes: 'Books and home decor',
         createdAt: new Date('2026-03-15')
@@ -1620,7 +1620,7 @@ export class MockDataService {
         itemCount: 15,
         categories: ['Furniture', 'Clothing', 'Electronics'],
         recurring: 'Every 2 Weeks',
-        notes: 'Regular donor â€” gold tier',
+        notes: 'Regular donor — gold tier',
         createdAt: new Date('2026-03-16')
       }
     ];

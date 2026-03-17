@@ -27,7 +27,7 @@
         </div>
       }
       @if (st.step() > 1) {
-        <button class="btn btn-secondary" (click)="st.prevStep()">← Back</button>
+        <button class="btn btn-secondary" (click)="st.prevStep()">Back</button>
       }
       <button class="btn btn-ghost" (click)="cancel()">✕ Cancel</button>
     </div>
@@ -53,7 +53,7 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Quick Identification</div>
+              <div class="card-title">Donor Identification</div>
               <div class="card-subtitle">Scan QR, search by phone / name, or continue anonymously</div>
             </div>
           </div>
@@ -119,8 +119,8 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Search Scheduled Appointment</div>
-              <div class="card-subtitle">Enter appointment ID or scan QR</div>
+              <div class="card-title">Search Scheduled Donation</div>
+              <div class="card-subtitle">Enter Donation ID or scan QR</div>
             </div>
           </div>
           <div class="appt-lookup-row">
@@ -307,7 +307,7 @@
           [disabled]="st.totalItems() === 0"
           (click)="st.nextStep()"
         >
-          {{ st.donationType() === DT.Both ? 'Next →' : 'Review →' }}
+          {{ st.donationType() === DT.Both ? 'Next' : 'Review' }}
         </button>
       </div>
 

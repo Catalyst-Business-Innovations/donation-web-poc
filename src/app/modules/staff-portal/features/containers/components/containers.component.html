@@ -153,9 +153,7 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     DETAIL MODAL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ─── DETAIL MODAL ─── -->
 <app-modal
   [open]="!!viewing()"
   [title]="(viewing()?.barcode ?? '') + '  Detail'"
@@ -292,9 +290,7 @@
   }
 </app-modal>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     CREATE CONTAINER MODAL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ─── CREATE CONTAINER MODAL ─── -->
 <app-modal
   [open]="creating()"
   title="New Container"
@@ -334,7 +330,7 @@
     <div class="form-group">
       <label class="form-label">Department <span class="form-required">*</span></label>
       <select class="form-select" [(ngModel)]="cDeptKey" (ngModelChange)="cCatKey = ''">
-        <option value="">select department</option>
+        <option value="">Select Department</option>
         @for (d of mockData.departments; track d.key) {
           <option [value]="d.key">{{ d.name }}</option>
         }
@@ -370,7 +366,7 @@
       <div class="form-group">
         <label class="form-label">Transfer To Store <span class="form-required">*</span></label>
         <select class="form-select" [(ngModel)]="cTransferTo">
-          <option value=""> select store </option>
+          <option value="">Select Store</option>
           @for (loc of mockData.locations; track loc.id) {
             <option [value]="loc.id">{{ loc.name }}</option>
           }
@@ -390,13 +386,10 @@
 
   <div class="form-group" style="margin-top: 12px">
     <label class="form-label">Notes <span class="form-hint">optional</span></label>
-    <textarea class="form-textarea" rows="2" [(ngModel)]="cNotes" placeholder="Any notes about this containerâ€¦"></textarea>
+    <textarea class="form-textarea" rows="2" [(ngModel)]="cNotes" placeholder="Any notes about this container"></textarea>
   </div>
 </app-modal>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     EDIT CONTAINER MODAL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <app-modal
   [open]="!!editing()"
   [title]="'Edit  ' + (editing()?.barcode ?? '')"
@@ -486,14 +479,14 @@
 
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <textarea class="form-textarea" rows="2" [(ngModel)]="eNotes" placeholder="Add a noteâ€¦"></textarea>
+      <textarea class="form-textarea" rows="2" [(ngModel)]="eNotes" placeholder="Add a note"></textarea>
     </div>
   }
 </app-modal>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- 
      MERGE MODAL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+-->
 <app-modal
   [open]="merging()"
   title="Merge Containers"
@@ -570,7 +563,7 @@
 
   <div class="form-group" style="margin-top: 8px">
     <label class="form-label">Notes <span class="form-hint">optional</span></label>
-    <textarea class="form-textarea" rows="2" [(ngModel)]="mNotes" placeholder="Reason for mergeâ€¦"></textarea>
+    <textarea class="form-textarea" rows="2" [(ngModel)]="mNotes" placeholder="Reason for merge"></textarea>
   </div>
 
   <div class="merge-warning">
@@ -579,9 +572,6 @@
   </div>
 </app-modal>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     BULK STATUS MODAL
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <app-modal
   [open]="bulkUpdating()"
   title="Bulk Status Update"
