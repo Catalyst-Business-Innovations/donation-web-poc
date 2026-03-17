@@ -1,0 +1,54 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-logo">📦</div>
+      <div class="brand-name">Brijjworks</div>
+      <div class="brand-sub">Staff Portal</div>
+    </div>
+
+    <h2 class="login-title">Staff Sign In</h2>
+    <p class="login-sub">Enter your store credentials to access the Staff &amp; Admin portal</p>
+
+    @if (error()) {
+      <div class="login-error">{{ error() }}</div>
+    }
+
+    <form class="login-form" (ngSubmit)="login()">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input
+          class="form-input"
+          type="text"
+          [(ngModel)]="username"
+          name="username"
+          placeholder="staff.name"
+          autocomplete="username"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input
+          class="form-input"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+
+      <button class="btn btn-primary btn-login" type="submit" [disabled]="loading()">
+        @if (loading()) {
+          Signing in…
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <a routerLink="/" class="back-link">← Back to Home</a>
+  </div>
+</div>

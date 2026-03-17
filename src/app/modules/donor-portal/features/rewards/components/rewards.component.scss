@@ -1,0 +1,124 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pts-hero {
+  background: linear-gradient(135deg, var(--slate-bg), var(--slate-dark));
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  margin-bottom: 20px;
+}
+.ph-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.6;
+}
+.ph-num {
+  font-size: 50px;
+  font-weight: 900;
+  line-height: 1;
+}
+.ph-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tier-track {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.tier-stop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+  &.achieved {
+    background: var(--secondary-light);
+  }
+  &.current {
+    background: var(--primary-light);
+    border: 2px solid var(--primary);
+  }
+}
+.ts-icon {
+  font-size: 28px;
+}
+.ts-label {
+  font-weight: 800;
+  font-size: 12px;
+}
+.ts-min {
+  font-size: 10px;
+  color: var(--gray-500);
+}
+.tier-conn {
+  flex: 1;
+  height: 3px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  &.filled {
+    background: var(--secondary);
+  }
+}
+
+.rewards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.reward-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+  &.can-redeem {
+    border-color: var(--secondary);
+    background: var(--secondary-light);
+  }
+}
+
+.points-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--gray-100);
+  &:last-child {
+    border-bottom: none;
+  }
+}
+.community-card {
+  background: linear-gradient(135deg, var(--success-50), var(--success-100)) !important;
+}
+.cause-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 900px) {
+  .rewards-grid {
+    grid-template-columns: 1fr;
+  }
+}

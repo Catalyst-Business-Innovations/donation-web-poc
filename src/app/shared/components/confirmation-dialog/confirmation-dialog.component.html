@@ -1,0 +1,34 @@
+<div class="confirmation-dialog-backdrop" *ngIf="isVisible" (click)="onBackdropClick($event)">
+  <div class="confirmation-dialog">
+    <div class="dialog-header">
+      <h3>{{ title }}</h3>
+    </div>
+    <div class="dialog-body">
+      <p>{{ message }}</p>
+      <div *ngIf="showTextarea" class="textarea-container">
+        <label *ngIf="textareaLabel" class="form-label">
+          {{ textareaLabel }}
+          <span *ngIf="textareaRequired" class="text-danger">*</span>
+        </label>
+        <textarea
+          class="form-control"
+          [class.is-invalid]="textareaRequired && !textareaValue.trim()"
+          rows="4"
+          [placeholder]="textareaPlaceholder"
+          [(ngModel)]="textareaValue"
+          (ngModelChange)="textareaValueChange.emit($event)"
+          [required]="textareaRequired"
+        ></textarea>
+        <div *ngIf="textareaRequired && !textareaValue.trim()" class="invalid-feedback">This field is required</div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn btn-secondary" (click)="onCancel()">
+        {{ cancelText }}
+      </button>
+      <button class="btn" [ngClass]="confirmButtonClass" (click)="onConfirm()" [disabled]="isConfirmDisabled">
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

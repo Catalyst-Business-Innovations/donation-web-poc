@@ -1,0 +1,50 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mono-cell {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+.donor-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.d-av-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.anon {
+  color: var(--gray-400);
+  font-style: italic;
+}
+.pts {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.cat-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cb-hdr {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+}

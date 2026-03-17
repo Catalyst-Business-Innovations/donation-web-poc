@@ -1,0 +1,119 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Daily Reports</div>
+    <div class="topbar-subtitle">Today's performance at {{ loc.name }}</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-secondary" (click)="toast.success('Exported', 'Report exported to CSV.')">Export CSV</button>
+    <button class="btn btn-primary" (click)="toast.info('Print', 'Sending to printer...')">Print</button>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-val">{{ loc.donationsToday }}</div>
+      <div class="metric-lbl">Donations Today</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">{{ loc.itemsToday }}</div>
+      <div class="metric-lbl">Items Processed</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">4.2 min</div>
+      <div class="metric-lbl">Avg Process Time</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">73%</div>
+      <div class="metric-lbl">ID Rate</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Hourly Donation Volume</div>
+      <div class="chart-sub">Donations processed by hour today</div>
+      <div class="bar-chart">
+        @for (h of hourly; track h.label) {
+          <div class="bar-col">
+            <div class="bar-val">{{ h.count || '' }}</div>
+            <div class="bar" [class.hi]="h.current" [style.height]="(h.count / maxHourly) * 100 + '%'"></div>
+            <div class="bar-lbl">{{ h.label }}</div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Category Breakdown</div>
+      <div class="chart-sub">Items by department today</div>
+      <div class="cat-breakdown">
+        @for (cat of categories; track cat.name) {
+          <div>
+            <div class="cb-hdr">
+              <span>{{ cat.name }}</span>
+              <span>{{ cat.count }} ({{ cat.pct }}%)</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill {{ cat.colorClass }}" [style.width]="cat.pct + '%'"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Today's Donations</div>
+        <div class="card-subtitle">All donations at this location</div>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Receipt #</th>
+            <th>Time</th>
+            <th>Donor</th>
+            <th>Items</th>
+            <th>Points</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of mockData.donations; track d.id) {
+            <tr>
+              <td class="mono-cell">{{ d.receiptNumber }}</td>
+              <td>{{ d.timestamp | date: 'h:mm a' }}</td>
+              <td>
+                @if (d.donorName) {
+                  <div class="donor-cell">
+                    <div class="d-av-sm">{{ d.donorInitials }}</div>
+                    {{ d.donorName }}
+                  </div>
+                } @else {
+                  <span class="anon">Anonymous</span>
+                }
+              </td>
+              <td style="font-weight: 700">{{ d.totalItems }}</td>
+              <td>
+                @if (d.loyaltyPointsEarned) {
+                  <span class="pts">+{{ d.loyaltyPointsEarned }}</span>
+                } @else {
+                  <span>—</span>
+                }
+              </td>
+              <td>
+                <span class="badge {{ d.status === DS.Completed ? 'badge-success' : 'badge-warning' }}">
+                  {{ DSL[d.status] }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

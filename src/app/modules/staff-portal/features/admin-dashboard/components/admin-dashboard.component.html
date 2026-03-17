@@ -1,0 +1,158 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Dashboard Overview</div>
+    <div class="topbar-subtitle">Real-time metrics across all locations</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-secondary" (click)="toast.info('Filter', 'Showing last 30 days')">Last 30 Days</button>
+    <button class="btn btn-primary" (click)="toast.success('Export', 'Report generating...')">Export</button>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-val">{{ a.totalDonations | number }}</div>
+      <div class="metric-lbl">Total Donations</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">{{ a.activeDonors | number }}</div>
+      <div class="metric-lbl">Active Donors</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">{{ a.avgProcessTimeMin }} min</div>
+      <div class="metric-lbl">Avg Process Time</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Donation Volume — Last 12 Months</div>
+      <div class="chart-sub">Items processed per month</div>
+      <div class="bar-chart">
+        @for (t of a.trends; track t.label) {
+          <div class="bar-col">
+            <div class="bar-val">{{ t.count }}</div>
+            <div class="bar" [class.hi]="$last" [style.height]="(t.count / maxT) * 100 + '%'"></div>
+            <div class="bar-lbl">{{ t.label }}</div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Category Distribution</div>
+      <div class="chart-sub">This month</div>
+      <div class="donut-wrap">
+        <svg viewBox="0 0 120 120" width="140" height="140">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--gray-200)" stroke-width="20" />
+          @for (seg of donut; track seg.color) {
+            <circle
+              cx="60"
+              cy="60"
+              r="50"
+              fill="none"
+              [attr.stroke]="seg.color"
+              stroke-width="20"
+              [attr.stroke-dasharray]="seg.dash + ' ' + seg.gap"
+              [attr.stroke-dashoffset]="seg.offset"
+              transform="rotate(-90 60 60)"
+            />
+          }
+          <text x="60" y="56" text-anchor="middle" font-size="14" font-weight="900" fill="var(--gray-900)">
+            {{ a.totalDonations | number }}
+          </text>
+          <text x="60" y="70" text-anchor="middle" font-size="8" fill="var(--gray-500)">total</text>
+        </svg>
+        <div class="donut-legend">
+          @for (cat of a.categoryBreakdown; track cat.categoryKey) {
+            <div class="donut-legend-item">
+              <div class="donut-dot" [style.background]="cat.color"></div>
+              {{ cat.categoryName }} — {{ cat.percentage }}%
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">📍 Store Status</div>
+        <div class="card-subtitle">Live store performance today</div>
+      </div>
+    </div>
+    <div class="loc-grid">
+      @for (loc of svc.locations; track loc.id) {
+        <div class="loc-card">
+          <div class="lc-header">
+            <div>
+              <div class="lc-name">{{ loc.name }}</div>
+              <div class="lc-addr">{{ loc.address }}</div>
+            </div>
+            <div class="lc-status">
+              <div class="status-dot {{ loc.status }}"></div>
+              <span>{{ loc.status }}</span>
+            </div>
+          </div>
+          <div class="lc-stats">
+            <div class="lc-stat">
+              <div>{{ loc.donationsToday }}</div>
+              <span>Donations</span>
+            </div>
+            <div class="lc-stat">
+              <div>{{ loc.itemsToday }}</div>
+              <span>Items</span>
+            </div>
+            <div class="lc-stat">
+              <div>{{ loc.staffCount }}</div>
+              <span>Staff</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Recent Donations</div>
+        <div class="card-subtitle">Latest across all stores</div>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Receipt #</th>
+            <th>Time</th>
+            <th>Donor</th>
+            <th>Store</th>
+            <th>Items</th>
+            <th>Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of svc.donations; track d.id) {
+            <tr>
+              <td class="mono">{{ d.receiptNumber }}</td>
+              <td>{{ d.timestamp | date: 'h:mm a' }}</td>
+              <td>{{ d.donorName ?? 'Anonymous' }}</td>
+              <td>{{ d.locationName }}</td>
+              <td style="font-weight: 700">{{ d.totalItems }}</td>
+              <td style="font-weight: 700; color: var(--secondary)">${{ d.totalEstimatedValue }}</td>
+              <td>
+                <span class="badge {{ d.status === DS.Completed ? 'badge-success' : 'badge-warning' }}">
+                  {{ DSL[d.status] }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

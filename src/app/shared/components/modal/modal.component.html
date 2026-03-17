@@ -1,0 +1,23 @@
+@if (open) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="modal" [class.modal-lg]="size === 'lg'" [class.modal-sm]="size === 'sm'" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">{{ title }}</div>
+        <button class="modal-close" (click)="closed.emit()"><app-icon name="close" size="20" /></button>
+      </div>
+
+      <div class="modal-body">
+        <ng-content />
+      </div>
+
+      @if (showFooter) {
+        <div class="modal-footer">
+          @if (showCancel) {
+            <button class="btn btn-secondary" (click)="closed.emit()">{{ effectiveCancelLabel }}</button>
+          }
+          <button class="btn btn-{{ confirmVariant }}" (click)="confirmed.emit()">{{ effectiveConfirmLabel }}</button>
+        </div>
+      }
+    </div>
+  </div>
+}

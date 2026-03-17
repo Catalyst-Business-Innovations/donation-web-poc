@@ -1,0 +1,643 @@
+<div class="nd-host">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">{{ topTitle() }}</div>
+      <div class="topbar-subtitle">{{ topSubtitle() }}</div>
+    </div>
+    <div class="topbar-actions">
+      @if (st.step() > 1 && st.donor() !== undefined) {
+        <div class="tb-donor-chip">
+          @if (st.donor() === null) {
+            <div class="tb-dc-avatar tb-dc-anon">👤</div>
+            <div class="tb-dc-info">
+              <span class="tb-dc-name">Anonymous</span>
+            </div>
+          } @else {
+            <div class="tb-dc-avatar">{{ st.donor()!.initials }}</div>
+            <div class="tb-dc-info">
+              <span class="tb-dc-name">{{ st.donor()!.displayName }}</span>
+              <span class="tb-dc-sub">
+                <app-icon [name]="tierCfg(st.donor()!.tier).icon" [size]="10"></app-icon>
+                {{ tierCfg(st.donor()!.tier).label }} · {{ st.donor()!.points | number }} pts
+              </span>
+            </div>
+          }
+          <button class="tb-dc-change" (click)="st.goToStep(1)">Change</button>
+        </div>
+      }
+      @if (st.step() > 1) {
+        <button class="btn btn-secondary" (click)="st.prevStep()">← Back</button>
+      }
+      <button class="btn btn-ghost" (click)="cancel()">✕ Cancel</button>
+    </div>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper">
+    @for (s of steps(); track s.n) {
+      <div class="step" [class.active]="st.step() === s.n" [class.done]="st.step() > s.n">
+        <div class="step-num">{{ st.step() > s.n ? '✓' : s.n }}</div>
+        <span>{{ s.label }}</span>
+      </div>
+      @if (!$last) {
+        <div class="step-arrow">→</div>
+      }
+    }
+  </div>
+
+  <!-- ─── STEP 1: Identify ─── -->
+  @if (st.step() === 1) {
+    <div class="page-content anim-in">
+      <div class="id-grid">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Quick Identification</div>
+              <div class="card-subtitle">Scan or tap to identify instantly</div>
+            </div>
+          </div>
+          <div class="quick-grid">
+            <button class="quick-btn qr-btn" (click)="toast.info('QR Scanner', 'Camera activated')">
+              <app-icon name="search" [size]="24"></app-icon>
+              <span>Scan QR</span>
+            </button>
+            <button class="quick-btn nfc-btn" (click)="toast.info('NFC Reader', 'Hold card near reader')">
+              <app-icon name="refresh" [size]="24"></app-icon>
+              <span>NFC Tap</span>
+            </button>
+            <button class="quick-btn anon-btn" (click)="selectAnonymous()">
+              <app-icon name="user" [size]="24"></app-icon>
+              <span>Anonymous</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Search by Phone or Name</div></div>
+          <div class="search-bar" style="margin-bottom: 12px">
+            <span class="search-icon"><app-icon name="search" size="14" /></span>
+            <input [(ngModel)]="searchQ" placeholder="Name or phone number..." />
+          </div>
+          @for (d of searchResults(); track d.id) {
+            <div class="donor-result" (click)="selectDonor(d)">
+              <div class="d-av">{{ d.initials }}</div>
+              <div class="dr-info">
+                <div class="dr-name">{{ d.displayName }}</div>
+                <div class="dr-meta">
+                  <app-icon [name]="tierCfg(d.tier).icon" [size]="12"></app-icon>
+                  {{ tierCfg(d.tier).label }} · {{ d.points | number }} pts
+                </div>
+              </div>
+              <span class="badge badge-gray">{{ d.totalDonations }} visits</span>
+            </div>
+          }
+          @if (searchQ.length > 1 && searchResults().length === 0) {
+            <div class="no-results">
+              <div>No donors found</div>
+              <button class="btn btn-primary" style="margin-top: 10px; width: 100%" (click)="showEnroll.set(true)">
+                + Enroll New Donor
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- ─── Appointment Lookup ─── -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Load Scheduled Appointment</div>
+              <div class="card-subtitle">Enter appointment ID or scan QR</div>
+            </div>
+          </div>
+          <div class="appt-lookup-row">
+            <input class="form-input" [(ngModel)]="apptQ" placeholder="APT-20260320-001"
+              (keyup.enter)="lookupAppointment()" />
+            <button class="btn btn-secondary" (click)="demoScanApptQR()">
+              <app-icon name="search" [size]="14"></app-icon> Scan QR
+            </button>
+            <button class="btn btn-primary" (click)="lookupAppointment()">Look Up</button>
+          </div>
+
+          @if (apptResult()) {
+            <div class="appt-result">
+              <div class="appt-res-body">
+                <div class="appt-res-id">{{ apptResult()!.id }}</div>
+                <div class="appt-res-name">{{ apptResult()!.donorName }}</div>
+                <div class="appt-res-meta">
+                  <app-icon name="map-pin" [size]="11"></app-icon> {{ apptResult()!.locationName }}
+                  &nbsp;·&nbsp;
+                  <app-icon name="calendar" [size]="11"></app-icon> {{ apptResult()!.date | date:'MMM d' }} @ {{ apptResult()!.timeSlot }}
+                  &nbsp;·&nbsp; {{ apptResult()!.itemCount }} items
+                </div>
+                <div class="appt-res-cats">
+                  @for (c of apptResult()!.categories; track c) {
+                    <span class="badge badge-gray">{{ c }}</span>
+                  }
+                </div>
+              </div>
+              <div class="appt-res-actions">
+                <span class="badge {{ apptStatusBadge(apptResult()!.status) }}">{{ apptStatusLabel(apptResult()!.status) }}</span>
+                @if (apptResult()!.status === AS.Scheduled) {
+                  <button class="btn btn-success" (click)="loadAppointment(apptResult()!)">Load &amp; Continue →</button>
+                } @else {
+                  <span class="appt-res-warn">Cannot load — appointment is {{ apptStatusLabel(apptResult()!.status) }}</span>
+                }
+              </div>
+            </div>
+          }
+
+          @if (apptNotFound()) {
+            <div class="appt-not-found">⚠ No appointment found for "{{ apptQ }}"</div>
+          }
+        </div>
+      </div>
+
+      <!-- Selected donor banner -->
+      @if (st.donor() !== undefined) {
+        @if (st.donor() === null) {
+          <div class="anon-banner">
+            <span style="font-size: 32px">👤</span>
+            <div class="ab-info">
+              <div class="ab-title">Anonymous Donation</div>
+              <div class="ab-sub">No loyalty points awarded. You can still enroll this donor.</div>
+            </div>
+            <button class="btn btn-ghost" style="color: rgba(255, 255, 255, 0.6)" (click)="clearDonor()">Change</button>
+            <button class="btn btn-success btn-lg" (click)="st.nextStep()">Continue →</button>
+          </div>
+        } @else {
+          <div class="found-banner">
+            <div class="d-av-lg">{{ st.donor()!.initials }}</div>
+            <div class="fb-info">
+              <div class="fb-tier">
+                <app-icon [name]="tierCfg(st.donor()!.tier).icon" [size]="14"></app-icon>
+                {{ tierCfg(st.donor()!.tier).label }} Member
+              </div>
+              <div class="fb-name">{{ st.donor()!.displayName }}</div>
+              <div class="fb-meta">{{ st.donor()!.points | number }} pts · {{ st.donor()!.totalDonations }} visits</div>
+            </div>
+            <button class="btn btn-ghost" style="color: rgba(255, 255, 255, 0.6)" (click)="clearDonor()">Change</button>
+            <button class="btn btn-success btn-lg" (click)="st.nextStep()">Continue →</button>
+          </div>
+        }
+      }
+
+      <!-- Enroll form -->
+      @if (showEnroll()) {
+        <div class="card enroll-card">
+          <div class="card-header">
+            <div class="card-title">Enroll New Donor</div>
+            <div class="card-subtitle">Name + phone or email required</div>
+          </div>
+          <div class="enroll-grid">
+            <div class="form-group">
+              <label class="form-label">First Name *</label>
+              <input class="form-input" [(ngModel)]="enrollForm.firstName" placeholder="First name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name *</label>
+              <input class="form-input" [(ngModel)]="enrollForm.lastName" placeholder="Last name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone *</label>
+              <input class="form-input" [(ngModel)]="enrollForm.phone" placeholder="(555) 000-0000" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" [(ngModel)]="enrollForm.email" placeholder="optional" />
+            </div>
+          </div>
+          <div class="enroll-actions">
+            <button class="btn btn-secondary" (click)="showEnroll.set(false)">Cancel</button>
+            <button class="btn btn-primary" (click)="enrollDonor()">Enroll & Continue →</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ─── STEP 2: Donation Type ─── -->
+  @if (st.step() === 2) {
+    <div class="page-content anim-in">
+      <div class="dtype-host">
+        @if (st.donor()) {
+          <div class="dtype-heading">What would {{ st.donor()!.displayName }} like to do today?</div>
+        } @else {
+          <div class="dtype-heading">How would you like to donate today?</div>
+        }
+        <div class="dtype-grid">
+          <button class="dtype-card" (click)="selectType(DT.Items)">
+            <div class="dtype-icon">&#128230;</div>
+            <div class="dtype-title">Donate Items</div>
+            <div class="dtype-desc">Clothing, electronics, furniture and more</div>
+            <div class="dtype-cta">Select &#8594;</div>
+          </button>
+          <button class="dtype-card" (click)="selectType(DT.Monetary)">
+            <div class="dtype-icon">&#128181;</div>
+            <div class="dtype-title">Monetary Donation</div>
+            <div class="dtype-desc">Cash, credit card, or tap-to-pay</div>
+            <div class="dtype-cta">Select &#8594;</div>
+          </button>
+          <button class="dtype-card" (click)="selectType(DT.Both)">
+            <div class="dtype-icon">&#127873;</div>
+            <div class="dtype-title">Items &amp; Monetary</div>
+            <div class="dtype-desc">Donate goods and make a payment together</div>
+            <div class="dtype-cta">Select &#8594;</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ─── STEP 3 / Add Items ─── -->
+  @if (isAddItemsStep()) {
+    <div class="step2-host anim-in">
+      <!-- Summary bar -->
+      <div class="summary-bar">
+        <div class="sb-stat">
+          <div class="sb-val">{{ st.totalItems() }}</div>
+          <div class="sb-lbl">Items</div>
+        </div>
+        @if (st.donor()) {
+          <div class="sb-divider"></div>
+          <div class="sb-stat">
+            <div class="sb-val">+{{ st.estPoints() }}</div>
+            <div class="sb-lbl">Points</div>
+          </div>
+        }
+        <label class="presort-toggle">
+          <input type="checkbox" [checked]="st.isPreSorted()" (change)="st.setPreSorted($any($event.target).checked)" />
+          Already Presorted
+        </label>
+
+        <!-- Container chip -->
+        <div class="sb-divider"></div>
+        @if (selectedContainer()) {
+          <div class="sb-container-chip" (click)="showContainerPicker.set(true)">
+            <app-icon name="package" [size]="14"></app-icon>
+            <div class="sbc-info">
+              <span class="sbc-id">{{ selectedContainer()!.barcode }}</span>
+              <span class="sbc-type">{{ containerTypeLabel(selectedContainer()!.containerType) }}</span>
+            </div>
+            <button class="sbc-clear" (click)="$event.stopPropagation(); selectedContainer.set(null)" title="Remove container">×</button>
+          </div>
+        } @else {
+          <button class="sb-container-btn" (click)="showContainerPicker.set(true)">
+            <app-icon name="package" [size]="14"></app-icon>
+            Assign Container
+          </button>
+        }
+
+        <button
+          class="btn btn-success btn-lg"
+          style="margin-left: auto"
+          [disabled]="st.totalItems() === 0"
+          (click)="st.nextStep()"
+        >
+          {{ st.donationType() === DT.Both ? 'Next →' : 'Review →' }}
+        </button>
+      </div>
+
+      <!-- Dept tabs -->
+      <div class="dept-tabs">
+        @for (dept of mockData.departments; track dept.key) {
+          <button class="dept-tab" [class.active]="activeDept() === dept.key" (click)="activeDept.set(dept.key)">
+            {{ dept.name }}
+            @if (deptCount(dept.key) > 0) {
+              <span class="dept-count">{{ deptCount(dept.key) }}</span>
+            }
+          </button>
+        }
+      </div>
+
+      <!-- Category grid -->
+      <div class="cat-scroll">
+        @for (dept of mockData.departments; track dept.key) {
+          @if (activeDept() === dept.key) {
+            <div class="cat-grid anim-in">
+
+              <!-- Dept-level any card (full-width banner) -->
+              <div class="cat-card cat-card-any"
+                   [class.has-items]="getQty(dept.key) > 0"
+                   (click)="adjust(key(dept.key), 1)">
+                <div class="cat-name">{{ dept.name }} <span class="cat-any-tag">Any</span></div>
+                <div class="qty-ctrl" (click)="$event.stopPropagation()">
+                  <button (click)="adjust(key(dept.key), -1)">&#8722;</button>
+                  <span>{{ getQty(dept.key) }}</span>
+                  <button (click)="adjust(key(dept.key), 1)">+</button>
+                </div>
+              </div>
+
+              <!-- One row per category: category card + subcategory cards side-by-side -->
+              @for (cat of dept.categories; track cat.key) {
+                <div class="cat-group">
+                  <div class="cat-card cat-card-cat"
+                       [class.has-items]="getQty(dept.key, cat.key) > 0"
+                       (click)="adjust(key(dept.key, cat.key), 1)">
+                    <div class="cat-name">{{ cat.name }}</div>
+                    <div class="qty-ctrl" (click)="$event.stopPropagation()">
+                      <button (click)="adjust(key(dept.key, cat.key), -1)">&#8722;</button>
+                      <span>{{ getQty(dept.key, cat.key) }}</span>
+                      <button (click)="adjust(key(dept.key, cat.key), 1)">+</button>
+                    </div>
+                  </div>
+                  @for (sub of (cat.subCategories ?? []); track sub.key) {
+                    <div class="cat-card"
+                         [class.has-items]="getQty(dept.key, cat.key, sub.key) > 0"
+                         (click)="adjust(key(dept.key, cat.key, sub.key), 1)">
+                      <div class="cat-name">{{ sub.name }}</div>
+                      <div class="qty-ctrl" (click)="$event.stopPropagation()">
+                        <button (click)="adjust(key(dept.key, cat.key, sub.key), -1)">&#8722;</button>
+                        <span>{{ getQty(dept.key, cat.key, sub.key) }}</span>
+                        <button (click)="adjust(key(dept.key, cat.key, sub.key), 1)">+</button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ─── Add Money Step (step 3 for Monetary-only, step 4 for Both) ─── -->
+  @if (isAddMoneyStep()) {
+    <div class="page-content anim-in">
+      <div class="add-money-host">
+
+        <!-- Amount -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Donation Amount</div>
+            <div class="card-subtitle">Select a preset or enter a custom amount</div>
+          </div>
+          <div class="preset-row">
+            @for (amt of [5, 10, 25, 50, 100]; track amt) {
+              <button class="preset-btn" [class.active]="monetary() === amt" (click)="setMonetary(amt)">
+                ${{ amt }}
+              </button>
+            }
+            <button class="preset-btn" [class.active]="customMon()" (click)="customMon.set(true)">Custom</button>
+          </div>
+          @if (customMon()) {
+            <input
+              class="form-input"
+              type="number"
+              style="margin-top: 10px"
+              placeholder="Enter amount"
+              (input)="setMonetary($any($event.target).valueAsNumber)"
+            />
+          }
+        </div>
+
+        <!-- Payment Method (shown once an amount is set) -->
+        @if ((monetary() ?? 0) > 0) {
+          <div class="card">
+            <div class="card-header"><div class="card-title">Payment Method</div></div>
+            <div class="pay-method-grid">
+              <button class="pay-method-btn" [class.active]="paymentMethod() === 'cash'" (click)="paymentMethod.set('cash')">
+                <span class="pm-icon">&#128181;</span>
+                <span class="pm-label">Cash</span>
+              </button>
+              <button class="pay-method-btn" [class.active]="paymentMethod() === 'card'" (click)="paymentMethod.set('card')">
+                <span class="pm-icon">&#128179;</span>
+                <span class="pm-label">Card / Tap</span>
+              </button>
+            </div>
+
+            @if (paymentMethod() === 'cash') {
+              <div class="cash-flow">
+                <div class="form-group">
+                  <label class="form-label">Cash Tendered</label>
+                  <input
+                    class="form-input"
+                    type="number"
+                    placeholder="0.00"
+                    [value]="cashTendered() ?? ''"
+                    (input)="cashTendered.set($any($event.target).valueAsNumber || null)"
+                  />
+                </div>
+                @if ((cashTendered() ?? 0) > 0) {
+                  @if ((cashTendered()! >= monetary()!)) {
+                    <div class="change-display">
+                      Change Due: <strong>${{ (cashTendered()! - monetary()!).toFixed(2) }}</strong>
+                    </div>
+                  } @else {
+                    <div class="change-insufficient">&#9888; Insufficient — need ${{ monetary()!.toFixed(2) }}</div>
+                  }
+                }
+              </div>
+            }
+
+            @if (paymentMethod() === 'card') {
+              <div class="card-terminal">
+                <div class="terminal-icon">&#128179;</div>
+                <div class="terminal-msg">Tap or insert card on the terminal</div>
+                <div class="terminal-sub">Waiting for customer to tap or swipe...</div>
+              </div>
+            }
+          </div>
+        }
+
+        <button
+          class="btn btn-success btn-lg"
+          style="margin-top: 16px"
+          [disabled]="!canProceedFromMoney()"
+          (click)="st.nextStep()"
+        >
+          Review &#8594;
+        </button>
+
+      </div>
+    </div>
+  }
+
+  <!-- ─── Review Step ─── -->
+  @if (isReviewStep()) {
+    <div class="page-content anim-in">
+      <div class="review-grid" [class.single-col]="st.donationType() === DT.Monetary">
+
+        @if (st.donationType() !== DT.Monetary) {
+          <div class="card receipt-card">
+            <div class="receipt-hdr">
+              <div>
+                <div class="receipt-title">Donation Receipt</div>
+                <div class="receipt-num">{{ receiptNum }}</div>
+              </div>
+            </div>
+            <div class="receipt-items">
+              @for (item of reviewItems(); track item.key) {
+                <div class="receipt-item-row">
+                  <span>{{ item.name }}</span>
+                  <span class="ri-qty">×{{ item.qty }}</span>
+                </div>
+              }
+            </div>
+            <div class="receipt-totals">
+              <div class="rt-row">
+                <span>Total Items</span>
+                <strong>{{ st.totalItems() }}</strong>
+              </div>
+              @if (st.donor()) {
+                <div class="rt-row points">
+                  <span>Points Earned</span>
+                  <strong>+{{ st.estPoints() }}</strong>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="review-right">
+
+          @if (st.donationType() !== DT.Items) {
+            <div class="card">
+              <div class="card-header"><div class="card-title">Payment</div></div>
+              <div class="money-summary">
+                <div class="ms-amount">${{ (monetary() ?? 0).toFixed(2) }}</div>
+                <div class="ms-method">
+                  @if (paymentMethod() === 'cash') { &#128181; Cash }
+                  @if (paymentMethod() === 'card') { &#128179; Card / Tap }
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">Receipt Delivery</div></div>
+            @for (opt of deliveryOpts; track opt.value) {
+              <label class="delivery-opt" [class.active]="delivery() === opt.value">
+                <input
+                  type="radio"
+                  name="del"
+                  [value]="opt.value"
+                  [checked]="delivery() === opt.value"
+                  (change)="delivery.set(opt.value)"
+                />
+                <app-icon [name]="opt.icon" [size]="14"></app-icon>
+                {{ opt.label }}
+              </label>
+            }
+          </div>
+
+          <button class="btn btn-success btn-lg complete-btn" (click)="complete()" [disabled]="!canComplete()">
+            <app-icon name="check-circle" [size]="16"></app-icon>
+            Complete Donation
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Container Picker Modal -->
+<app-modal
+  [open]="showContainerPicker()"
+  title="Assign Container"
+  confirmLabel="Confirm"
+  [showCancel]="true"
+  cancelLabel="Clear Selection"
+  (closed)="selectedContainer.set(null); showContainerPicker.set(false)"
+  (confirmed)="showContainerPicker.set(false)"
+>
+  <div class="cpicker-body">
+    <div class="search-bar" style="margin-bottom: 12px">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="containerSearchQ()" (ngModelChange)="containerSearchQ.set($event)" placeholder="Search by barcode, type or donor..." />
+    </div>
+    @if (availableContainers().length === 0) {
+      <div class="cpicker-empty">No open containers found.</div>
+    } @else {
+      <div class="cpicker-list">
+        @for (c of availableContainers(); track c.id) {
+          <div class="cpicker-row" [class.selected]="selectedContainer()?.id === c.id"
+               (click)="selectedContainer.set(c); showContainerPicker.set(false)">
+            <div class="cpicker-icon">
+              <app-icon name="package" [size]="18"></app-icon>
+            </div>
+            <div class="cpicker-info">
+              <div class="cpicker-barcode">{{ c.barcode }}</div>
+              <div class="cpicker-meta">
+                {{ containerTypeLabel(c.containerType) }} · {{ c.locationName }}
+                @if (c.donorVisitLabel) { · {{ c.donorVisitLabel }} }
+              </div>
+            </div>
+            <div class="cpicker-right">
+              <span class="badge" [class.badge-success]="c.status === CS.Available" [class.badge-info]="c.status === CS.ReadyForSorting" [class.badge-warning]="c.status === CS.Sorting" [class.badge-purple]="c.status === CS.InUse">{{ containerStatusLabel(c.status) }}</span>
+              <span class="cpicker-items">{{ c.totalItems }} items</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</app-modal>
+
+<!-- Donation Confirmation Modal -->
+<app-modal
+  [open]="showConfirmation()"
+  [title]="'Donation Complete!'"
+  confirmText="Done"
+  [showCancel]="false"
+  (closed)="closeConfirmation()"
+  (confirmed)="closeConfirmation()"
+>
+  <div style="text-align: center; padding: 20px">
+
+    <!-- Donation ID + QR -->
+    <div style="margin-bottom: 20px">
+      <h3 style="color: var(--secondary); margin-bottom: 6px">Donation ID</h3>
+      <div style="font-size: 22px; font-weight: 800; color: var(--primary); font-family: monospace; letter-spacing: 2px">
+        {{ donationId() }}
+      </div>
+    </div>
+    <div style="margin-bottom: 20px">
+      <div style="display: inline-block; padding: 14px; background: white; border-radius: 8px; border: 2px solid var(--gray-200)">
+        <app-qr-code [value]="donationId()" [size]="140"></app-qr-code>
+      </div>
+      <div style="font-size: 11px; color: var(--gray-500); margin-top: 6px">Scan to view donation details</div>
+    </div>
+
+    <!-- Donation Summary -->
+    <div style="background: var(--gray-50); border-radius: 8px; padding: 14px; margin-bottom: 16px; text-align: left">
+      <div style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px">Donation Summary</div>
+      @if (st.donationType() !== DT.Monetary) {
+        <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--gray-200)">
+          <span style="font-size: 13px; color: var(--gray-600)">Items Donated</span>
+          <strong style="font-size: 13px">{{ st.totalItems() }} item{{ st.totalItems() === 1 ? '' : 's' }}</strong>
+        </div>
+      }
+      @if (st.donationType() !== DT.Items) {
+        <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--gray-200)">
+          <span style="font-size: 13px; color: var(--gray-600)">Monetary Donation</span>
+          <strong style="font-size: 13px">${{ (monetary() ?? 0).toFixed(2) }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--gray-200)">
+          <span style="font-size: 13px; color: var(--gray-600)">Payment Method</span>
+          <strong style="font-size: 13px">{{ paymentMethod() === 'cash' ? '💵 Cash' : '💳 Card / Tap' }}</strong>
+        </div>
+      }
+      <div style="display: flex; justify-content: space-between; padding: 7px 0">
+        <span style="font-size: 13px; color: var(--gray-600)">Receipt #</span>
+        <strong style="font-size: 13px">{{ receiptNum }}</strong>
+      </div>
+    </div>
+
+    <!-- Points awarded -->
+    @if (st.donor()) {
+      <div style="background: var(--success-light); border: 1px solid var(--success); border-radius: 8px; padding: 14px; margin-bottom: 16px">
+        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px">
+          Points Awarded to {{ st.donor()!.displayName }}
+        </div>
+        <div style="font-size: 12px; color: var(--gray-600)">Thank you for your continued support!</div>
+      </div>
+    }
+
+    <div style="font-size: 12px; color: var(--gray-500)">
+      {{ today | date: 'MMM d, yyyy' }}
+    </div>
+  </div>
+</app-modal>

@@ -1,0 +1,313 @@
+import { IconName } from '../../shared/components/icon/icon.component';
+
+export enum DonorTier       { Bronze = 1, Silver, Gold, Platinum }
+export enum DonationStatus  { Pending = 1, Processing, Completed, Cancelled }
+export enum ContainerStatus { Available = 1, ReadyForSorting, Sorting, InUse }
+export enum ContainerDest   { Production = 1, Reserve, Warehouse, Transfer, Salvage, Ecommerce }
+export enum ItemCondition   { Sellable = 1, NeedsRefurbishment, Salvage, Dispose }
+export enum ContainerType   { Gaylord = 1, CartRack, Pallet, Tote, Baler }
+export enum PresortMethod   { DockSide = 1, Batch }
+export enum PaymentMethod   { CreditCard = 1, DebitCard, ApplePay, GooglePay, Cash }
+export enum ReceiptDelivery { Email = 1, SMS, Print, None }
+export enum LocationStatus  { Open = 1, Closed, Busy }
+export enum StaffRole       { Attendant = 1, PresortWorker, Manager, Admin }
+export enum AppointmentStatus { Scheduled = 1, CheckedIn, Completed, Cancelled, NoShow }
+export enum AppointmentType   { WalkIn = 1, Scheduled, Pickup }
+export enum DonationType      { Items = 1, Monetary, Both }
+
+// ── Display label maps (used by components and templates) ────────────────────
+export const DonorTierLabel: Record<DonorTier, string> = {
+  [DonorTier.Bronze]:   'Bronze',
+  [DonorTier.Silver]:   'Silver',
+  [DonorTier.Gold]:     'Gold',
+  [DonorTier.Platinum]: 'Platinum',
+};
+export const DonationStatusLabel: Record<DonationStatus, string> = {
+  [DonationStatus.Pending]:    'Pending',
+  [DonationStatus.Processing]: 'Processing',
+  [DonationStatus.Completed]:  'Completed',
+  [DonationStatus.Cancelled]:  'Cancelled',
+};
+export const ContainerStatusLabel: Record<ContainerStatus, string> = {
+  [ContainerStatus.Available]:       'Available',
+  [ContainerStatus.ReadyForSorting]: 'Ready for Sorting',
+  [ContainerStatus.Sorting]:         'Sorting',
+  [ContainerStatus.InUse]:           'In Use',
+};
+export const ContainerDestLabel: Record<ContainerDest, string> = {
+  [ContainerDest.Production]: 'Production',
+  [ContainerDest.Reserve]:    'Reserve',
+  [ContainerDest.Warehouse]:  'Warehouse',
+  [ContainerDest.Transfer]:   'Transfer',
+  [ContainerDest.Salvage]:    'Salvage',
+  [ContainerDest.Ecommerce]:  'E-Commerce',
+};
+export const ItemConditionLabel: Record<ItemCondition, string> = {
+  [ItemCondition.Sellable]:            'Sellable',
+  [ItemCondition.NeedsRefurbishment]:  'Needs Refurb',
+  [ItemCondition.Salvage]:             'Salvage',
+  [ItemCondition.Dispose]:             'Dispose',
+};
+export const ContainerTypeLabel: Record<ContainerType, string> = {
+  [ContainerType.Gaylord]:  'Gaylord',
+  [ContainerType.CartRack]: 'Cart / Rack',
+  [ContainerType.Pallet]:   'Pallet',
+  [ContainerType.Tote]:     'Tote / Bin',
+  [ContainerType.Baler]:    'Baler',
+};
+export const PresortMethodLabel: Record<PresortMethod, string> = {
+  [PresortMethod.DockSide]: 'Dock-Side',
+  [PresortMethod.Batch]:    'Batch',
+};
+export const ReceiptDeliveryLabel: Record<ReceiptDelivery, string> = {
+  [ReceiptDelivery.Email]: 'Email',
+  [ReceiptDelivery.SMS]:   'SMS',
+  [ReceiptDelivery.Print]: 'Print',
+  [ReceiptDelivery.None]:  'No Receipt',
+};
+export const LocationStatusLabel: Record<LocationStatus, string> = {
+  [LocationStatus.Open]:   'Open',
+  [LocationStatus.Closed]: 'Closed',
+  [LocationStatus.Busy]:   'Busy',
+};
+export const AppointmentStatusLabel: Record<AppointmentStatus, string> = {
+  [AppointmentStatus.Scheduled]: 'Scheduled',
+  [AppointmentStatus.CheckedIn]: 'Checked In',
+  [AppointmentStatus.Completed]: 'Completed',
+  [AppointmentStatus.Cancelled]: 'Cancelled',
+  [AppointmentStatus.NoShow]:    'No Show',
+};
+export const AppointmentTypeLabel: Record<AppointmentType, string> = {
+  [AppointmentType.WalkIn]:    'Walk-in',
+  [AppointmentType.Scheduled]: 'Scheduled',
+  [AppointmentType.Pickup]:    'Pickup',
+};
+export const DonationTypeLabel: Record<DonationType, string> = {
+  [DonationType.Items]:    'Donate Items',
+  [DonationType.Monetary]: 'Monetary Donation',
+  [DonationType.Both]:     'Items & Monetary',
+};
+
+export interface Donor {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address?: string;
+  loyaltyTier: DonorTier;
+  loyaltyPoints: number;
+  totalDonations: number;
+  lifetimeValue: number;
+  joinDate: Date;
+  lastDonationDate?: Date;
+  preferredLocationId?: string;
+}
+
+export interface SubCategory {
+  key: string;
+  name: string;
+  icon: string;
+  estimatedValue: number;
+}
+
+export interface DonationCategory {
+  key: string;
+  name: string;
+  icon: string;
+  color: string;
+  estimatedValue: number;
+  active: boolean;
+  sortOrder: number;
+  subCategories?: SubCategory[];
+}
+
+/** Mid-level category within a department (donation wizard) */
+export interface DeptCategory {
+  key: string;
+  name: string;
+  estimatedValue: number;
+  subCategories?: SubCategory[];
+}
+
+export interface DonationDepartment {
+  key: string;
+  name: string;
+  icon: string;
+  color: string;
+  estimatedValue: number;
+  active: boolean;
+  sortOrder: number;
+  categories: DeptCategory[];
+}
+
+export interface DonationItem {
+  id: string;
+  donationId: string;
+  categoryKey: string;
+  subCategoryKey?: string;
+  categoryName: string;
+  quantity: number;
+  estimatedValuePerItem: number;
+  totalEstimatedValue: number;
+  condition?: ItemCondition;
+}
+
+export interface Donation {
+  id: string;
+  receiptNumber: string;
+  donorId?: string;
+  donorName?: string;
+  donorInitials?: string;
+  donorTier?: DonorTier;
+  locationId: string;
+  locationName: string;
+  attendantId: string;
+  timestamp: Date;
+  status: DonationStatus;
+  items: DonationItem[];
+  totalItems: number;
+  totalEstimatedValue: number;
+  loyaltyPointsEarned?: number;
+  presortCompleted?: boolean;
+  isPreSorted?: boolean;
+  notes?: string;
+}
+
+export interface ContainerContent {
+  categoryKey: string;
+  categoryName: string;
+  quantity: number;
+  condition: ItemCondition;
+  ecommerceQty?: number;
+}
+
+export interface Container {
+  id: string;
+  barcode: string;
+  donationId?: string;
+  donationReceiptNumber?: string;
+  donorVisitLabel?: string;
+  presortWorkerName?: string;
+  containerType: ContainerType;
+  presortMethod?: PresortMethod;
+  contents: ContainerContent[];
+  destination?: ContainerDest;
+  status: ContainerStatus;
+  /** Primary department this container is sorted into */
+  deptKey?: string;
+  deptName?: string;
+  /** Optional sub-category within the department */
+  catKey?: string;
+  catName?: string;
+  locationId: string;
+  locationName: string;
+  createdAt: Date;
+  updatedAt: Date;
+  presortedAt?: Date;
+  totalItems: number;
+  totalEstimatedValue: number;
+  salvageWeightLbs?: number;
+  isSeasonal?: boolean;
+  seasonalTag?: string;
+  parentContainerId?: string;
+  notes?: string;
+  closedAt?: Date;
+  transferToLocationId?: string;
+  transferToLocationName?: string;
+  mergedContainerIds?: string[];
+}
+
+export interface Location {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  managerName?: string;
+  staffCount: number;
+  status: LocationStatus;
+  hours: string;
+  donationsToday: number;
+  itemsToday: number;
+  revenueToday?: number;
+}
+
+export interface TrendPoint {
+  label: string;
+  count: number;
+  value: number;
+}
+export interface CategoryBreak {
+  categoryKey: string;
+  categoryName: string;
+  color: string;
+  count: number;
+  percentage: number;
+}
+export interface LocationPerf {
+  locationId: string;
+  locationName: string;
+  totalValue: number;
+  percentage: number;
+}
+
+export interface AnalyticsSummary {
+  totalDonations: number;
+  totalValue: number;
+  activeDonors: number;
+  avgProcessTimeMin: number;
+  newDonorsThisMonth: number;
+  repeatDonorRate: number;
+  monetaryDonationVolume: number;
+  identificationRate: number;
+  trends: TrendPoint[];
+  categoryBreakdown: CategoryBreak[];
+  topLocations: LocationPerf[];
+}
+
+export interface LoyaltyTierConfig {
+  tier: DonorTier;
+  label: string;
+  icon: IconName;
+  minDonations: number;
+  pointsMultiplier: number;
+  color: string;
+  bgColor: string;
+  perks: string[];
+}
+
+export interface StaffSession {
+  staffId: string;
+  staffName: string;
+  role: StaffRole;
+  locationId: string;
+  locationName: string;
+}
+
+export interface ToastModel {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message: string;
+}
+
+// AppointmentStatus and AppointmentType are declared as enums above with the other enums.
+export interface ScheduledAppointment {
+  id: string;
+  donorId?: string;
+  donorName: string;
+  donorPhone?: string;
+  donorEmail?: string;
+  address?: string;
+  locationId?: string;
+  locationName?: string;
+  type: AppointmentType;
+  date: Date;
+  timeSlot: string;
+  status: AppointmentStatus;
+  itemCount?: number;
+  categories?: string[];
+  recurring?: string;
+  notes?: string;
+  createdAt: Date;
+}

@@ -1,0 +1,114 @@
+import { Component, inject, signal, computed } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { MockDataService } from '../../../../../core/services/mock-data.service';
+import { ToastService } from '../../../../../core/services/toast.service';
+import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
+import { QrCodeComponent } from '../../../../../shared/components/qr-code/qr-code.component';
+import { ScheduledAppointment, AppointmentStatus, AppointmentType,
+  AppointmentStatusLabel, AppointmentTypeLabel } from '../../../../../core/models/domain.models';
+
+@Component({
+  selector: 'app-donations',
+  standalone: true,
+  imports: [FormsModule, DatePipe, ModalComponent, IconComponent, QrCodeComponent],
+  templateUrl: './donations.component.html',
+  styleUrl: './donations.component.scss'
+})
+export class DonationsComponent {
+  protected mockData = inject(MockDataService);
+  protected toast = inject(ToastService);
+  private router = inject(Router);
+
+  // expose for template
+  protected readonly AS = AppointmentStatus;
+  protected readonly AT = AppointmentType;
+
+  protected query = '';
+  protected statusFilter: AppointmentStatus | '' = '';
+  protected dateFilter = '';
+
+  protected selected = signal<ScheduledAppointment | null>(null);
+
+  readonly allAppointments = computed(() => this.mockData.getAppointments());
+
+  readonly filtered = computed(() => {
+    const q = this.query.toLowerCase();
+    return this.allAppointments().filter(a => {
+      const mQ = !q
+        || a.donorName.toLowerCase().includes(q)
+        || a.id.toLowerCase().includes(q)
+        || (a.locationName ?? '').toLowerCase().includes(q)
+        || (a.notes ?? '').toLowerCase().includes(q);
+      const mS = !this.statusFilter || a.status === this.statusFilter;
+      const mD = !this.dateFilter || a.date.toISOString().startsWith(this.dateFilter);
+      return mQ && mS && mD;
+    });
+  });
+
+  readonly counts = computed(() => {
+    const appts = this.allAppointments();
+    return {
+      scheduled: appts.filter(a => a.status === AppointmentStatus.Scheduled).length,
+      checkedIn: appts.filter(a => a.status === AppointmentStatus.CheckedIn).length,
+      completed: appts.filter(a => a.status === AppointmentStatus.Completed).length,
+      cancelled: appts.filter(a => a.status === AppointmentStatus.Cancelled).length,
+      total: appts.length,
+    };
+  });
+
+  statusLabel(s: AppointmentStatus): string {
+    return AppointmentStatusLabel[s] ?? String(s);
+  }
+
+  statusBadge(s: AppointmentStatus): string {
+    const m: Record<AppointmentStatus, string> = {
+      [AppointmentStatus.Scheduled]: 'badge-info',
+      [AppointmentStatus.CheckedIn]: 'badge-warning',
+      [AppointmentStatus.Completed]: 'badge-success',
+      [AppointmentStatus.Cancelled]: 'badge-danger',
+      [AppointmentStatus.NoShow]:    'badge-gray',
+    };
+    return m[s] ?? 'badge-gray';
+  }
+
+  typeBadge(type: AppointmentType): string {
+    const m: Record<AppointmentType, string> = {
+      [AppointmentType.Scheduled]: 'badge-purple',
+      [AppointmentType.WalkIn]:    'badge-gray',
+      [AppointmentType.Pickup]:    'badge-warning',
+    };
+    return m[type] ?? 'badge-gray';
+  }
+
+  typeLabel(type: AppointmentType): string {
+    return AppointmentTypeLabel[type] ?? String(type);
+  }
+
+  openDetail(a: ScheduledAppointment): void {
+    this.selected.set(a);
+  }
+
+  closeDetail(): void {
+    this.selected.set(null);
+  }
+
+  checkIn(a: ScheduledAppointment): void {
+    this.toast.success('Checked In', `${a.donorName} has been checked in.`);
+    this.selected.set(null);
+    this.router.navigate(['/staff/new-donation']);
+  }
+
+  markComplete(a: ScheduledAppointment): void {
+    this.toast.success('Completed', `Appointment ${a.id} marked as completed.`);
+    this.selected.set(null);
+  }
+
+  markCancelled(a: ScheduledAppointment, event: Event): void {
+    event.stopPropagation();
+    this.toast.info('Cancelled', `Appointment ${a.id} cancelled.`);
+  }
+
+}

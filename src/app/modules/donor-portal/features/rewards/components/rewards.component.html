@@ -1,0 +1,150 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Loyalty & Rewards</div>
+    <div class="topbar-subtitle">{{ donor.loyaltyPoints | number }} points available</div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="pts-hero">
+    <div class="ph-left">
+      <div class="ph-label">Available Points</div>
+      <div class="ph-num">{{ donor.loyaltyPoints | number }}</div>
+      <div style="font-size: 13px; opacity: 0.7">
+        Earning at {{ tier.pointsMultiplier }}× rate ({{ tier.label }} tier)
+      </div>
+    </div>
+    <div class="ph-actions">
+      <button class="btn btn-success" (click)="toast.info('Redeem', 'Opening redemption catalogue...')">
+        Redeem Points
+      </button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 20px">
+    <div class="card-title" style="margin-bottom: 16px">Tier Progress</div>
+    <div class="tier-track">
+      @for (t of svc.loyaltyTiers; track t.tier) {
+        <div class="tier-stop" [class.current]="t.tier === donor.loyaltyTier" [class.achieved]="isAchieved(t.tier)">
+          <div class="ts-icon"><app-icon [name]="t.icon" [size]="20"></app-icon></div>
+          <div class="ts-label">{{ t.label }}</div>
+          <div class="ts-min">{{ t.minDonations }}+ visits</div>
+        </div>
+        @if (!$last) {
+          <div class="tier-conn" [class.filled]="isAchieved(t.tier)"></div>
+        }
+      }
+    </div>
+    @if (nextTier) {
+      <div style="margin-top: 14px; font-size: 13px; color: var(--gray-600)">
+        You have
+        <strong>{{ donor.totalDonations }} visits</strong>
+        .
+        <strong>{{ nextTier.minDonations - donor.totalDonations }}</strong>
+        more to reach
+        <app-icon [name]="nextTier.icon" [size]="14" style="margin: 0 2px"></app-icon>
+        {{ nextTier.label }}.
+      </div>
+    }
+  </div>
+
+  <div class="rewards-grid">
+    <div class="card">
+      <div class="card-title" style="margin-bottom: 4px">Redeem Rewards</div>
+      <div class="card-subtitle" style="margin-bottom: 14px">Donor-exclusive — no shopping required</div>
+      @for (r of catalogue; track r.title) {
+        <div class="reward-row" [class.can-redeem]="donor.loyaltyPoints >= r.cost">
+          <span style="width: 36px; text-align: center; flex-shrink: 0">
+            <app-icon [name]="r.icon" [size]="26"></app-icon>
+          </span>
+          <div style="flex: 1">
+            <div style="font-weight: 700; font-size: 13px">{{ r.title }}</div>
+            <div style="font-size: 11px; color: var(--gray-500)">{{ r.desc }}</div>
+          </div>
+          <div style="text-align: right">
+            <div style="font-weight: 800; color: var(--primary)">{{ r.cost | number }} pts</div>
+            <button
+              class="btn btn-primary btn-sm"
+              style="margin-top: 4px"
+              [disabled]="donor.loyaltyPoints < r.cost"
+              (click)="openRedeemModal(r)"
+            >
+              {{ donor.loyaltyPoints >= r.cost ? 'Redeem' : 'Need more' }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <div class="card">
+        <div class="card-title" style="margin-bottom: 12px">Points History</div>
+        @for (entry of pointsLog; track entry.date) {
+          <div class="points-row">
+            <app-icon [name]="entry.icon" [size]="18"></app-icon>
+            <div style="flex: 1">
+              <div style="font-weight: 600; font-size: 13px">{{ entry.label }}</div>
+              <div style="font-size: 11px; color: var(--gray-500)">{{ entry.date }}</div>
+            </div>
+            <span
+              [style.color]="entry.delta > 0 ? 'var(--secondary)' : 'var(--danger)'"
+              style="font-weight: 800; font-size: 14px"
+            >
+              {{ entry.delta > 0 ? '+' : '' }}{{ entry.delta | number }}
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Redeem Confirmation Modal -->
+<app-modal
+  [open]="showRedeemModal()"
+  [title]="'Confirm Redemption'"
+  confirmText="Confirm Redeem"
+  cancelText="Cancel"
+  (closed)="closeRedeemModal()"
+  (confirmed)="confirmRedeem()"
+>
+  @if (selectedReward()) {
+    <div style="padding: 20px">
+      <div style="text-align: center; margin-bottom: 24px">
+        <div style="font-size: 48px; margin-bottom: 12px">{{ selectedReward()!.icon }}</div>
+        <h3 style="color: var(--primary); margin-bottom: 8px">{{ selectedReward()!.title }}</h3>
+        <p style="color: var(--gray-600); font-size: 14px">{{ selectedReward()!.desc }}</p>
+      </div>
+
+      <div style="background: var(--gray-50); border-radius: 8px; padding: 16px; margin-bottom: 16px">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px">
+          <span style="font-weight: 600; color: var(--gray-700)">Required Points:</span>
+          <span style="font-weight: 800; color: var(--primary)">{{ selectedReward()!.cost | number }} pts</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px">
+          <span style="font-weight: 600; color: var(--gray-700)">Your Balance:</span>
+          <span style="font-weight: 800; color: var(--secondary)">{{ donor.loyaltyPoints | number }} pts</span>
+        </div>
+        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--gray-300)" />
+        <div style="display: flex; justify-content: space-between">
+          <span style="font-weight: 700; color: var(--gray-800)">After Redemption:</span>
+          <span style="font-weight: 800; color: var(--info)">
+            {{ donor.loyaltyPoints - selectedReward()!.cost | number }} pts
+          </span>
+        </div>
+      </div>
+
+      <div
+        style="background: var(--warning-light); border: 1px solid var(--warning); border-radius: 8px; padding: 12px"
+      >
+        <div style="display: flex; align-items: start; gap: 8px">
+          <span style="font-size: 18px">ℹ️</span>
+          <div style="font-size: 12px; color: var(--gray-700)">
+            <strong>Note:</strong>
+            Redemption is final and cannot be undone. You'll receive confirmation via email within 24 hours.
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</app-modal>

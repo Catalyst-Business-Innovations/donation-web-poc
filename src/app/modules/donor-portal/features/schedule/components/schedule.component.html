@@ -1,0 +1,304 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Schedule Donation</div>
+    <div class="topbar-subtitle">Pre-plan your visit and set up a Giving cart</div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="sched-grid">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Choose Store & Time</div></div>
+
+      <div class="form-group">
+        <label class="form-label">Store *</label>
+        <select class="form-select" [(ngModel)]="selLocation">
+          <option value="">Select a store...</option>
+          @for (loc of svc.locations; track loc.id) {
+            <option [value]="loc.id" [disabled]="loc.status === LS.Closed">
+              {{ loc.name }} — {{ loc.address }} {{ loc.status === LS.Closed ? '(Closed)' : '' }}
+            </option>
+          }
+        </select>
+      </div>
+
+      @if (selLocation) {
+        @for (loc of svc.locations; track loc.id) {
+          @if (loc.id === selLocation) {
+            <div class="loc-preview">
+              <div>
+                <div style="font-weight: 700">{{ loc.name }}</div>
+                <div style="font-size: 12px; color: var(--gray-600)">{{ loc.address }}</div>
+                <div style="font-size: 12px; color: var(--gray-600); margin-top: 2px">🕐 {{ loc.hours }}</div>
+              </div>
+              <span class="badge {{ loc.status === LS.Open ? 'badge-success' : 'badge-warning' }}">
+                {{ LSL[loc.status] }}
+              </span>
+            </div>
+          }
+        }
+      }
+
+      <div class="date-time-grid">
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input class="form-input" type="date" [(ngModel)]="selDate" [min]="today" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred Time</label>
+          <select class="form-select" [(ngModel)]="selTime">
+            <option value="">Any time</option>
+            @for (s of timeSlots; track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Notes for Staff</label>
+        <textarea
+          class="form-input form-textarea"
+          [(ngModel)]="notes"
+          placeholder="e.g. 'Large furniture piece' or 'Blue SUV'"
+        ></textarea>
+      </div>
+      <button
+        class="btn btn-success btn-lg"
+        style="width: 100%"
+        [disabled]="!selLocation || !selDate"
+        (click)="submit()"
+      >
+        Schedule Donation
+      </button>
+    </div>
+
+    <div class="right-col">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🛒 Giving Cart</div>
+            <div class="card-subtitle">Add items to speed up check-in</div>
+          </div>
+          <button class="btn btn-primary btn-sm" (click)="showAdd.set(true)">+ Add Item</button>
+        </div>
+
+        @if (cart().length === 0) {
+          <div class="empty-state" style="padding: 24px">
+            <div class="empty-state-icon" style="font-size: 36px">🛒</div>
+            <div class="empty-state-title">Cart is empty</div>
+            <div class="empty-state-text">Add items you plan to bring.</div>
+          </div>
+        } @else {
+          @for (item of cart(); track item.id) {
+            <div class="cart-row">
+              <div style="flex: 1">
+                <div style="font-weight: 700; font-size: 13px">{{ item.category }}</div>
+                @if (item.description) {
+                  <div style="font-size: 11px; color: var(--gray-500)">{{ item.description }}</div>
+                }
+              </div>
+              <span style="font-family: var(--font-mono); font-weight: 700">×{{ item.qty }}</span>
+              <button class="btn-icon danger" (click)="removeCartItem(item.id)">
+                <app-icon name="close" size="14" />
+              </button>
+            </div>
+          }
+          <div class="cart-total">{{ totalCartItems }} items total</div>
+        }
+
+        @if (showAdd()) {
+          <div class="add-item-form">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" [(ngModel)]="newItem.category">
+                <option value="">Select...</option>
+                @for (cat of svc.categories.slice(0, 8); track cat.key) {
+                  <option [value]="cat.name">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="add-row">
+              <div class="form-group" style="flex: 1; margin: 0">
+                <label class="form-label">Description</label>
+                <input class="form-input" [(ngModel)]="newItem.description" placeholder="e.g. Winter jackets" />
+              </div>
+              <div class="form-group" style="width: 80px; margin: 0">
+                <label class="form-label">Qty</label>
+                <input class="form-input" type="number" min="1" [(ngModel)]="newItem.qty" />
+              </div>
+            </div>
+            <div class="add-actions">
+              <button class="btn btn-primary" (click)="addCartItem()">Add</button>
+              <button class="btn btn-secondary" (click)="showAdd.set(false)">Cancel</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom: 12px">Upcoming Donations</div>
+        @for (s of upcoming; track s.date) {
+          <div class="upcoming-row upcoming-row-click" (click)="viewVisit(s)">
+            <div class="up-date">
+              <div class="up-day">{{ s.day }}</div>
+              <div class="up-month">{{ s.month }}</div>
+            </div>
+            <div style="flex: 1">
+              <div style="font-weight: 700; font-size: 13px">{{ s.location }}</div>
+              <div style="font-size: 11px; color: var(--gray-500)">{{ s.time }} · {{ s.items }} items planned</div>
+            </div>
+            <app-icon name="arrow-right" size="14" style="color: var(--gray-400)" />
+            <button
+              class="btn-icon danger"
+              (click)="$event.stopPropagation(); toast.info('Cancelled', 'Scheduled donation cancelled.')"
+              title="Cancel"
+            >
+              <app-icon name="close" size="14" />
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Visit Detail Modal -->
+<app-modal
+  [open]="!!selectedVisit()"
+  title="Appointment Details"
+  confirmLabel="Close"
+  [showCancel]="false"
+  (closed)="closeVisitDetail()"
+  (confirmed)="closeVisitDetail()"
+>
+  @if (selectedVisit()) {
+    <div class="visit-detail">
+      <!-- Appointment ID -->
+      <div class="apt-id-block">
+        <div class="apt-id-label">Appointment ID</div>
+        <div class="apt-id-value">{{ selectedVisit()!.id }}</div>
+      </div>
+
+      <!-- QR Code -->
+      <div class="qr-wrap">
+        <div class="qr-frame">
+          <app-qr-code [value]="selectedVisit()!.id" [size]="162"></app-qr-code>
+        </div>
+        <div class="qr-hint">Show this at check-in to speed up processing</div>
+      </div>
+
+      <!-- Details grid -->
+      <div class="apt-detail-grid">
+        <div class="apt-row">
+          <span class="apt-key">📍 Store</span>
+          <strong class="apt-val">{{ selectedVisit()!.location }}</strong>
+        </div>
+        <div class="apt-row">
+          <span class="apt-key">📅 Date</span>
+          <strong class="apt-val">{{ selectedVisit()!.date | date: 'MMMM d, yyyy' }}</strong>
+        </div>
+        <div class="apt-row">
+          <span class="apt-key">🕐 Time</span>
+          <strong class="apt-val">{{ selectedVisit()!.time }}</strong>
+        </div>
+        @if (selectedVisit()!.recurring) {
+          <div class="apt-row">
+            <span class="apt-key">🔁 Frequency</span>
+            <strong class="apt-val">{{ selectedVisit()!.recurring }}</strong>
+          </div>
+        }
+        <div class="apt-row">
+          <span class="apt-key">📦 Items Planned</span>
+          <strong class="apt-val">{{ selectedVisit()!.items }}</strong>
+        </div>
+        @if (selectedVisit()!.notes) {
+          <div class="apt-row">
+            <span class="apt-key">📝 Notes</span>
+            <span class="apt-val">{{ selectedVisit()!.notes }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</app-modal>
+
+<!-- Schedule Confirmation Modal -->
+<app-modal
+  [open]="showConfirmation()"
+  [title]="'📅 Donation Scheduled!'"
+  confirmText="Done"
+  [showCancel]="false"
+  (closed)="closeConfirmation()"
+  (confirmed)="closeConfirmation()"
+>
+  <div style="text-align: center; padding: 20px">
+    <div style="margin-bottom: 24px">
+      <h3 style="color: var(--secondary); margin-bottom: 8px">Appointment ID</h3>
+      <div
+        style="font-size: 24px; font-weight: 800; color: var(--primary); font-family: monospace; letter-spacing: 2px"
+      >
+        {{ confirmationId() }}
+      </div>
+    </div>
+
+      <div style="margin-bottom: 24px">
+        <div style="display: inline-block; padding: 16px; background: white; border-radius: 8px; border: 2px solid var(--gray-200)">
+          <app-qr-code [value]="confirmationId()" [size]="160"></app-qr-code>
+        </div>
+        <div style="font-size: 11px; color: var(--gray-500); margin-top: 8px">
+          Scan at check-in to speed up processing
+        </div>
+      </div>
+
+    <div
+      style="
+        background: var(--info-light);
+        border: 1px solid var(--info);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        text-align: left;
+      "
+    >
+      <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--primary)">
+        📍 Appointment Details
+      </div>
+      <div style="display: grid; gap: 8px">
+        <div style="display: flex; justify-content: space-between">
+          <span style="color: var(--gray-600); font-size: 13px">Store:</span>
+          <strong style="font-size: 13px">{{ confirmationData().location }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between">
+          <span style="color: var(--gray-600); font-size: 13px">Date:</span>
+          <strong style="font-size: 13px">{{ confirmationData().date | date: 'MMMM d, yyyy' }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between">
+          <span style="color: var(--gray-600); font-size: 13px">Time:</span>
+          <strong style="font-size: 13px">{{ confirmationData().time }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between">
+          <span style="color: var(--gray-600); font-size: 13px">Frequency:</span>
+          <strong style="font-size: 13px">{{ confirmationData().recurring }}</strong>
+        </div>
+        @if (confirmationData().items > 0) {
+          <div style="display: flex; justify-content: space-between">
+            <span style="color: var(--gray-600); font-size: 13px">Items in Cart:</span>
+            <strong style="font-size: 13px">{{ confirmationData().items }}</strong>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div style="background: var(--success-light); border: 1px solid var(--success); border-radius: 8px; padding: 12px">
+      <div style="display: flex; align-items: start; gap: 8px">
+        <span style="font-size: 18px">✅</span>
+        <div style="font-size: 12px; color: var(--gray-700); text-align: left">
+          <strong>Confirmation sent!</strong>
+          Check your email for appointment details and directions. You'll receive a reminder 24 hours before your
+          scheduled time.
+        </div>
+      </div>
+    </div>
+  </div>
+</app-modal>

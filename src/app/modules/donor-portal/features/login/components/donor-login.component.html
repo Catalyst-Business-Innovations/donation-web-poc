@@ -1,0 +1,59 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-logo">🎁</div>
+      <div class="brand-name">Brijjworks</div>
+      <div class="brand-sub">Donor Portal</div>
+    </div>
+
+    <h2 class="login-title">Welcome back</h2>
+    <p class="login-sub">Sign in to view your donations, rewards and receipts</p>
+
+    @if (error()) {
+      <div class="login-error">{{ error() }}</div>
+    }
+
+    <form class="login-form" (ngSubmit)="login()">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input
+          class="form-input"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" style="display: flex; justify-content: space-between">
+          <span>Password</span>
+          <a href="#" class="forgot-link" (click)="$event.preventDefault()">Forgot password?</a>
+        </label>
+        <input
+          class="form-input"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+
+      <button class="btn btn-primary btn-login" type="submit" [disabled]="loading()">
+        @if (loading()) {
+          Signing in…
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <p class="login-footer">Not a donor yet? Visit any Brijjworks store to register.</p>
+
+    <a routerLink="/" class="back-link">← Back to Home</a>
+  </div>
+</div>

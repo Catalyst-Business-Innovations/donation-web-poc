@@ -1,0 +1,13 @@
+# Build output
+dist/
+.angular/
+
+# Dependencies
+node_modules/
+
+# Generated files
+*.js.map
+coverage/
+
+# Environment files (may contain sensitive values)
+src/environments/environment.prod.ts

@@ -1,0 +1,144 @@
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 30px;
+  padding: 45px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow:
+    0px 8px 8px -4px #17171708,
+    0px 20px 24px -4px #17171714;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 28px;
+  .brand-logo {
+    font-size: 48px;
+    margin-bottom: 8px;
+  }
+  .brand-name {
+    font-size: 22px;
+    font-weight: 900;
+    color: #141414;
+    letter-spacing: -0.5px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+  .brand-sub {
+    font-size: 13px;
+    color: #999;
+    margin-top: 2px;
+  }
+}
+
+.login-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #141414;
+  margin: 0 0 6px;
+  text-align: center;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.login-sub {
+  font-size: 14px;
+  color: #676767;
+  text-align: center;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+
+.login-error {
+  background: #fef3f2;
+  color: #f04438;
+  border: 1px solid #ffcdc9;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #141414;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.form-input {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  &:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+  }
+}
+
+.forgot-link {
+  font-size: 12px;
+  color: #0070b9;
+  text-decoration: underline;
+  font-weight: 600;
+  &:hover {
+    color: #175f91;
+  }
+}
+
+.btn-login {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 8px;
+  background: #667eea;
+  border-radius: 12px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: #5a6fd6;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.login-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  margin: 24px 0 0;
+  line-height: 1.5;
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #757575;
+  text-decoration: none;
+  &:hover {
+    color: #667eea;
+  }
+}

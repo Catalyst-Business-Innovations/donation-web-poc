@@ -1,0 +1,75 @@
+<div class="sl-shell">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sl-sidebar">
+    <div class="sl-logo">
+      <img src="../../../assets/brijjlogo.svg" alt="Brijjworks" class="sl-logo-img" />
+      <div class="sl-logo-text">
+        <div class="sl-logo-brand">Brijjworks</div>
+        <div class="sl-logo-sub">{{ moduleLabel }}</div>
+      </div>
+    </div>
+
+    <nav class="sl-nav">
+      @for (sec of sections; track sec.title) {
+        <div class="sl-section">
+          <div class="sl-section-title">{{ sec.title }}</div>
+          @for (item of sec.items; track item.route) {
+            <a class="sl-item" [routerLink]="item.route" routerLinkActive="active">
+              <app-icon [name]="item.icon" [size]="16" class="sl-item-icon"></app-icon>
+              <span class="sl-item-label">{{ item.label }}</span>
+              @if (item.badge) {
+                <span class="sl-badge">{{ item.badge }}</span>
+              }
+            </a>
+          }
+        </div>
+      }
+    </nav>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="sl-main">
+    <!-- Navbar -->
+    <header class="sl-navbar">
+      <h4 class="sl-navbar-title">{{ activeCrumb }}</h4>
+
+      <div class="sl-profile-wrap" (click)="toggleDropdown($event)">
+        <div class="sl-profile">
+          <div class="sl-avatar">{{ userInitials }}</div>
+          <div class="sl-user-info">
+            <div class="sl-user-name">{{ userName }}</div>
+            <div class="sl-user-role">{{ userRole }}</div>
+          </div>
+          <svg
+            class="sl-arrow"
+            [class.open]="dropdownOpen"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+
+        @if (dropdownOpen) {
+          <div class="sl-dropdown" (click)="$event.stopPropagation()">
+            @if (storeName) {
+              <div class="sl-dd-header">{{ storeName }}</div>
+            }
+            @if (logoutRoute) {
+              <a [routerLink]="logoutRoute" class="sl-dd-item sl-dd-danger">Sign Out</a>
+            }
+          </div>
+        }
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="sl-content">
+      <ng-content />
+    </div>
+  </div>
+</div>

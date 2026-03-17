@@ -1,0 +1,607 @@
+﻿<div class="topbar">
+  <div>
+    <div class="topbar-title">Container Management</div>
+    <div class="topbar-subtitle">Track containers through the full production chain</div>
+  </div>
+  <div class="topbar-actions">
+    @if (selectionCount() > 0) {
+      <span class="sel-count">{{ selectionCount() }} selected</span>
+      <button class="btn btn-secondary btn-sm" (click)="clearSelection()">Deselect All</button>
+      <button class="btn btn-secondary btn-sm" (click)="openMerge()" [disabled]="selectionCount() < 2">Merge</button>
+      <button class="btn btn-secondary btn-sm" (click)="openBulkStatus()">Bulk Status</button>
+    }
+    <button class="btn btn-secondary" (click)="toast.info('Print', 'Use individual Print Label buttons to print.')">Print Labels</button>
+    <button class="btn btn-primary" (click)="openCreate()">+ New Container</button>
+  </div>
+</div>
+
+<div class="page-content">
+  
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-bar" style="flex: 1; max-width: 360px">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [(ngModel)]="query" placeholder="Search barcode, dept, or location..." />
+    </div>
+    <select class="form-select f-sel" [(ngModel)]="deptFilter">
+      <option value="">All Departments</option>
+      @for (d of mockData.departments; track d.key) {
+        <option [value]="d.key">{{ d.name }}</option>
+      }
+    </select>
+    <select class="form-select f-sel" [(ngModel)]="statusFilter">
+      <option [value]="''">All Statuses</option>
+      <option [value]="CS.Available">Available</option>
+      <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
+      <option [value]="CS.Sorting">Sorting</option>
+      <option [value]="CS.InUse">In Use</option>
+    </select>
+    <select class="form-select f-sel" [(ngModel)]="destFilter">
+      <option [value]="''">All Destinations</option>
+      <option [value]="CD.Production">Production</option>
+      <option [value]="CD.Reserve">Reserve</option>
+      <option [value]="CD.Warehouse">Warehouse</option>
+      <option [value]="CD.Ecommerce">E-Commerce</option>
+      <option [value]="CD.Salvage">Salvage</option>
+      <option [value]="CD.Transfer">Transfer</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="check-col">
+              <input type="checkbox" [checked]="allSelected()" (change)="toggleSelectAll()" />
+            </th>
+            <th>Ref #</th>
+            <th>Type</th>
+            <th>Department</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Destination</th>
+            <th>Items</th>
+            <th>Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of filtered(); track c.id) {
+            <tr [class.row-selected]="isSelected(c.id)">
+              <td class="check-col" (click)="$event.stopPropagation()">
+                <input type="checkbox" [checked]="isSelected(c.id)" (change)="toggleSelect(c.id)" />
+              </td>
+              <td class="clickable-cell" (click)="openDetail(c)">
+                <div class="barcode-cell">{{ c.barcode }}</div>
+                @if (c.donorVisitLabel) {
+                  <div class="donor-label">{{ c.donorVisitLabel }}</div>
+                }
+              </td>
+              <td><span class="type-badge">{{ CTL[c.containerType] }}</span></td>
+              <td>
+                @if (c.deptName) {
+                  <span class="badge badge-info" style="font-size: 11px">{{ c.deptName }}</span>
+                } @else {
+                  <span class="text-muted"></span>
+                }
+              </td>
+              <td>
+                @if (c.catName) {
+                  <span style="font-size: 12px">{{ c.catName }}</span>
+                } @else {
+                  <span class="text-muted">Any</span>
+                }
+              </td>
+              <td>
+                <span class="badge {{ mapper.statusBadge(c.status) }}">{{ mapper.statusLabel(c.status) }}</span>
+              </td>
+              <td>
+                @if (c.destination) {
+                  <span class="badge {{ mapper.destBadge(c.destination) }}">
+                    <app-icon [name]="mapper.destIcon(c.destination)" [size]="12" style="margin-right: 3px"></app-icon>
+                    {{ c.destination }}
+                  </span>
+                  @if (c.transferToLocationName) {
+                    <div style="font-size: 10px; color: var(--gray-500); margin-top: 2px">â†’ {{ c.transferToLocationName }}</div>
+                  }
+                } @else {
+                  <span class="text-muted">TBD</span>
+                }
+              </td>
+              <td>
+                @if (fillPct(c) > 0) {
+                  <div class="fill-bar">
+                    <div class="fill-bar-inner" [style.width.%]="fillPct(c)" [class.fill-full]="fillPct(c) >= 90"></div>
+                  </div>
+                  <div class="fill-label">{{ c.totalItems }} <span class="fill-cap">/ {{ CAPACITY[c.containerType] }}</span></div>
+                } @else {
+                  <span style="font-weight: 700">{{ c.totalItems || '' }}</span>
+                }
+              </td>
+              <td style="font-size: 12px; color: var(--gray-500)">{{ c.updatedAt | date: 'M/d h:mm a' }}</td>
+              <td>
+                <div class="table-actions">
+                  @if (nextStatus(c)) {
+                    <button class="btn-advance" (click)="advanceStatus(c); $event.stopPropagation()" [title]="nextStatusLabel(c)">
+                      {{ nextStatusLabel(c) }}
+                    </button>
+                  }
+                  <button class="btn-icon" title="View Details" (click)="openDetail(c); $event.stopPropagation()">
+                    <app-icon name="eye" size="14" />
+                  </button>
+                  <button class="btn-icon" title="Edit" (click)="openEdit(c); $event.stopPropagation()">
+                    <app-icon name="edit" size="14" />
+                  </button>
+                  <button class="btn-icon" title="Print Label" (click)="printLabel(c); $event.stopPropagation()">
+                    <app-icon name="printer" [size]="14"></app-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (filtered().length === 0) {
+        <div class="empty-state">
+          <div class="empty-state-icon"><app-icon name="layers" [size]="40"></app-icon></div>
+          <div class="empty-state-title">No containers match</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     DETAIL MODAL
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<app-modal
+  [open]="!!viewing()"
+  [title]="(viewing()?.barcode ?? '') + '  Detail'"
+  confirmLabel="Edit Container"
+  cancelLabel="Close"
+  [showCancel]="true"
+  size="lg"
+  (closed)="viewing.set(null)"
+  (confirmed)="openEdit(viewing()!); viewing.set(null)"
+>
+  @if (viewing()) {
+    <!-- Timeline -->
+    <div class="timeline">
+      @for (step of detailTimeline(viewing()!); track step.label) {
+        <div class="tl-step" [class.tl-done]="step.done">
+          <div class="tl-dot">
+            <app-icon [name]="step.icon" size="14" />
+          </div>
+          <div class="tl-body">
+            <div class="tl-label">{{ step.label }}</div>
+            @if (step.time) {
+              <div class="tl-time">{{ step.time | date: 'M/d h:mm a' }}</div>
+            }
+          </div>
+        </div>
+        @if (!$last) { <div class="tl-connector"></div> }
+      }
+    </div>
+
+    <!-- Info grid -->
+    <div class="edit-info-grid" style="margin-top: 16px">
+      <div class="ei-cell">
+        <div class="form-label">Type</div>
+        <span class="type-badge">{{ CTL[viewing()!.containerType] }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Department</div>
+        <span>{{ viewing()!.deptName ?? '' }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Category</div>
+        <span>{{ viewing()!.catName ?? 'Any' }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Status</div>
+        <span class="badge {{ mapper.statusBadge(viewing()!.status) }}">{{ mapper.statusLabel(viewing()!.status) }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Destination</div>
+        @if (viewing()!.destination) {
+          <span class="badge {{ mapper.destBadge(viewing()!.destination!) }}">{{ viewing()!.destination }}</span>
+        } @else {
+          <span class="text-muted">TBD</span>
+        }
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Total Items</div>
+        <strong>{{ viewing()!.totalItems || '' }}</strong>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Store</div>
+        <span>{{ viewing()!.locationName }}</span>
+      </div>
+      @if (viewing()!.salvageWeightLbs) {
+        <div class="ei-cell">
+          <div class="form-label">Salvage Weight</div>
+          <span>{{ viewing()!.salvageWeightLbs }} lbs</span>
+        </div>
+      }
+      @if (viewing()!.presortWorkerName) {
+        <div class="ei-cell">
+          <div class="form-label">Presort Worker</div>
+          <span>{{ viewing()!.presortWorkerName }}</span>
+        </div>
+      }
+      @if (viewing()!.transferToLocationName) {
+        <div class="ei-cell">
+          <div class="form-label">Transfer To</div>
+          <span>{{ viewing()!.transferToLocationName }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Fill bar -->
+    @if (fillPct(viewing()!) > 0) {
+      <div class="form-section-hdr" style="margin-top: 16px">
+        Fill Level
+        <span class="section-count">{{ fillPct(viewing()!) }}%</span>
+      </div>
+      <div class="fill-bar-lg">
+        <div class="fill-bar-inner" [style.width.%]="fillPct(viewing()!)" [class.fill-full]="fillPct(viewing()!) >= 90"></div>
+      </div>
+      <div class="fill-label" style="margin-top: 4px">{{ viewing()!.totalItems }} of {{ CAPACITY[viewing()!.containerType] }} items</div>
+    }
+
+    <!-- Contents -->
+    @if (viewing()!.contents.length > 0) {
+      <div class="form-section-hdr" style="margin-top: 16px">
+        Contents
+        <span class="section-count">{{ viewing()!.contents.length }}</span>
+      </div>
+      <div class="contents-breakdown">
+        @for (item of viewing()!.contents; track item.categoryKey) {
+          <div class="cb-row">
+            <span class="cb-name">{{ item.categoryName }}</span>
+            <span class="cb-qty">{{ item.quantity }}</span>
+            <span class="badge {{ mapper.condBadge(item.condition) }}" style="font-size: 10px">{{ ICL[item.condition] }}</span>
+            @if (item.ecommerceQty) {
+              <span class="badge badge-warning" style="font-size: 10px">{{ item.ecommerceQty }} e-com</span>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Notes -->
+    @if (viewing()!.notes) {
+      <div class="detail-notes">{{ viewing()!.notes }}</div>
+    }
+
+    <!-- Quick actions -->
+    <div class="detail-actions">
+      @if (nextStatus(viewing()!)) {
+        <button class="btn btn-primary btn-sm" (click)="advanceStatus(viewing()!)">
+          {{ nextStatusLabel(viewing()!) }}
+        </button>
+      }
+      @if (viewing()!.status === CS.Available) {
+        <button class="btn btn-sm btn-danger-outline" (click)="disposeContainer(viewing()!)">
+          Reset to Available
+        </button>
+      }
+    </div>
+  }
+</app-modal>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     CREATE CONTAINER MODAL
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<app-modal
+  [open]="creating()"
+  title="New Container"
+  confirmLabel="Create Container"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  (closed)="creating.set(false)"
+  (confirmed)="saveCreate()"
+>
+  <div class="form-section-hdr">Container</div>
+
+  <div class="form-row-2">
+    <div class="form-group">
+      <label class="form-label">Container Type</label>
+      <select class="form-select" [(ngModel)]="cType">
+        <option [value]="CT.Gaylord">Gaylord (large cardboard box)</option>
+        <option [value]="CT.CartRack">Cart / Z-Rack</option>
+        <option [value]="CT.Pallet">Pallet</option>
+        <option [value]="CT.Tote">Tote / Bin</option>
+        <option [value]="CT.Baler">Baler</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" [(ngModel)]="cStatus">
+        <option [value]="CS.Available">Available</option>
+        <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
+        <option [value]="CS.Sorting">Sorting</option>
+        <option [value]="CS.InUse">In Use</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-section-hdr" style="margin-top: 20px">Classification</div>
+
+  <div class="form-row-2">
+    <div class="form-group">
+      <label class="form-label">Department <span class="form-required">*</span></label>
+      <select class="form-select" [(ngModel)]="cDeptKey" (ngModelChange)="cCatKey = ''">
+        <option value="">select department</option>
+        @for (d of mockData.departments; track d.key) {
+          <option [value]="d.key">{{ d.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category <span class="form-hint">optional</span></label>
+      <select class="form-select" [(ngModel)]="cCatKey" [disabled]="!cDeptKey">
+        <option value="">Any (dept-level)</option>
+        @for (cat of cDeptCats(); track cat.key) {
+          <option [value]="cat.key">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="form-section-hdr" style="margin-top: 20px">Routing</div>
+
+  <div class="form-row-2">
+    <div class="form-group">
+      <label class="form-label">Destination <span class="form-hint">optional  set after presort</span></label>
+      <select class="form-select" [(ngModel)]="cDest">
+        <option [value]="null">TBD</option>
+        <option [value]="CD.Production">Production Floor</option>
+        <option [value]="CD.Reserve">Reserve / Backstock</option>
+        <option [value]="CD.Warehouse">Warehouse</option>
+        <option [value]="CD.Ecommerce">E-Commerce</option>
+        <option [value]="CD.Salvage">Salvage / Recycling</option>
+        <option [value]="CD.Transfer">Transfer to another store</option>
+      </select>
+    </div>
+    @if (cDest === CD.Transfer) {
+      <div class="form-group">
+        <label class="form-label">Transfer To Store <span class="form-required">*</span></label>
+        <select class="form-select" [(ngModel)]="cTransferTo">
+          <option value=""> select store </option>
+          @for (loc of mockData.locations; track loc.id) {
+            <option [value]="loc.id">{{ loc.name }}</option>
+          }
+        </select>
+      </div>
+    }
+  </div>
+
+  <div class="form-row-2">
+    @if (cDeptKey === 'salvage') {
+      <div class="form-group">
+        <label class="form-label">Salvage Weight (lbs)</label>
+        <input class="form-input" type="number" min="0" step="0.1" [(ngModel)]="cSalvageWeight" placeholder="0.0" />
+      </div>
+    }
+  </div>
+
+  <div class="form-group" style="margin-top: 12px">
+    <label class="form-label">Notes <span class="form-hint">optional</span></label>
+    <textarea class="form-textarea" rows="2" [(ngModel)]="cNotes" placeholder="Any notes about this containerâ€¦"></textarea>
+  </div>
+</app-modal>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     EDIT CONTAINER MODAL
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<app-modal
+  [open]="!!editing()"
+  [title]="'Edit  ' + (editing()?.barcode ?? '')"
+  confirmLabel="Save Changes"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  (closed)="editing.set(null)"
+  (confirmed)="saveEdit()"
+>
+  @if (editing()) {
+    <!-- Read-only info grid -->
+    <div class="edit-info-grid">
+      <div class="ei-cell">
+        <div class="form-label">Container Type</div>
+        <span class="type-badge">{{ CTL[editing()!.containerType] }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Department</div>
+        <span>{{ editing()!.deptName ?? '' }}</span>
+      </div>
+      @if (editing()!.catName) {
+        <div class="ei-cell">
+          <div class="form-label">Category</div>
+          <span>{{ editing()!.catName }}</span>
+        </div>
+      }
+      <div class="ei-cell">
+        <div class="form-label">Total Items</div>
+        <strong>{{ editing()!.totalItems || '' }}</strong>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Store</div>
+        <span>{{ editing()!.locationName }}</span>
+      </div>
+      @if (editing()!.salvageWeightLbs) {
+        <div class="ei-cell">
+          <div class="form-label">Salvage Weight</div>
+          <span>{{ editing()!.salvageWeightLbs }} lbs</span>
+        </div>
+      }
+      @if (editing()!.presortedAt) {
+        <div class="ei-cell">
+          <div class="form-label">Sorting Started</div>
+          <span>{{ editing()!.presortedAt | date: 'M/d h:mm a' }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Editable fields -->
+    <div class="form-section-hdr" style="margin-top: 20px">Update</div>
+
+    <div class="form-row-2">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" [(ngModel)]="eStatus">
+          <option [value]="CS.Available">Available</option>
+          <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
+          <option [value]="CS.Sorting">Sorting</option>
+          <option [value]="CS.InUse">In Use</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Destination</label>
+        <select class="form-select" [(ngModel)]="eDest">
+          <option [value]="null">TBD</option>
+          <option [value]="CD.Production">Production Floor</option>
+          <option [value]="CD.Reserve">Reserve / Backstock</option>
+          <option [value]="CD.Warehouse">Warehouse</option>
+          <option [value]="CD.Ecommerce">E-Commerce</option>
+          <option [value]="CD.Salvage">Salvage / Recycling</option>
+          <option [value]="CD.Transfer">Transfer</option>
+        </select>
+      </div>
+    </div>
+
+    @if (eDest === CD.Transfer) {
+      <div class="form-group">
+        <label class="form-label">Transfer To Store <span class="form-required">*</span></label>
+        <select class="form-select" [(ngModel)]="eTransferTo">
+          <option value=""> select store </option>
+          @for (loc of mockData.locations; track loc.id) {
+            <option [value]="loc.id">{{ loc.name }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" rows="2" [(ngModel)]="eNotes" placeholder="Add a noteâ€¦"></textarea>
+    </div>
+  }
+</app-modal>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     MERGE MODAL
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<app-modal
+  [open]="merging()"
+  title="Merge Containers"
+  confirmLabel="Merge Containers"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  (closed)="merging.set(false)"
+  (confirmed)="saveMerge()"
+>
+  <div class="merge-summary">
+    Merging <strong>{{ selectionCount() }}</strong> containers 
+    <strong>{{ mergeTotal() }}</strong> combined items into one new container.
+  </div>
+
+  <div class="form-section-hdr" style="margin-top: 16px">New Container Properties</div>
+
+  <div class="form-row-2">
+    <div class="form-group">
+      <label class="form-label">Container Type</label>
+      <select class="form-select" [(ngModel)]="mType">
+        <option [value]="CT.Gaylord">Gaylord</option>
+        <option [value]="CT.CartRack">Cart / Z-Rack</option>
+        <option [value]="CT.Pallet">Pallet</option>
+        <option [value]="CT.Tote">Tote / Bin</option>
+        <option [value]="CT.Baler">Baler</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Department <span class="form-required">*</span></label>
+      <select class="form-select" [(ngModel)]="mDeptKey" (ngModelChange)="mCatKey = ''">
+        <option value=""> select </option>
+        @for (d of mockData.departments; track d.key) {
+          <option [value]="d.key">{{ d.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row-2">
+    <div class="form-group">
+      <label class="form-label">Category <span class="form-hint">optional</span></label>
+      <select class="form-select" [(ngModel)]="mCatKey" [disabled]="!mDeptKey">
+        <option value="">Any (dept-level)</option>
+        @for (cat of mDeptCats(); track cat.key) {
+          <option [value]="cat.key">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Destination</label>
+      <select class="form-select" [(ngModel)]="mDest">
+        <option [value]="null">TBD</option>
+        <option [value]="CD.Production">Production Floor</option>
+        <option [value]="CD.Reserve">Reserve / Backstock</option>
+        <option [value]="CD.Warehouse">Warehouse</option>
+        <option [value]="CD.Ecommerce">E-Commerce</option>
+        <option [value]="CD.Salvage">Salvage / Recycling</option>
+        <option [value]="CD.Transfer">Transfer to another store</option>
+      </select>
+    </div>
+  </div>
+
+  @if (mDest === CD.Transfer) {
+    <div class="form-group">
+      <label class="form-label">Transfer To Store <span class="form-required">*</span></label>
+      <select class="form-select" [(ngModel)]="mTransferTo">
+        <option value=""> select store </option>
+        @for (loc of mockData.locations; track loc.id) {
+          <option [value]="loc.id">{{ loc.name }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  <div class="form-group" style="margin-top: 8px">
+    <label class="form-label">Notes <span class="form-hint">optional</span></label>
+    <textarea class="form-textarea" rows="2" [(ngModel)]="mNotes" placeholder="Reason for mergeâ€¦"></textarea>
+  </div>
+
+  <div class="merge-warning">
+    <app-icon name="alert-circle" size="14" />
+    The selected source containers will be marked as <strong>Disposed</strong> after merging.
+  </div>
+</app-modal>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     BULK STATUS MODAL
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<app-modal
+  [open]="bulkUpdating()"
+  title="Bulk Status Update"
+  confirmLabel="Apply to All"
+  cancelLabel="Cancel"
+  size="sm"
+  [showCancel]="true"
+  (closed)="bulkUpdating.set(false)"
+  (confirmed)="saveBulkStatus()"
+>
+  <p class="bulk-desc">
+    Update status for <strong>{{ selectionCount() }}</strong> selected container(s).
+  </p>
+  <div class="form-group">
+    <label class="form-label">New Status</label>
+    <select class="form-select" [(ngModel)]="bulkStatus">
+      <option [value]="CS.Available">Available</option>
+      <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
+      <option [value]="CS.Sorting">Sorting</option>
+      <option [value]="CS.InUse">In Use</option>
+    </select>
+  </div>
+</app-modal>

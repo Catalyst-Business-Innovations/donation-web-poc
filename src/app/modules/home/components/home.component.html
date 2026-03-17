@@ -1,0 +1,25 @@
+<div class="landing">
+  <div class="landing-inner">
+    <div class="landing-header">
+      <div class="landing-logo"><app-icon name="gift" [size]="56"></app-icon></div>
+      <h1>Brijjworks</h1>
+      <p>Enterprise Donation Management System</p>
+    </div>
+
+    <div class="module-grid">
+      @for (m of modules; track m.route) {
+        <div class="module-card" [routerLink]="m.route">
+          <div class="mc-icon"><app-icon [name]="m.icon" [size]="48"></app-icon></div>
+          <div class="mc-name">{{ m.name }}</div>
+          <div class="mc-desc">{{ m.description }}</div>
+          <ul class="mc-features">
+            @for (f of m.features; track f) {
+              <li>{{ f }}</li>
+            }
+          </ul>
+          <button class="btn btn-primary mc-btn" [routerLink]="m.route">{{ m.btnLabel }}</button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

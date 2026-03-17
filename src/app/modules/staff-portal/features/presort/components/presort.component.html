@@ -1,0 +1,436 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Presort</div>
+    <div class="topbar-subtitle">Route donation containers to appropriate departments</div>
+  </div>
+  <div class="topbar-actions">
+    <div class="pending-chip" [class.pending-warn]="backlogClass() === 'warn'" [class.pending-danger]="backlogClass() === 'danger'">
+      <app-icon name="package" [size]="14"></app-icon>
+      {{ queue.length }} Awaiting Presort
+    </div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="presort-layout">
+
+    <!-- ══ Queue Column ════════════════════════════════════ -->
+    <div class="queue-col">
+      <div class="card">
+        <div class="queue-header">
+          <span class="card-title">Queue</span>
+          <span class="queue-count" [class.warn]="backlogClass() === 'warn'" [class.danger]="backlogClass() === 'danger'">
+            {{ queue.length }}
+          </span>
+        </div>
+
+        @for (q of queue; track q.id) {
+          <div class="queue-item" [class.active]="ps().activeId === q.id" (click)="selectContainer(q)">
+            <div class="qi-top-row">
+              <span class="qi-type-badge">
+                <app-icon [name]="containerTypeIcon(q.containerType)" [size]="11"></app-icon>
+                {{ containerTypeLabel(q.containerType) }}
+              </span>
+              <span class="qi-age" [class]="'age-' + ageClass(q.receivedAt)">{{ ageLabel(q.receivedAt) }}</span>
+            </div>
+            <div class="qi-barcode">{{ q.barcode }}</div>
+            <div class="qi-source">{{ q.donorVisitLabel }}</div>
+            <div class="qi-meta">
+              {{ q.itemCount }} est. items &nbsp;·&nbsp;
+              <span class="qi-method" [class.dock]="q.presortMethod === PM.DockSide">
+                {{ presortMethodLabel(q.presortMethod) }}
+              </span>
+            </div>
+            @if (q.presortMethod === PM.DockSide) {
+              <button class="qi-quick-btn" (click)="quickComplete(q, $event)">
+                <app-icon name="check-circle" [size]="11"></app-icon>
+                Quick Complete
+              </button>
+            }
+          </div>
+        }
+
+        @if (!queue.length) {
+          <div class="queue-empty">
+            <app-icon name="check-circle" [size]="28"></app-icon>
+            <p>Queue clear</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ══ Presort Form Column ═════════════════════════════ -->
+    <div class="form-col">
+      @if (ps().activeId) {
+        <div class="card anim-in">
+
+          <!-- Status pipeline -->
+          <div class="ps-pipeline">
+            <div class="pipe-step done">
+              <span class="pipe-num"><app-icon name="checkmark" [size]="11"></app-icon></span>
+              <span class="pipe-lbl">Received</span>
+            </div>
+            <div class="pipe-conn done"></div>
+            <div class="pipe-step active">
+              <span class="pipe-num">2</span>
+              <span class="pipe-lbl">In Presort</span>
+            </div>
+            <div class="pipe-conn"></div>
+            <div class="pipe-step">
+              <span class="pipe-num">3</span>
+              <span class="pipe-lbl">Presorted</span>
+            </div>
+            <div class="pipe-conn"></div>
+            <div class="pipe-step">
+              <span class="pipe-num">4</span>
+              <span class="pipe-lbl">Production</span>
+            </div>
+          </div>
+
+          <!-- Container header -->
+          <div class="ps-container-hdr">
+            <div class="ps-hdr-left">
+              <app-icon [name]="containerTypeIcon(ps().containerType)" [size]="20" class="ps-hdr-icon"></app-icon>
+              <div>
+                <div class="ps-barcode">{{ activeBarcode() }}</div>
+                <div class="ps-donor-link">{{ activeQueueItem()?.donorVisitLabel }}</div>
+              </div>
+            </div>
+            <div class="ps-hdr-right">
+              <select class="form-select ps-method-select"
+                [value]="ps().presortMethod"
+                (change)="setPresortMethod($any($event.target).value)">
+                <option [value]="PM.Batch">Batch</option>
+                <option [value]="PM.DockSide">Dock-Side</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Category rows -->
+          <div class="items-section">
+            <div class="items-header">
+              <span class="form-label" style="margin:0">Categories</span>
+              <span class="items-total">{{ totalItemCount() }} items</span>
+            </div>
+
+            @for (item of ps().items; track item.categoryKey) {
+              <div class="ps-item-row" [class.salvage-row]="item.condition === IC.Salvage || item.condition === IC.Dispose">
+                <span class="ps-item-icon">{{ item.icon }}</span>
+                <span class="ps-item-name">{{ item.categoryName }}</span>
+
+                <div class="ps-qty">
+                  <button (click)="adjust(item, -1)">−</button>
+                  <span>{{ item.quantity }}</span>
+                  <button (click)="adjust(item, 1)">+</button>
+                </div>
+
+                <select class="form-select ps-cond"
+                  [value]="item.condition"
+                  (change)="setCondition(item, $any($event.target).value)">
+                  @for (c of conditions; track c.value) {
+                    <option [value]="c.value">{{ c.label }}</option>
+                  }
+                </select>
+
+                @if (ps().ecommerce && (item.condition === IC.Sellable || item.condition === IC.NeedsRefurbishment)) {
+                  <div class="ps-ecomm-qty">
+                    <span class="ps-ecomm-lbl">E-Com</span>
+                    <input type="number" min="0" [max]="item.quantity"
+                      class="form-input ps-ecomm-input"
+                      [value]="item.ecommerceQty"
+                      (change)="setEcommerceQty(item, +$any($event.target).value)" />
+                  </div>
+                }
+
+                <button class="btn-icon danger" (click)="removeItem(item)" title="Remove">
+                  <app-icon name="close" size="13" />
+                </button>
+              </div>
+            }
+
+            <!-- Salvage weight (conditional) -->
+            @if (hasSalvageItems()) {
+              <div class="salvage-weight-row">
+                <app-icon name="refresh" [size]="14" class="salvage-icon"></app-icon>
+                <span class="salvage-lbl">Salvage Weight</span>
+                <input type="number" min="0" step="0.1"
+                  class="form-input salvage-input"
+                  placeholder="0.0"
+                  [value]="ps().salvageWeightLbs ?? ''"
+                  (input)="setSalvageWeight($any($event.target).value)" />
+                <span class="salvage-unit">lbs</span>
+                <span class="salvage-hint">{{ salvageItemCount() }} salvage items</span>
+              </div>
+            }
+
+            <div class="add-cat-row">
+              <select class="form-select" style="flex: 1" [(ngModel)]="addCatKey">
+                <option value="">+ Add Category...</option>
+                @for (cat of mockData.categories; track cat.key) {
+                  <option [value]="cat.key">{{ cat.icon }} {{ cat.name }}</option>
+                }
+              </select>
+              <button class="btn btn-secondary" [disabled]="!addCatKey" (click)="addCategory()">Add</button>
+            </div>
+          </div>
+
+          <!-- Route -->
+          <div class="route-section">
+            <label class="form-label">Route Container To</label>
+            <div class="route-opts">
+              @for (opt of routeOptions; track opt.value) {
+                <button class="route-btn" [class.active]="ps().destination === opt.value" (click)="setDest(opt.value)">
+                  <app-icon [name]="opt.icon" [size]="14"></app-icon>
+                  {{ opt.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Flags -->
+          <div class="flags-section">
+            <div class="flag-item">
+              <label class="toggle-switch">
+                <input type="checkbox" [checked]="ps().isSeasonal" (change)="setIsSeasonal($any($event.target).checked)" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+              <span class="flag-label">Hold for Season</span>
+              @if (ps().isSeasonal) {
+                <select class="form-select flag-select"
+                  [value]="ps().seasonalTag"
+                  (change)="setSeasonalTag($any($event.target).value)">
+                  @for (tag of seasonalTags; track tag) {
+                    <option [value]="tag">{{ tag }}</option>
+                  }
+                </select>
+              }
+            </div>
+            <div class="flag-item">
+              <label class="toggle-switch">
+                <input type="checkbox" [checked]="ps().ecommerce" (change)="setEcommerce($any($event.target).checked)" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+              <span class="flag-label">E-Commerce Cherry-Pick</span>
+              @if (ps().ecommerce) {
+                <span class="flag-hint">Set per-category qty in items above</span>
+              }
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-input form-textarea"
+              [value]="ps().notes"
+              (input)="setNote($any($event.target).value)"
+              placeholder="Quality observations, special handling..."></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="ps-actions">
+            @if (ps().items.length >= 2) {
+              <button class="btn btn-secondary" (click)="splitContainer()">
+                <app-icon name="layers" [size]="15"></app-icon>
+                Split ({{ ps().items.length }})
+              </button>
+            }
+            <button class="btn btn-success" style="flex:1" (click)="complete()">
+              <app-icon name="check-circle" [size]="16"></app-icon>
+              Complete &amp; Label
+            </button>
+            <button class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+          </div>
+        </div>
+
+      } @else {
+        <div class="empty-state">
+          <div class="empty-state-icon"><app-icon name="list" [size]="36"></app-icon></div>
+          <div class="empty-state-title">Select a container from the queue</div>
+          <div class="empty-state-text">Click any item on the left to begin presorting</div>
+        </div>
+      }
+    </div>
+
+    <!-- ══ Stats Column ════════════════════════════════════ -->
+    <div class="stats-col">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Today's Throughput</div>
+        <div class="thru-row">
+          <span>Sorted Today</span>
+          <strong>{{ stats().sortedToday }}</strong>
+        </div>
+        <div class="thru-row">
+          <span>Items Processed</span>
+          <strong>{{ stats().itemsProcessed }}</strong>
+        </div>
+        <div class="thru-row">
+          <span>Avg Sort Time</span>
+          <strong>{{ stats().avgSortMinutes }} min</strong>
+        </div>
+        <div class="thru-row">
+          <span>Oldest Queued</span>
+          <strong [class]="'stat-age-' + oldestQueueClass()">{{ oldestQueueLabel() }}</strong>
+        </div>
+        <div class="thru-row">
+          <span>Salvage Rate</span>
+          <strong>{{ stats().salvageRate }}%</strong>
+        </div>
+        <div class="thru-row" style="border:none">
+          <span>E-Com Diverted</span>
+          <strong>{{ stats().ecommerceItems }} items</strong>
+        </div>
+
+        <div class="dept-breakdown">
+          <div class="dept-breakdown-title">Dept Volume</div>
+          @for (d of stats().deptVolume; track d.name) {
+            <div class="dep-item">
+              <div class="dep-hdr">
+                <span>{{ d.name }}</span>
+                <span>{{ d.pct }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width]="d.pct + '%'" [style.background]="d.color"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ Complete Confirmation Modal ══════════════════════════════ -->
+<app-modal
+  [open]="showConfirm()"
+  title="Confirm Presort Completion"
+  confirmLabel="Complete &amp; Generate Label"
+  cancelLabel="Go Back"
+  [showCancel]="true"
+  confirmVariant="success"
+  (closed)="showConfirm.set(false)"
+  (confirmed)="confirmComplete()">
+  <div class="confirm-body">
+    <div class="confirm-hero">
+      <app-icon name="package" [size]="28"></app-icon>
+      <div>
+        <div class="confirm-hero-title">Ready to finalize container</div>
+        <div class="confirm-hero-sub">{{ activeBarcode() }} · {{ activeQueueItem()?.donorVisitLabel }}</div>
+      </div>
+    </div>
+
+    <div class="confirm-grid">
+      <div class="confirm-cell">
+        <div class="confirm-cell-lbl">Container Type</div>
+        <div class="confirm-cell-val">{{ containerTypeLabel(ps().containerType) }}</div>
+      </div>
+      <div class="confirm-cell">
+        <div class="confirm-cell-lbl">Destination</div>
+        <div class="confirm-cell-val">{{ destLabel(ps().destination) }}</div>
+      </div>
+      <div class="confirm-cell">
+        <div class="confirm-cell-lbl">Total Items</div>
+        <div class="confirm-cell-val">{{ totalItemCount() }}</div>
+      </div>
+      <div class="confirm-cell">
+        <div class="confirm-cell-lbl">Categories</div>
+        <div class="confirm-cell-val">{{ ps().items.length }}</div>
+      </div>
+      @if (ps().isSeasonal) {
+        <div class="confirm-cell confirm-cell-wide confirm-cell-warn">
+          <div class="confirm-cell-lbl">Seasonal Hold</div>
+          <div class="confirm-cell-val">{{ ps().seasonalTag }}</div>
+        </div>
+      }
+      @if (ps().ecommerce) {
+        <div class="confirm-cell confirm-cell-wide confirm-cell-info">
+          <div class="confirm-cell-lbl">E-Commerce Cherry-Pick</div>
+          <div class="confirm-cell-val">Enabled</div>
+        </div>
+      }
+      @if (ps().salvageWeightLbs) {
+        <div class="confirm-cell confirm-cell-wide confirm-cell-danger">
+          <div class="confirm-cell-lbl">Salvage Weight</div>
+          <div class="confirm-cell-val">{{ ps().salvageWeightLbs }} lbs</div>
+        </div>
+      }
+    </div>
+
+    <div class="confirm-items">
+      <div class="confirm-items-title">Items Summary</div>
+      @for (item of ps().items; track item.categoryKey) {
+        <div class="confirm-item-row">
+          <span class="confirm-item-icon">{{ item.icon }}</span>
+          <span class="confirm-item-name">{{ item.categoryName }}</span>
+          <span class="confirm-item-qty">{{ item.quantity }} items</span>
+          <span class="badge" [class]="'badge-' + (item.condition === IC.Sellable ? 'success' : item.condition === IC.NeedsRefurbishment ? 'warning' : 'danger')">
+            {{ condLabel(item.condition) }}
+          </span>
+          @if (item.ecommerceQty > 0) {
+            <span class="badge badge-info">E-Com: {{ item.ecommerceQty }}</span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</app-modal>
+
+<!-- ══ Split Confirmation Modal ══════════════════════════════════ -->
+<app-modal
+  [open]="showSplitConfirm()"
+  title="Split into Separate Containers"
+  [confirmLabel]="'Create ' + ps().items.length + ' Containers'"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  confirmVariant="primary"
+  (closed)="showSplitConfirm.set(false)"
+  (confirmed)="confirmSplit()">
+  <div class="confirm-body">
+    <div class="confirm-hero">
+      <app-icon name="layers" [size]="28"></app-icon>
+      <div>
+        <div class="confirm-hero-title">{{ ps().items.length }} new containers will be created</div>
+        <div class="confirm-hero-sub">One barcode per department — all route to {{ destLabel(ps().destination) }}</div>
+      </div>
+    </div>
+    <div class="split-list">
+      @for (item of ps().items; track item.categoryKey; let i = $index) {
+        <div class="split-row">
+          <span class="split-index">{{ i + 1 }}</span>
+          <span class="split-icon">{{ item.icon }}</span>
+          <span class="split-name">{{ item.categoryName }}</span>
+          <span class="split-qty">{{ item.quantity }} items</span>
+          <span class="badge" [class]="'badge-' + (item.condition === IC.Sellable ? 'success' : item.condition === IC.NeedsRefurbishment ? 'warning' : 'danger')">
+            {{ condLabel(item.condition) }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+</app-modal>
+
+<!-- ══ Quick Complete Confirmation Modal ═════════════════════════ -->
+<app-modal
+  [open]="!!quickCompleteId()"
+  title="Quick Complete — Dock-Side Pre-Sorted"
+  confirmLabel="Mark Complete → Production"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  confirmVariant="success"
+  (closed)="quickCompleteId.set(null)"
+  (confirmed)="confirmQuickComplete()">
+  <div class="confirm-body">
+    <div class="confirm-hero">
+      <app-icon name="check-circle" [size]="28"></app-icon>
+      <div>
+        <div class="confirm-hero-title">
+          {{ quickCompleteBarcode() }}
+        </div>
+        <div class="confirm-hero-sub">This container was sorted at the dock intake. No detail entry needed.</div>
+      </div>
+    </div>
+    <p style="font-size:13px; color: var(--gray-600); line-height:1.6; margin-top:12px">
+      Container will be marked <strong>Presorted</strong> and routed directly to <strong>Production</strong>.
+    </p>
+  </div>
+</app-modal>

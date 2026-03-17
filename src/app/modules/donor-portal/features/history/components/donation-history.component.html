@@ -1,0 +1,129 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">My Donations</div>
+    <div class="topbar-subtitle">
+      {{ donor.totalDonations }} donations since {{ donor.joinDate | date: 'MMM yyyy' }}
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-secondary" (click)="toast.info('Export', 'Downloading history...')">
+      <app-icon name="download" [size]="14" style="margin-right: 6px"></app-icon>
+      Download All
+    </button>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="year-btns">
+    @for (yr of years; track yr) {
+      <button
+        class="btn"
+        [class.btn-primary]="selectedYear() === yr"
+        [class.btn-secondary]="selectedYear() !== yr"
+        (click)="selectedYear.set(yr)"
+      >
+        {{ yr }}
+      </button>
+    }
+    <button
+      class="btn"
+      [class.btn-primary]="selectedYear() === null"
+      [class.btn-secondary]="selectedYear() !== null"
+      (click)="selectedYear.set(null)"
+    >
+      All Time
+    </button>
+  </div>
+
+  <div class="year-summary">
+    <div class="ys-stat">
+      <div class="ys-val">{{ summary().donations }}</div>
+      <div class="ys-lbl">Donations</div>
+    </div>
+    <div class="ys-div"></div>
+    <div class="ys-stat">
+      <div class="ys-val">{{ summary().items }}</div>
+      <div class="ys-lbl">Items</div>
+    </div>
+    <div class="ys-div"></div>
+    <div class="ys-stat">
+      <div class="ys-val">${{ summary().value | number: '1.0-0' }}</div>
+      <div class="ys-lbl">Est. Value</div>
+    </div>
+    <div class="ys-div"></div>
+    <div class="ys-stat">
+      <div class="ys-val">{{ summary().points }}</div>
+      <div class="ys-lbl">Points Earned</div>
+    </div>
+    <button
+      class="btn btn-secondary"
+      style="margin-left: auto"
+      (click)="toast.success('Receipt', 'Year-end summary generating...')"
+    >
+      Year-End Summary
+    </button>
+  </div>
+
+  @for (d of filteredDonations(); track d.id) {
+    <div class="h-card" [class.expanded]="expandedId() === d.id">
+      <div class="hc-hdr" (click)="toggle(d.id)">
+        <div class="hc-icon"><app-icon name="package" [size]="20"></app-icon></div>
+        <div style="flex: 1">
+          <div style="font-weight: 700; font-size: 15px">{{ d.locationName }}</div>
+          <div style="font-size: 12px; color: var(--gray-500)">
+            {{ d.timestamp | date: 'EEEE, MMMM d, yyyy' }} at {{ d.timestamp | date: 'h:mm a' }}
+          </div>
+        </div>
+        <div style="text-align: right; margin-right: 14px">
+          <div style="font-weight: 800; font-size: 16px; color: var(--secondary)">${{ d.totalEstimatedValue }}</div>
+          <div style="font-size: 11px; color: var(--gray-500)">{{ d.totalItems }} items</div>
+        </div>
+        <div class="hc-badges">
+          <span class="badge {{ d.status === DS.Completed ? 'badge-success' : 'badge-warning' }}">{{ DSL[d.status] }}</span>
+          @if (d.loyaltyPointsEarned) {
+            <span style="font-size: 11px; color: var(--primary); font-weight: 700">
+              +{{ d.loyaltyPointsEarned }} pts
+            </span>
+          }
+        </div>
+        <span class="hc-chevron" [style.transform]="expandedId() === d.id ? 'rotate(180deg)' : 'rotate(0)'">
+          <app-icon name="chevron-down" [size]="14"></app-icon>
+        </span>
+      </div>
+
+      @if (expandedId() === d.id) {
+        <div class="hc-body">
+          <div class="hc-receipt-row">
+            <span style="font-family: var(--font-mono); font-size: 12px; color: var(--gray-500)">
+              {{ d.receiptNumber }}
+            </span>
+            <button class="btn btn-sm btn-secondary" (click)="toast.success('Downloaded', 'Receipt saved.')">
+              <app-icon name="download" [size]="14" style="margin-right: 4px"></app-icon>
+              Download
+            </button>
+          </div>
+          @for (item of d.items; track item.id) {
+            <div class="hc-item-row">
+              <span style="font-weight: 600; flex: 1">{{ item.categoryName }}</span>
+              <span>{{ item.quantity }} items</span>
+              <span style="font-weight: 700; color: var(--secondary); min-width: 80px; text-align: right">
+                ${{ item.totalEstimatedValue | number: '1.2-2' }}
+              </span>
+            </div>
+          }
+          <div class="hc-total">
+            <span>Total Estimated Value</span>
+            <span>${{ d.totalEstimatedValue | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (filteredDonations().length === 0) {
+    <div class="empty-state">
+      <div class="empty-state-icon"><app-icon name="package" [size]="40"></app-icon></div>
+      <div class="empty-state-title">No donations found</div>
+    </div>
+  }
+</div>

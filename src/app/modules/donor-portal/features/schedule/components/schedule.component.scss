@@ -1,0 +1,202 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sched-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+}
+.loc-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px;
+  background: var(--secondary-light);
+  border: 1px solid var(--secondary);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+}
+.date-time-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.recurring-opts {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.recur-opt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.cart-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+}
+.cart-total {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-600);
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-200);
+  margin-top: 4px;
+}
+.add-item-form {
+  margin-top: 12px;
+  padding: 14px;
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+}
+.add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.add-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.upcoming-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+  &:last-child {
+    border-bottom: none;
+  }
+}
+.upcoming-row-click {
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 10px 6px;
+  margin: 0 -6px;
+  transition: background 0.15s;
+  &:hover { background: var(--gray-50); }
+  &:active { background: var(--primary-light); }
+}
+
+// ── Visit detail modal ─────────────────────────────────────────────────────
+.visit-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 0;
+}
+.apt-id-block {
+  text-align: center;
+  .apt-id-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    margin-bottom: 6px;
+  }
+  .apt-id-value {
+    font-size: 22px;
+    font-weight: 900;
+    font-family: var(--font-mono);
+    letter-spacing: 2px;
+    color: var(--primary);
+  }
+}
+.qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.qr-frame {
+  padding: 14px;
+  background: #fff;
+  border: 2px solid var(--gray-200);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+.qr-hint {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.apt-detail-grid {
+  width: 100%;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.apt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.apt-key {
+  font-size: 13px;
+  color: var(--gray-600);
+  white-space: nowrap;
+}
+.apt-val {
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+}
+.apt-reminder {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--success-light);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--gray-700);
+}
+.up-date {
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  text-align: center;
+  min-width: 50px;
+}
+.up-day {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--primary);
+}
+.up-month {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+@media (max-width: 900px) {
+  .sched-grid {
+    grid-template-columns: 1fr;
+  }
+}

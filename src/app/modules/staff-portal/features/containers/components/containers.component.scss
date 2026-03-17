@@ -1,0 +1,499 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.pipeline-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  &:hover {
+    background: var(--gray-50);
+  }
+  &.active {
+    background: var(--primary-light);
+  }
+}
+.ps-icon {
+  font-size: 22px;
+}
+.ps-count {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--gray-900);
+}
+.ps-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.pipeline-arrow {
+  font-size: 20px;
+  color: var(--gray-300);
+}
+
+.filters-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.f-sel {
+  width: 155px;
+  height: 40px;
+  font-size: 13px;
+}
+
+.barcode-cell {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+.donor-label {
+  font-size: 10px;
+  color: var(--gray-500);
+  margin-top: 2px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.type-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border-radius: 999px;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.contents-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 200px;
+}
+
+// ── Shared form layout ─────────────────────────────────────────────────────
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.form-section-hdr {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 1px 7px;
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.form-hint {
+  font-size: 10px;
+  color: var(--gray-400);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.form-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--gray-900);
+  background: #fff;
+  box-sizing: border-box;
+  &:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+}
+.form-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--gray-900);
+  resize: vertical;
+  box-sizing: border-box;
+  &:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+}
+
+// ── Contents table inside create modal ────────────────────────────────────
+.cat-pick-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.cat-pick-sel { flex: 1; }
+.contents-empty {
+  font-size: 12px;
+  color: var(--gray-400);
+  padding: 12px;
+  background: var(--gray-50);
+  border: 1px dashed var(--gray-200);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  margin-bottom: 12px;
+}
+.contents-table {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.ct-header {
+  display: grid;
+  grid-template-columns: 1fr 70px 140px 80px 36px;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--gray-50);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  letter-spacing: 0.3px;
+}
+.ct-row {
+  display: grid;
+  grid-template-columns: 1fr 70px 140px 80px 36px;
+  gap: 8px;
+  padding: 7px 10px;
+  align-items: center;
+  border-top: 1px solid var(--gray-100);
+  &:hover { background: var(--gray-50); }
+}
+.ct-name { font-size: 13px; font-weight: 600; }
+.ct-qty {
+  width: 100%;
+  height: 30px;
+  padding: 0 6px;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  font-size: 13px;
+  text-align: center;
+  &:focus { outline: none; border-color: var(--primary); }
+}
+.ct-cond { height: 30px; font-size: 12px; padding: 0 4px; }
+
+// ── Options row (toggle) ───────────────────────────────────────────────────
+.options-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-switch {
+  cursor: pointer;
+  .toggle-track {
+    width: 36px; height: 20px;
+    background: var(--gray-200);
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  &.on .toggle-track { background: var(--primary); }
+  &.on .toggle-thumb { left: 19px; }
+}
+.salvage-row { margin-bottom: 12px; }
+
+// ── Edit modal info grid ───────────────────────────────────────────────────
+.edit-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 4px;
+}
+.ei-cell {
+  .form-label { margin-bottom: 3px; }
+}
+.mono-sm { font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
+
+// ── Content row (shared between detail and edit modal) ─────────────────────
+.content-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  margin-bottom: 5px;
+}
+
+// ── Danger icon button ─────────────────────────────────────────────────────
+.btn-icon-danger {
+  color: var(--danger) !important;
+  &:hover { background: #fff0f0 !important; }
+}
+
+// ── Small btn ─────────────────────────────────────────────────────────────
+.btn-sm { padding: 0 12px; height: 34px; font-size: 12px; white-space: nowrap; }
+
+// ── Selection state ────────────────────────────────────────────────────────
+.check-col {
+  width: 36px;
+  padding: 0 0 0 12px !important;
+}
+.row-selected {
+  background: var(--primary-light) !important;
+}
+.sel-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 4px 10px;
+  background: var(--primary-light);
+  border-radius: 999px;
+}
+.clickable-cell {
+  cursor: pointer;
+  &:hover .barcode-cell { color: var(--primary); }
+}
+
+// ── Fill bar ───────────────────────────────────────────────────────────────
+.fill-bar {
+  width: 80px;
+  height: 6px;
+  background: var(--gray-200);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 3px;
+}
+.fill-bar-lg {
+  width: 100%;
+  height: 10px;
+  background: var(--gray-200);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.fill-bar-inner {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+  &.fill-full { background: var(--danger); }
+}
+.fill-label {
+  font-size: 11px;
+  color: var(--gray-600);
+  font-weight: 600;
+}
+.fill-cap {
+  color: var(--gray-400);
+  font-weight: 400;
+}
+
+// ── Advance button ─────────────────────────────────────────────────────────
+.btn-advance {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  height: 24px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  &:hover { background: #0050cc; }
+}
+
+// ── Timeline ───────────────────────────────────────────────────────────────
+.timeline {
+  display: flex;
+  align-items: flex-start;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.tl-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  opacity: 0.35;
+  &.tl-done { opacity: 1; }
+}
+.tl-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--gray-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  .tl-done & { background: var(--primary); }
+}
+.tl-body { text-align: center; }
+.tl-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-700);
+}
+.tl-time {
+  font-size: 10px;
+  color: var(--gray-500);
+  margin-top: 2px;
+}
+.tl-connector {
+  flex: 0 0 20px;
+  height: 2px;
+  background: var(--gray-300);
+  align-self: center;
+  margin-top: -24px;
+}
+
+// ── Contents breakdown ─────────────────────────────────────────────────────
+.contents-breakdown {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.cb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--gray-100);
+  &:first-child { border-top: none; }
+  &:hover { background: var(--gray-50); }
+}
+.cb-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+}
+.cb-qty {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-700);
+  background: var(--gray-100);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+// ── Detail panel extras ────────────────────────────────────────────────────
+.detail-notes {
+  font-size: 12px;
+  color: var(--gray-700);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-top: 12px;
+}
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-200);
+}
+.btn-danger-outline {
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: transparent;
+  padding: 0 12px;
+  height: 34px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  &:hover { background: #fff0f0; }
+}
+
+// ── Merge modal ────────────────────────────────────────────────────────────
+.merge-summary {
+  font-size: 13px;
+  color: var(--gray-700);
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 4px;
+}
+.merge-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #b45309;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-top: 12px;
+}
+
+// ── Bulk status modal ──────────────────────────────────────────────────────
+.bulk-desc {
+  font-size: 13px;
+  color: var(--gray-700);
+  margin-bottom: 16px;
+}

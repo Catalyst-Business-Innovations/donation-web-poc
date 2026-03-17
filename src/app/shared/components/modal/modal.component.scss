@@ -1,0 +1,9 @@
+/*
+ * Modal visual styles are defined globally in styles/styles.scss
+ * (.modal-overlay, .modal, .modal-header, .modal-body, .modal-footer)
+ * This avoids Angular view-encapsulation issues when the host has display:contents.
+ */
+:host {
+  /* Transparent to layout — the fixed overlay escapes all parent containers */
+  display: contents;
+}
