@@ -81,8 +81,27 @@
 
 .quick-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+}
+
+.id-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+  }
 }
 
 .quick-btn {
@@ -113,6 +132,14 @@
   &.anon-btn:hover {
     border-color: var(--accent);
     background: var(--accent-light);
+  }
+  &.quick-items-btn:hover {
+    border-color: var(--secondary);
+    background: var(--secondary-light);
+  }
+  &.quick-money-btn:hover {
+    border-color: #16a34a;
+    background: #f0fdf4;
   }
 }
 
@@ -579,11 +606,42 @@
   .qty-ctrl { justify-content: flex-end; }
 }
 
+.cat-card-any-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 // Category-level card (leftmost in each group row)
 .cat-card-cat {
   background: var(--gray-50);
   border-color: var(--gray-300);
   .cat-name { font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+}
+
+.cat-type-chip {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-radius: 3px;
+  padding: 1px 5px;
+  line-height: 1.6;
+  align-self: flex-start;
+  pointer-events: none;
+}
+.cat-type-dept {
+  color: #5b21b6;
+  background: #ede9fe;
+}
+.cat-type-cat {
+  color: #0369a1;
+  background: #e0f2fe;
+}
+.cat-type-sub {
+  color: #065f46;
+  background: #d1fae5;
 }
 
 .cat-any-tag {

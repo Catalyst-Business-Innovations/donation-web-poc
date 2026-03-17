@@ -54,7 +54,7 @@
           <div class="card-header">
             <div>
               <div class="card-title">Quick Identification</div>
-              <div class="card-subtitle">Scan or tap to identify instantly</div>
+              <div class="card-subtitle">Scan QR, search by phone / name, or continue anonymously</div>
             </div>
           </div>
           <div class="quick-grid">
@@ -62,20 +62,13 @@
               <app-icon name="search" [size]="24"></app-icon>
               <span>Scan QR</span>
             </button>
-            <button class="quick-btn nfc-btn" (click)="toast.info('NFC Reader', 'Hold card near reader')">
-              <app-icon name="refresh" [size]="24"></app-icon>
-              <span>NFC Tap</span>
-            </button>
             <button class="quick-btn anon-btn" (click)="selectAnonymous()">
               <app-icon name="user" [size]="24"></app-icon>
               <span>Anonymous</span>
             </button>
           </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header"><div class="card-title">Search by Phone or Name</div></div>
-          <div class="search-bar" style="margin-bottom: 12px">
+          <div class="id-divider">or search</div>
+          <div class="search-bar" style="margin-bottom: 8px">
             <span class="search-icon"><app-icon name="search" size="14" /></span>
             <input [(ngModel)]="searchQ" placeholder="Name or phone number..." />
           </div>
@@ -102,21 +95,41 @@
           }
         </div>
 
+        <!-- ─── Quick Donation ─── -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Quick Donation</div>
+              <div class="card-subtitle">Skip identification — donor recorded as anonymous</div>
+            </div>
+          </div>
+          <div class="quick-grid">
+            <button class="quick-btn quick-items-btn" (click)="quickDonate(DT.Items)">
+              <span style="font-size: 26px">&#128230;</span>
+              <span>Donate Items</span>
+            </button>
+            <button class="quick-btn quick-money-btn" (click)="quickDonate(DT.Monetary)">
+              <span style="font-size: 26px">&#128181;</span>
+              <span>Donate Money</span>
+            </button>
+          </div>
+        </div>
+
         <!-- ─── Appointment Lookup ─── -->
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Load Scheduled Appointment</div>
+              <div class="card-title">Search Scheduled Appointment</div>
               <div class="card-subtitle">Enter appointment ID or scan QR</div>
             </div>
           </div>
           <div class="appt-lookup-row">
             <input class="form-input" [(ngModel)]="apptQ" placeholder="APT-20260320-001"
               (keyup.enter)="lookupAppointment()" />
+            <button class="btn btn-primary" (click)="lookupAppointment()">Search</button>
             <button class="btn btn-secondary" (click)="demoScanApptQR()">
               <app-icon name="search" [size]="14"></app-icon> Scan QR
             </button>
-            <button class="btn btn-primary" (click)="lookupAppointment()">Look Up</button>
           </div>
 
           @if (apptResult()) {
@@ -320,7 +333,10 @@
               <div class="cat-card cat-card-any"
                    [class.has-items]="getQty(dept.key) > 0"
                    (click)="adjust(key(dept.key), 1)">
-                <div class="cat-name">{{ dept.name }} <span class="cat-any-tag">Any</span></div>
+                <div class="cat-card-any-text">
+                  <span class="cat-type-chip cat-type-dept">Department</span>
+                  <div class="cat-name">{{ dept.name }} <span class="cat-any-tag">Any</span></div>
+                </div>
                 <div class="qty-ctrl" (click)="$event.stopPropagation()">
                   <button (click)="adjust(key(dept.key), -1)">&#8722;</button>
                   <span>{{ getQty(dept.key) }}</span>
@@ -334,6 +350,7 @@
                   <div class="cat-card cat-card-cat"
                        [class.has-items]="getQty(dept.key, cat.key) > 0"
                        (click)="adjust(key(dept.key, cat.key), 1)">
+                    <span class="cat-type-chip cat-type-cat">Category</span>
                     <div class="cat-name">{{ cat.name }}</div>
                     <div class="qty-ctrl" (click)="$event.stopPropagation()">
                       <button (click)="adjust(key(dept.key, cat.key), -1)">&#8722;</button>
@@ -345,6 +362,7 @@
                     <div class="cat-card"
                          [class.has-items]="getQty(dept.key, cat.key, sub.key) > 0"
                          (click)="adjust(key(dept.key, cat.key, sub.key), 1)">
+                      <span class="cat-type-chip cat-type-sub">Subcategory</span>
                       <div class="cat-name">{{ sub.name }}</div>
                       <div class="qty-ctrl" (click)="$event.stopPropagation()">
                         <button (click)="adjust(key(dept.key, cat.key, sub.key), -1)">&#8722;</button>

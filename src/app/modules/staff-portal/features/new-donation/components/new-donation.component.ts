@@ -71,7 +71,7 @@ export class NewDonationComponent {
 
   readonly topSubtitle = computed(() => {
     const s = this.st.step(), dt = this.st.donationType();
-    if (s === 1) return 'Scan QR, NFC tap, search by phone, or continue anonymously';
+    if (s === 1) return 'Scan QR, search by phone, or continue anonymously';
     if (s === 2) return "Select how you'd like to donate today";
     if (this.isAddMoneyStep()) return 'Select amount and payment method';
     if (this.isAddItemsStep()) return 'Quick-tap categories — complete in under 10 seconds';
@@ -226,6 +226,12 @@ export class NewDonationComponent {
 
   selectAnonymous(): void {
     this.st.setDonor(null);
+  }
+
+  quickDonate(type: DonationType): void {
+    this.st.setDonor(null);
+    this.st.setDonationType(type);
+    this.st.goToStep(type === DonationType.Monetary ? 3 : 3);
   }
   clearDonor(): void {
     this.st.setDonor(undefined);
