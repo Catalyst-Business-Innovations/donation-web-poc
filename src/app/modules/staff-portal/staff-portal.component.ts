@@ -32,24 +32,21 @@ export class StaffPortalComponent {
       title: 'Operations',
       items: [
         { label: 'New Donation', icon: 'package', route: '/staff/new-donation' },
-        { label: 'Donor Lookup', icon: 'search', route: '/staff/lookup' },
         { label: 'Donations', icon: 'calendar', route: '/staff/donations' },
+        { label: 'Donors', icon: 'users', route: '/staff/donors' },
         { label: 'Presort', icon: 'list', route: '/staff/presort', badge: 3 }
       ]
     },
     {
       title: 'Reporting',
       items: [
-        { label: 'Dashboard', icon: 'grid', route: '/staff/dashboard' },
-        { label: 'Daily Reports', icon: 'bar-chart', route: '/staff/reports' },
-        { label: 'Analytics', icon: 'trending-up', route: '/staff/analytics' }
+        { label: 'Dashboard', icon: 'grid', route: '/staff/dashboard' }
       ]
     },
     {
       title: 'Admin',
       items: [
         { label: 'Containers', icon: 'layers', route: '/staff/containers' },
-        { label: 'Donors', icon: 'users', route: '/staff/donors' },
         { label: 'Campaigns', icon: 'send', route: '/staff/campaigns' },
         { label: 'Settings', icon: 'settings', route: '/staff/settings' }
       ]

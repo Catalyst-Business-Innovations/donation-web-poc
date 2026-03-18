@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe, DatePipe } from '@angular/common';
 import { MockDataService } from '../../../../../core/services/mock-data.service';
+import { CampaignStatus } from '../../../../../core/models/domain.models';
 import { ToastService } from '../../../../../core/services/toast.service';
 import { DonorDashboardMapper } from '../models/donor-dashboard.models';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
@@ -31,6 +32,10 @@ export class DonorDashboardComponent {
   }
 
   readonly impact = DonorDashboardMapper.impactItems(this.donor.totalDonations, this.donor.lifetimeValue);
+
+  readonly activeCampaigns = computed(() =>
+    this.svc.campaigns().filter(c => c.status === CampaignStatus.Active)
+  );
 
   readonly badges = [
     { icon: 'star' as const, label: 'First Donation', earned: true },

@@ -29,6 +29,8 @@ import {
   CampaignStatus,
   CampaignNotification,
   NotificationChannel,
+  NotificationTemplate,
+  DonorTierLabel,
 } from '../models/domain.models';
 import { StorageService } from './storage.service';
 import { PresortQueueItem } from '../../modules/staff-portal/features/presort/models/presort.models';
@@ -100,6 +102,21 @@ export class MockDataService {
       channel: NotificationChannel.Email,
       targetCriteria: [{ categoryKey: 'clothing', categoryName: 'Clothing', subCategoryKey: 'womens', subCategoryName: "Women's" }],
       notificationHistory: [],
+      emailTemplate: {
+        channel: NotificationChannel.Email,
+        subject: 'Help Us Stock Up on Winter Jackets, {{first_name}}!',
+        body: `<p>Hi <strong>{{donor_name}}</strong>,</p>\n<p>As a valued <strong>{{tier}}</strong> member of {{org_name}}, we\'re reaching out to let you know our Winter Jacket Drive is starting soon.</p>\n<p>Your previous clothing donations have made a real difference. We\'d love your help again this year — every jacket counts!</p>\n<p>You currently have <strong>{{points}} points</strong> in your loyalty account. Donate during this campaign to earn bonus points.</p>\n<p>Thank you for your generosity,<br>The {{org_name}} Team</p>`,
+        blocks: [
+          { id: 's1', type: 'header' as const, content: 'Winter Jacket Drive', align: 'center' as const, level: 1 },
+          { id: 's2', type: 'text' as const, content: 'Hi {{donor_name}},\n\nAs a valued {{tier}} member of {{org_name}}, we\'re reaching out to let you know our Winter Jacket Drive is starting soon.', align: 'left' as const },
+          { id: 's3', type: 'text' as const, content: 'Your previous clothing donations have made a real difference. We\'d love your help again this year — every jacket counts!', align: 'left' as const },
+          { id: 's4', type: 'text' as const, content: 'You currently have {{points}} points in your loyalty account. Donate during this campaign to earn bonus points.', align: 'left' as const },
+          { id: 's5', type: 'button' as const, content: 'Learn More', align: 'center' as const, meta: 'https://example.org/jackets' },
+          { id: 's6', type: 'divider' as const, content: '', align: 'center' as const },
+          { id: 's7', type: 'text' as const, content: 'Thank you for your generosity,\nThe {{org_name}} Team', align: 'left' as const },
+        ],
+        updatedAt: new Date('2026-03-18'),
+      },
       createdAt: new Date('2026-03-18'),
       createdByStaffId: 1,
     },
@@ -116,6 +133,26 @@ export class MockDataService {
         { donorId: 5, donorName: 'David Chen',       channel: NotificationChannel.Email, sentAt: new Date('2026-03-20'), success: true },
         { donorId: 10, donorName: 'Lisa Anderson',    channel: NotificationChannel.SMS,   sentAt: new Date('2026-03-20'), success: true },
       ],
+      emailTemplate: {
+        channel: NotificationChannel.Email,
+        subject: 'Got Old Electronics? We\'ll Take Them, {{first_name}}!',
+        body: `<p>Hi <strong>{{donor_name}}</strong>,</p>\n<p>{{org_name}} is running an Electronics Recycling Push and we thought of you!</p>\n<p>Whether it\'s old phones, laptops, or cables — we\'ll make sure they\'re recycled responsibly.</p>\n<p>Drop off anytime before March 31. As a <strong>{{tier}}</strong> donor with <strong>{{points}} points</strong>, you\'re making a big impact.</p>\n<p>See you soon!<br>{{org_name}}</p>`,
+        blocks: [
+          { id: 'e1', type: 'header' as const, content: 'Electronics Recycling Push', align: 'center' as const, level: 1 },
+          { id: 'e2', type: 'text' as const, content: 'Hi {{donor_name}},\n\n{{org_name}} is running an Electronics Recycling Push and we thought of you!', align: 'left' as const },
+          { id: 'e3', type: 'text' as const, content: 'Whether it\'s old phones, laptops, or cables — we\'ll make sure they\'re recycled responsibly.', align: 'left' as const },
+          { id: 'e4', type: 'text' as const, content: 'Drop off anytime before March 31. As a {{tier}} donor with {{points}} points, you\'re making a big impact.', align: 'left' as const },
+          { id: 'e5', type: 'button' as const, content: 'Find a Drop-off', align: 'center' as const, meta: 'https://example.org/recycle' },
+          { id: 'e6', type: 'text' as const, content: 'See you soon!\n{{org_name}}', align: 'left' as const },
+        ],
+        updatedAt: new Date('2026-03-15'),
+      },
+      smsTemplate: {
+        channel: NotificationChannel.SMS,
+        subject: '',
+        body: `Hi {{first_name}}! {{org_name}} is collecting electronics thru Mar 31. Drop off old devices & earn bonus points! You have {{points}} pts as a {{tier}} member. Details: example.org/recycle`,
+        updatedAt: new Date('2026-03-15'),
+      },
       createdAt: new Date('2026-03-15'),
       createdByStaffId: 1,
     },
@@ -1891,6 +1928,24 @@ export class MockDataService {
     this._campaigns.update(list =>
       list.map(c => c.id === id ? { ...c, ...patch } : c)
     );
+  }
+
+  saveCampaignTemplate(campaignId: number, template: NotificationTemplate): void {
+    const field = template.channel === NotificationChannel.Email ? 'emailTemplate' : 'smsTemplate';
+    this._campaigns.update(list =>
+      list.map(c => c.id === campaignId ? { ...c, [field]: { ...template, updatedAt: new Date() } } : c)
+    );
+  }
+
+  /** Resolve merge variables in a template body/subject using a sample donor */
+  previewTemplate(text: string, donor: Donor, campaignName: string): string {
+    return text
+      .replace(/\{\{donor_name\}\}/g, `${donor.firstName} ${donor.lastName}`)
+      .replace(/\{\{first_name\}\}/g, donor.firstName)
+      .replace(/\{\{campaign_name\}\}/g, campaignName)
+      .replace(/\{\{points\}\}/g, donor.loyaltyPoints.toLocaleString())
+      .replace(/\{\{tier\}\}/g, DonorTierLabel[donor.loyaltyTier])
+      .replace(/\{\{org_name\}\}/g, 'Our Organization');
   }
 
   /**

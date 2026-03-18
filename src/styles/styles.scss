@@ -472,14 +472,11 @@ app-receipts,
 app-rewards,
 app-schedule,
 app-admin-dashboard,
-app-analytics,
 app-settings,
 app-donor-management,
-app-donor-lookup,
 app-new-donation,
 app-presort,
-app-containers,
-app-reports {
+app-containers {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;

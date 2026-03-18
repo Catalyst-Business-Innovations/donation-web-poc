@@ -48,7 +48,10 @@ export type IconName =
   | 'gift'
   | 'phone'
   | 'mail'
-  | 'printer';
+  | 'printer'
+  | 'award'
+  | 'sliders'
+  | 'bell';
 
 @Component({
   selector: 'app-icon',

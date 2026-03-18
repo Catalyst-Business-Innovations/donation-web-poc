@@ -1,157 +1,221 @@
 <div class="topbar">
   <div>
     <div class="topbar-title">Settings</div>
-    <div class="topbar-subtitle">Configure global preferences and categories</div>
+    <div class="topbar-subtitle">Configure system rules and loyalty tiers</div>
   </div>
 </div>
 
 <div class="page-content">
-  <div class="settings-grid">
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab() === 'general'" (click)="activeTab.set('general')">
+      <app-icon name="settings" [size]="16"></app-icon> General
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'loyalty'" (click)="activeTab.set('loyalty')">
+      <app-icon name="award" [size]="16"></app-icon> Loyalty & Rewards
+    </button>
+  </div>
 
-    <!-- Loyalty Tiers -->
-    <div class="card">
-      <div class="card-header"><div class="card-title">Loyalty Tiers</div></div>
-      @for (tier of tierCopies; track tier.tier) {
-        <div class="tier-config-row">
-          <app-icon [name]="tier.icon" [size]="22"></app-icon>
-          <span style="font-weight: 700; width: 80px">{{ tier.label }}</span>
-          <div class="tier-inputs">
-            <div class="mini-field">
-              <label>Min Visits</label>
-              <input type="number" class="form-input mini-in" [(ngModel)]="tier.minDonations" />
-            </div>
-            <div class="mini-field">
-              <label>Points ×</label>
-              <input type="number" class="form-input mini-in" [(ngModel)]="tier.pointsMultiplier" step="0.5" />
-            </div>
+  <!-- ═══════════ GENERAL TAB ═══════════ -->
+  @if (activeTab() === 'general') {
+    <div class="tab-panel">
+
+      <!-- System Rules -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-icon"><app-icon name="sliders" [size]="20"></app-icon></div>
+          <div>
+            <div class="settings-card-title">System Rules</div>
+            <div class="settings-card-desc">Payment options, association windows, points, and email requirements</div>
           </div>
         </div>
-      }
-      <button class="btn btn-success" style="margin-top: 12px" (click)="save('Loyalty configuration')">Save</button>
+        <div class="settings-card-body">
+          <div class="rules-section-label">Payment</div>
+          <div class="rule-row" (click)="systemRules.isCashAccepted = !systemRules.isCashAccepted">
+            <div>
+              <div class="rule-label">Accept Cash Donations</div>
+              <div class="rule-desc">Show cash as a payment option at the donation terminal</div>
+            </div>
+            <label class="toggle" (click)="$event.stopPropagation()">
+              <input type="checkbox" [(ngModel)]="systemRules.isCashAccepted" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+
+          <div class="rules-section-label">Donor Association</div>
+          <div class="rule-row">
+            <div>
+              <div class="rule-label">Association Window</div>
+              <div class="rule-desc">Hours staff can link an anonymous donation to a donor</div>
+            </div>
+            <div class="mini-field">
+              <input type="number" class="form-input mini-in" [(ngModel)]="systemRules.associationWindowHours" min="1" max="168" />
+              <label>hrs</label>
+            </div>
+          </div>
+
+          <div class="rules-section-label">Loyalty Points</div>
+          <div class="rule-row">
+            <div>
+              <div class="rule-label">Points per Item</div>
+              <div class="rule-desc">Loyalty points awarded per donated item</div>
+            </div>
+            <div class="mini-field">
+              <input type="number" class="form-input mini-in" [(ngModel)]="systemRules.pointsPerItem" min="1" />
+              <label>pts</label>
+            </div>
+          </div>
+
+          <div class="rules-section-label">Email Requirements</div>
+          <div class="rule-row" (click)="systemRules.emailForReceipt = !systemRules.emailForReceipt">
+            <div>
+              <div class="rule-label">Required for Receipt</div>
+              <div class="rule-desc">Donor must have email to receive e-receipts</div>
+            </div>
+            <label class="toggle" (click)="$event.stopPropagation()">
+              <input type="checkbox" [(ngModel)]="systemRules.emailForReceipt" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="rule-row" (click)="systemRules.emailForLogin = !systemRules.emailForLogin">
+            <div>
+              <div class="rule-label">Required for Portal Login</div>
+              <div class="rule-desc">Donor must have email to access the donor portal</div>
+            </div>
+            <label class="toggle" (click)="$event.stopPropagation()">
+              <input type="checkbox" [(ngModel)]="systemRules.emailForLogin" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="rule-row" (click)="systemRules.emailForCampaigns = !systemRules.emailForCampaigns">
+            <div>
+              <div class="rule-label">Required for Campaigns</div>
+              <div class="rule-desc">Exclude donors without email from campaign notifications</div>
+            </div>
+            <label class="toggle" (click)="$event.stopPropagation()">
+              <input type="checkbox" [(ngModel)]="systemRules.emailForCampaigns" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-card-footer">
+          <button class="btn btn-success" (click)="saveSystemRules()">Save System Rules</button>
+        </div>
+      </div>
+
     </div>
+  }
 
-    
+  <!-- ═══════════ LOYALTY & REWARDS TAB ═══════════ -->
+  @if (activeTab() === 'loyalty') {
+    <div class="tab-panel">
 
-    <!-- System Rules (Req 2, 3, 4) -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">System Rules</div>
-        <div class="card-subtitle">Cash, association window, points, email requirements</div>
+      <!-- Loyalty Tiers -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-icon"><app-icon name="award" [size]="20"></app-icon></div>
+          <div>
+            <div class="settings-card-title">Loyalty Tiers</div>
+            <div class="settings-card-desc">Configure tier thresholds, multipliers, and view perks for each level</div>
+          </div>
+        </div>
+        <div class="settings-card-body">
+          <div class="tier-grid">
+            @for (tier of tierCopies; track tier.tier; let i = $index) {
+              <div class="tier-card" [style.--tier-color]="tier.color" [style.--tier-bg]="tier.bgColor">
+                <div class="tier-card-header">
+                  <div class="tier-card-icon">
+                    <app-icon [name]="tier.icon" [size]="22"></app-icon>
+                  </div>
+                  <div class="tier-card-rank">Tier {{ i + 1 }}</div>
+                </div>
+                <div class="tier-card-name">{{ tier.label }}</div>
+                <div class="tier-card-fields">
+                  <div class="tier-field">
+                    <label>Min Visits</label>
+                    <input type="number" class="form-input" [(ngModel)]="tier.minDonations" min="0" />
+                  </div>
+                  <div class="tier-field">
+                    <label>Points Multiplier</label>
+                    <div class="multiplier-input">
+                      <input type="number" class="form-input" [(ngModel)]="tier.pointsMultiplier" step="0.5" min="1" />
+                      <span class="multiplier-x">×</span>
+                    </div>
+                  </div>
+                </div>
+                @if (tier.perks && tier.perks.length) {
+                  <div class="tier-card-perks">
+                    <div class="tier-perks-label">Perks</div>
+                    @for (perk of tier.perks; track perk) {
+                      <div class="tier-perk">
+                        <app-icon name="checkmark" [size]="12"></app-icon>
+                        <span>{{ perk }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+        <div class="settings-card-footer">
+          <button class="btn btn-success" (click)="save('Loyalty configuration')">Save Tiers</button>
+        </div>
       </div>
 
-      <div class="rules-section-label">Payment</div>
-      <div class="rule-row">
-        <div>
-          <div class="rule-label">Accept Cash Donations</div>
-          <div class="rule-desc">Show cash as a payment option at the donation terminal</div>
+      <!-- Reward Definitions -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-icon"><app-icon name="gift" [size]="20"></app-icon></div>
+          <div>
+            <div class="settings-card-title">Reward Definitions</div>
+            <div class="settings-card-desc">Configure redeemable rewards for loyal donors</div>
+          </div>
+          <button class="btn btn-primary btn-sm" style="margin-left: auto" (click)="openAddRewardModal()">+ Add Reward</button>
         </div>
-        <label class="toggle-label">
-          <input type="checkbox" [(ngModel)]="systemRules.isCashAccepted" style="accent-color: var(--primary)" />
-          {{ systemRules.isCashAccepted ? 'On' : 'Off' }}
-        </label>
+        <div class="settings-card-body no-padding">
+          <table class="reward-table">
+            <thead>
+              <tr>
+                <th>Reward</th>
+                <th style="text-align: right">Points</th>
+                <th style="text-align: right">Value</th>
+                <th style="text-align: center">Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of svc.rewardDefinitions(); track r.id) {
+                <tr [class.inactive-row]="!r.active">
+                  <td>
+                    <div class="reward-name-cell">
+                      <span class="reward-icon">{{ r.icon }}</span>
+                      <div>
+                        <div class="reward-name">{{ r.name }}</div>
+                        <div class="reward-desc">{{ r.description }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="text-align: right; font-weight: 700; color: var(--primary)">{{ r.pointsRequired }}</td>
+                  <td style="text-align: right">{{ r.discountValue > 0 ? '$' + r.discountValue : '—' }}</td>
+                  <td style="text-align: center">
+                    <span class="status-dot" [class.active]="r.active"></span>
+                    {{ r.active ? 'Active' : 'Off' }}
+                  </td>
+                  <td style="text-align: right; white-space: nowrap">
+                    <button class="btn-icon" title="Edit" (click)="openEditRewardModal(r)"><app-icon name="edit" [size]="14"></app-icon></button>
+                    <button class="btn-icon btn-icon-danger" title="Delete" (click)="deleteReward(r.id)"><app-icon name="delete" [size]="14"></app-icon></button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="rules-section-label">Donor Association</div>
-      <div class="rule-row">
-        <div>
-          <div class="rule-label">Association Window</div>
-          <div class="rule-desc">Hours staff can link an anonymous donation to a donor</div>
-        </div>
-        <div class="mini-field">
-          <input type="number" class="form-input mini-in" [(ngModel)]="systemRules.associationWindowHours" min="1" max="168" />
-          <label>hrs</label>
-        </div>
-      </div>
-
-      <div class="rules-section-label">Loyalty Points (Req 4)</div>
-      <div class="rule-row">
-        <div>
-          <div class="rule-label">Points per Item</div>
-          <div class="rule-desc">Loyalty points awarded per donated item</div>
-        </div>
-        <div class="mini-field">
-          <input type="number" class="form-input mini-in" [(ngModel)]="systemRules.pointsPerItem" min="1" />
-          <label>pts</label>
-        </div>
-      </div>
-
-      <div class="rules-section-label">Email Requirements (Req 3)</div>
-      <div class="rule-row" (click)="systemRules.emailForReceipt = !systemRules.emailForReceipt">
-        <div>
-          <div class="rule-label">Required for Receipt</div>
-          <div class="rule-desc">Donor must have email to receive e-receipts</div>
-        </div>
-        <label class="toggle-label" (click)="$event.stopPropagation()">
-          <input type="checkbox" [(ngModel)]="systemRules.emailForReceipt" style="accent-color: var(--primary)" />
-          {{ systemRules.emailForReceipt ? 'On' : 'Off' }}
-        </label>
-      </div>
-      <div class="rule-row" (click)="systemRules.emailForLogin = !systemRules.emailForLogin">
-        <div>
-          <div class="rule-label">Required for Portal Login</div>
-          <div class="rule-desc">Donor must have email to access the donor portal</div>
-        </div>
-        <label class="toggle-label" (click)="$event.stopPropagation()">
-          <input type="checkbox" [(ngModel)]="systemRules.emailForLogin" style="accent-color: var(--primary)" />
-          {{ systemRules.emailForLogin ? 'On' : 'Off' }}
-        </label>
-      </div>
-      <div class="rule-row" (click)="systemRules.emailForCampaigns = !systemRules.emailForCampaigns">
-        <div>
-          <div class="rule-label">Required for Campaigns</div>
-          <div class="rule-desc">Exclude donors without email from campaign notifications</div>
-        </div>
-        <label class="toggle-label" (click)="$event.stopPropagation()">
-          <input type="checkbox" [(ngModel)]="systemRules.emailForCampaigns" style="accent-color: var(--primary)" />
-          {{ systemRules.emailForCampaigns ? 'On' : 'Off' }}
-        </label>
-      </div>
-
-      <button class="btn btn-success" style="margin-top: 14px" (click)="saveSystemRules()">Save System Rules</button>
     </div>
+  }
 
-    <!-- Reward Definitions (Req 5) -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Reward Tiers</div>
-        <button class="btn btn-primary btn-sm" (click)="openAddRewardModal()">+ Add Tier</button>
-      </div>
-      <table class="reward-table">
-        <thead>
-          <tr>
-            <th>Reward</th>
-            <th style="text-align: right">Points</th>
-            <th style="text-align: right">Value</th>
-            <th style="text-align: center">Active</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (r of svc.rewardDefinitions(); track r.id) {
-            <tr [class.inactive-row]="!r.active">
-              <td>
-                <span style="margin-right: 6px">{{ r.icon }}</span>
-                <span style="font-weight: 600">{{ r.name }}</span>
-                <div style="font-size: 11px; color: var(--gray-500)">{{ r.description }}</div>
-              </td>
-              <td style="text-align: right; font-weight: 700; color: var(--primary)">{{ r.pointsRequired }}</td>
-              <td style="text-align: right">{{ r.discountValue > 0 ? '$' + r.discountValue : '—' }}</td>
-              <td style="text-align: center">
-                <span class="badge" [class.badge-success]="r.active" [class.badge-warning]="!r.active">
-                  {{ r.active ? 'Active' : 'Off' }}
-                </span>
-              </td>
-              <td style="text-align: right; white-space: nowrap">
-                <button class="btn-icon" title="Edit" (click)="openEditRewardModal(r)"><app-icon name="edit" size="14" /></button>
-                <button class="btn-icon" title="Delete" style="color: var(--danger)" (click)="deleteReward(r.id)"><app-icon name="delete" size="14" /></button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-  </div>
 </div>
 
 <!-- Add/Edit Reward Modal -->
@@ -216,41 +280,4 @@
   </div>
 </app-modal>
 
-<!-- Configure Integration Modal -->
-<app-modal
-  [open]="modalMode() === 'configure-integration'"
-  [title]="modalTitle"
-  [confirmLabel]="confirmLabel"
-  (closed)="closeModal()"
-  (confirmed)="toggleIntegrationConnection()"
->
-  @if (selectedIntegration(); as int) {
-    <div style="display: flex; flex-direction: column; gap: 16px">
-      <div style="display: flex; align-items: center; gap: 12px">
-        <div style="font-size: 48px">{{ int.icon }}</div>
-        <div style="flex: 1">
-          <div style="font-weight: 700; font-size: 18px; margin-bottom: 4px">{{ int.name }}</div>
-          <div style="color: var(--gray-600)">{{ int.desc }}</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <div style="display: flex; align-items: center; gap: 8px">
-          <span class="badge {{ int.connected ? 'badge-success' : 'badge-danger' }}">
-            {{ int.connected ? '✅ Connected' : '❌ Disconnected' }}
-          </span>
-        </div>
-      </div>
-      @if (int.connected) {
-        <div style="padding: 12px; background: var(--gray-50); border-radius: 8px; border: 1px solid var(--gray-200)">
-          <div style="font-weight: 600; margin-bottom: 8px">Connection Details</div>
-          <div style="font-size: 12px; color: var(--gray-600); line-height: 1.6">
-            <div>Last sync: 2 minutes ago</div>
-            <div>Endpoint: https://api.brijjworks.com/v1/integration</div>
-            <div>API Key: ****-****-****-{{ int.name.slice(0, 4) }}</div>
-          </div>
-        </div>
-      }
-    </div>
-  }
-</app-modal>
+

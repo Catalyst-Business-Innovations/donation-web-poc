@@ -82,6 +82,71 @@
   letter-spacing: 0.5px;
 }
 
+// ── Active Campaigns Strip ──
+.campaigns-strip {
+  margin-bottom: 20px;
+}
+.campaigns-strip-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-700);
+  margin-bottom: 10px;
+}
+.campaigns-strip-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.campaign-card {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.15s;
+  &:hover {
+    border-color: var(--primary);
+  }
+}
+.campaign-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--primary-light, #e8f4ff);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.campaign-card-body {
+  min-width: 0;
+}
+.campaign-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 2px;
+}
+.campaign-card-desc {
+  font-size: 12px;
+  color: var(--gray-500);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+.campaign-card-dates {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+}
+
 .dash-grid {
   display: grid;
   grid-template-columns: 1fr 320px;

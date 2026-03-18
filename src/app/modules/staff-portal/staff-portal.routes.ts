@@ -10,12 +10,7 @@ export const staffRoutes: Routes = [
     loadComponent: () =>
       import('./features/new-donation/components/new-donation.component').then(m => m.NewDonationComponent)
   },
-  {
-    path: 'lookup',
-    data: { breadcrumb: 'Donor Lookup' },
-    loadComponent: () =>
-      import('./features/donor-lookup/components/donor-lookup.component').then(m => m.DonorLookupComponent)
-  },
+
   {
     path: 'donations',
     data: { breadcrumb: 'Donations' },
@@ -33,11 +28,7 @@ export const staffRoutes: Routes = [
     loadComponent: () =>
       import('./features/containers/components/containers.component').then(m => m.ContainersComponent)
   },
-  {
-    path: 'reports',
-    data: { breadcrumb: 'Daily Reports' },
-    loadComponent: () => import('./features/reports/components/reports.component').then(m => m.ReportsComponent)
-  },
+
 
   // Admin (merged)
   {
@@ -46,11 +37,7 @@ export const staffRoutes: Routes = [
     loadComponent: () =>
       import('./features/admin-dashboard/components/admin-dashboard.component').then(m => m.AdminDashboardPageComponent)
   },
-  {
-    path: 'analytics',
-    data: { breadcrumb: 'Analytics' },
-    loadComponent: () => import('./features/analytics/components/analytics.component').then(m => m.AnalyticsComponent)
-  },
+
   {
     path: 'donors',
     data: { breadcrumb: 'Donors' },

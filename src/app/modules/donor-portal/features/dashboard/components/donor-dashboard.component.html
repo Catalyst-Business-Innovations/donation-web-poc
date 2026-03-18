@@ -55,6 +55,31 @@
     </div>
   </div>
 
+  <!-- Active Campaigns -->
+  @if (activeCampaigns().length > 0) {
+    <div class="campaigns-strip">
+      <div class="campaigns-strip-header">
+        <app-icon name="send" [size]="16"></app-icon>
+        <span>Active Campaigns</span>
+      </div>
+      <div class="campaigns-strip-list">
+        @for (c of activeCampaigns(); track c.id) {
+          <div class="campaign-card">
+            <div class="campaign-card-icon"><app-icon name="send" [size]="20"></app-icon></div>
+            <div class="campaign-card-body">
+              <div class="campaign-card-name">{{ c.name }}</div>
+              <div class="campaign-card-desc">{{ c.description }}</div>
+              <div class="campaign-card-dates">
+                <app-icon name="calendar" [size]="11"></app-icon>
+                {{ c.startDate | date: 'MMM d' }} – {{ c.endDate | date: 'MMM d, yyyy' }}
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
   <div class="dash-grid">
     <div class="card">
       <div class="card-header">

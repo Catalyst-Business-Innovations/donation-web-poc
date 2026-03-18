@@ -160,6 +160,122 @@ export interface CampaignTargetCriteria {
   attributeValue?: string;  // future: e.g. "Red"
 }
 
+/** Supported merge variables for campaign templates */
+export const TemplateMergeVariables = [
+  { key: '{{donor_name}}',    label: 'Donor Name',     sample: 'John Smith' },
+  { key: '{{first_name}}',    label: 'First Name',     sample: 'John' },
+  { key: '{{campaign_name}}', label: 'Campaign Name',  sample: 'Winter Jacket Drive' },
+  { key: '{{points}}',        label: 'Points Balance', sample: '1,250' },
+  { key: '{{tier}}',          label: 'Loyalty Tier',   sample: 'Gold' },
+  { key: '{{org_name}}',      label: 'Organization',   sample: 'Our Organization' },
+] as const;
+
+// ── Email Block Builder types ──────────────────────────────────────────────
+export type EmailBlockType = 'header' | 'text' | 'button' | 'divider' | 'image' | 'spacer';
+export type EmailBlockAlign = 'left' | 'center' | 'right';
+
+export interface EmailBlock {
+  id: string;
+  type: EmailBlockType;
+  content: string;
+  align: EmailBlockAlign;
+  /** Button URL, image alt text, etc. */
+  meta?: string;
+  /** Heading level for headers (1-3), spacer height in px */
+  level?: number;
+}
+
+/** A pre-built starter template for the email builder */
+export interface EmailStarterTemplate {
+  name: string;
+  description: string;
+  icon: string;
+  subject: string;
+  blocks: EmailBlock[];
+}
+
+/** Built-in starter templates */
+export const EMAIL_STARTER_TEMPLATES: EmailStarterTemplate[] = [
+  {
+    name: 'Blank',
+    description: 'Start from scratch',
+    icon: 'file',
+    subject: '',
+    blocks: [
+      { id: 's0', type: 'text', content: '', align: 'left' },
+    ],
+  },
+  {
+    name: 'Donation Appeal',
+    description: 'Ask past donors to donate again',
+    icon: 'gift',
+    subject: 'We Need Your Help Again, {{first_name}}!',
+    blocks: [
+      { id: 's1', type: 'header', content: '{{campaign_name}}', align: 'center', level: 1 },
+      { id: 's2', type: 'divider', content: '', align: 'center' },
+      { id: 's3', type: 'text', content: 'Hi <strong>{{donor_name}}</strong>,\n\nAs a valued <strong>{{tier}}</strong> member of {{org_name}}, we\'re reaching out because your past donations have made a real difference in our community.', align: 'left' },
+      { id: 's4', type: 'text', content: 'We\'re launching <strong>{{campaign_name}}</strong> and we\'d love your support. Every contribution counts!', align: 'left' },
+      { id: 's5', type: 'button', content: 'Donate Now', align: 'center', meta: 'https://donate.example.com' },
+      { id: 's6', type: 'spacer', content: '', align: 'center', level: 20 },
+      { id: 's7', type: 'text', content: 'You currently have <strong>{{points}} points</strong>. Donate during this campaign to earn bonus points!\n\nThank you for your generosity,\nThe {{org_name}} Team', align: 'left' },
+    ],
+  },
+  {
+    name: 'Thank You',
+    description: 'Post-campaign thank you note',
+    icon: 'star',
+    subject: 'Thank You, {{first_name}}! 🎉',
+    blocks: [
+      { id: 's1', type: 'header', content: 'Thank You!', align: 'center', level: 1 },
+      { id: 's2', type: 'divider', content: '', align: 'center' },
+      { id: 's3', type: 'text', content: 'Dear <strong>{{donor_name}}</strong>,\n\nOn behalf of the entire {{org_name}} team, we want to sincerely thank you for your generous donation to <strong>{{campaign_name}}</strong>.', align: 'left' },
+      { id: 's4', type: 'text', content: 'Your contribution directly supports our mission of serving the community. As a <strong>{{tier}}</strong> member, you\'ve been instrumental in making this campaign a success.', align: 'left' },
+      { id: 's5', type: 'text', content: 'Your loyalty account now has <strong>{{points}} points</strong>. Keep donating to unlock even more rewards!', align: 'center' },
+      { id: 's6', type: 'button', content: 'View My Rewards', align: 'center', meta: 'https://rewards.example.com' },
+      { id: 's7', type: 'spacer', content: '', align: 'center', level: 16 },
+      { id: 's8', type: 'text', content: 'With gratitude,\nThe {{org_name}} Team', align: 'left' },
+    ],
+  },
+  {
+    name: 'Event Invite',
+    description: 'Invite donors to a special event',
+    icon: 'calendar',
+    subject: 'You\'re Invited, {{first_name}}!',
+    blocks: [
+      { id: 's1', type: 'header', content: 'You\'re Invited!', align: 'center', level: 1 },
+      { id: 's2', type: 'text', content: 'Hi <strong>{{first_name}}</strong>,\n\nAs one of our most valued <strong>{{tier}}</strong> donors, we\'d love you to join us for a special event.', align: 'left' },
+      { id: 's3', type: 'header', content: '{{campaign_name}}', align: 'center', level: 2 },
+      { id: 's4', type: 'text', content: 'Join us for an exclusive event where you can learn about the impact of your donations and connect with other supporters.', align: 'center' },
+      { id: 's5', type: 'button', content: 'RSVP Now', align: 'center', meta: 'https://rsvp.example.com' },
+      { id: 's6', type: 'divider', content: '', align: 'center' },
+      { id: 's7', type: 'text', content: 'We look forward to seeing you there!\n\nBest,\n{{org_name}}', align: 'left' },
+    ],
+  },
+  {
+    name: 'Points Reminder',
+    description: 'Remind donors about loyalty points',
+    icon: 'trending-up',
+    subject: '{{first_name}}, You Have {{points}} Points!',
+    blocks: [
+      { id: 's1', type: 'header', content: 'Your Points Update', align: 'center', level: 1 },
+      { id: 's2', type: 'divider', content: '', align: 'center' },
+      { id: 's3', type: 'text', content: 'Hi <strong>{{donor_name}}</strong>,\n\nJust a friendly reminder — you have <strong>{{points}} loyalty points</strong> in your {{org_name}} account!', align: 'left' },
+      { id: 's4', type: 'text', content: 'As a <strong>{{tier}}</strong> member, you can redeem your points for exclusive rewards and discounts.', align: 'left' },
+      { id: 's5', type: 'button', content: 'Browse Rewards', align: 'center', meta: 'https://rewards.example.com' },
+      { id: 's6', type: 'text', content: 'Donate during <strong>{{campaign_name}}</strong> to earn even more points!\n\n— The {{org_name}} Team', align: 'left' },
+    ],
+  },
+];
+
+/** A notification template attached to a campaign */
+export interface NotificationTemplate {
+  channel: NotificationChannel;
+  subject: string;           // Email subject line (unused for SMS)
+  body: string;              // HTML for Email, plain text for SMS
+  blocks?: EmailBlock[];     // Block-based structure for the visual builder
+  updatedAt: Date;
+}
+
 /** A log entry from a campaign notification run (Req 6) */
 export interface CampaignNotification {
   donorId: number;
@@ -182,6 +298,8 @@ export interface Campaign {
   channel: NotificationChannel;
   targetCriteria: CampaignTargetCriteria[];
   notificationHistory: CampaignNotification[];
+  emailTemplate?: NotificationTemplate;
+  smsTemplate?: NotificationTemplate;
   createdAt: Date;
   createdByStaffId: number;
 }
