@@ -6,7 +6,7 @@ export interface CartItem {
   qty: number;
 }
 export interface ScheduledVisit {
-  id: string;
+  referenceNumber: string;
   date: string;
   day: string;
   month: string;

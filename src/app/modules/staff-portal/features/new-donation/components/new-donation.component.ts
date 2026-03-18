@@ -38,7 +38,7 @@ export class NewDonationComponent {
   protected paymentMethod = signal<'cash' | 'card' | null>(null);
   protected cashTendered = signal<number | null>(null);
   protected cardApproved = signal(false);
-  protected delivery = signal<ReceiptDelivery>(ReceiptDelivery.Email);
+  protected delivery = signal<ReceiptDelivery>(ReceiptDelivery.Print);
   protected readonly AS = DonationStatus;
   protected readonly RD = ReceiptDelivery;
   protected readonly CS = ContainerStatus;
@@ -46,6 +46,7 @@ export class NewDonationComponent {
   protected receiptNum = this.mockData.newReceipt();
   protected showConfirmation = signal(false);
   protected donationId = signal<number>(0);
+  protected donationRefNumber = signal<string>('');
   protected readonly today = new Date();
 
   // Phase 2 — Post-payment donor association (Req 1)
@@ -125,10 +126,9 @@ export class NewDonationComponent {
   });
 
   readonly deliveryOpts: { value: ReceiptDelivery; icon: IconName; label: string }[] = [
+    { value: ReceiptDelivery.Print, icon: 'printer',  label: 'Print' },
     { value: ReceiptDelivery.Email, icon: 'mail',     label: 'Email' },
     { value: ReceiptDelivery.SMS,   icon: 'send',     label: 'SMS' },
-    { value: ReceiptDelivery.Print, icon: 'printer',  label: 'Print' },
-    { value: ReceiptDelivery.None,  icon: 'x-circle', label: 'No Receipt' }
   ];
 
   readonly searchResults = computed<SelectedDonor[]>(() => {
@@ -342,6 +342,7 @@ export class NewDonationComponent {
     // Generate donation ID
     const newDonationId = Date.now();
     this.donationId.set(newDonationId);
+    this.donationRefNumber.set(`DON-${newDonationId}`);
     this.showConfirmation.set(true);
   }
 
@@ -359,7 +360,7 @@ export class NewDonationComponent {
     this.paymentMethod.set(null);
     this.cashTendered.set(null);
     this.cardApproved.set(false);
-    this.delivery.set(ReceiptDelivery.Email);
+    this.delivery.set(ReceiptDelivery.Print);
     this.showEnroll.set(false);
     this.searchQ.set('');
     this.sdQ = '';
@@ -387,7 +388,7 @@ export class NewDonationComponent {
     this.paymentMethod.set(null);
     this.cashTendered.set(null);
     this.cardApproved.set(false);
-    this.delivery.set(ReceiptDelivery.Email);
+    this.delivery.set(ReceiptDelivery.Print);
     this.showEnroll.set(false);
     this.searchQ.set('');
     this.sdQ = '';

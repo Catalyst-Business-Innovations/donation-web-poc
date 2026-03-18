@@ -34,7 +34,6 @@
             <th>Date</th>
             <th>Store</th>
             <th>Items</th>
-            <th>Est. Value</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -45,7 +44,6 @@
               <td>{{ d.timestamp | date: 'MMM d, yyyy' }}</td>
               <td>{{ d.locationName }}</td>
               <td style="font-weight: 700">{{ d.totalItems }}</td>
-              <td style="font-weight: 700; color: var(--secondary)">${{ d.totalEstimatedValue }}</td>
               <td>
                 <div class="table-actions">
                   <button class="btn-icon" (click)="viewReceipt(d)" title="View Receipt">
@@ -122,10 +120,6 @@
             border-top: 2px solid var(--gray-200);
           "
         >
-          <div style="font-weight: 700">Estimated Value</div>
-          <div style="font-weight: 800; font-size: 20px; color: var(--secondary)">
-            ${{ receipt.totalEstimatedValue }}
-          </div>
         </div>
       </div>
 

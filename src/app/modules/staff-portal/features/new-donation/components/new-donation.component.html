@@ -353,35 +353,43 @@
                 </div>
               </div>
 
-              <!-- One row per category: category card + subcategory cards side-by-side -->
-              @for (cat of dept.categories; track cat.key) {
-                <div class="cat-group">
-                  <div class="cat-card cat-card-cat"
-                       [class.has-items]="getQty(dept.key, cat.key) > 0"
-                       (click)="adjust(key(dept.key, cat.key), 1)">
-                    <span class="cat-type-chip cat-type-cat">Category</span>
-                    <div class="cat-name">{{ cat.name }}</div>
-                    <div class="qty-ctrl" (click)="$event.stopPropagation()">
-                      <button (click)="adjust(key(dept.key, cat.key), -1)">&#8722;</button>
-                      <span>{{ getQty(dept.key, cat.key) }}</span>
-                      <button (click)="adjust(key(dept.key, cat.key), 1)">+</button>
-                    </div>
-                  </div>
-                  @for (sub of (cat.subCategories ?? []); track sub.key) {
-                    <div class="cat-card"
-                         [class.has-items]="getQty(dept.key, cat.key, sub.key) > 0"
-                         (click)="adjust(key(dept.key, cat.key, sub.key), 1)">
-                      <span class="cat-type-chip cat-type-sub">Subcategory</span>
-                      <div class="cat-name">{{ sub.name }}</div>
+              <!-- One row per category: full-width category card, then subcategories in smaller grid -->
+              <div class="cat-categories-tree">
+                @for (cat of dept.categories; track cat.key) {
+                  <div class="cat-group">
+                    <div class="cat-card cat-card-any cat-card-cat"
+                         [class.has-items]="getQty(dept.key, cat.key) > 0"
+                         (click)="adjust(key(dept.key, cat.key), 1)">
+                      <div class="cat-card-any-text">
+                        <span class="cat-type-chip cat-type-cat">Category</span>
+                        <div class="cat-name">{{ cat.name }} <span class="cat-any-tag">Any</span></div>
+                      </div>
                       <div class="qty-ctrl" (click)="$event.stopPropagation()">
-                        <button (click)="adjust(key(dept.key, cat.key, sub.key), -1)">&#8722;</button>
-                        <span>{{ getQty(dept.key, cat.key, sub.key) }}</span>
-                        <button (click)="adjust(key(dept.key, cat.key, sub.key), 1)">+</button>
+                        <button (click)="adjust(key(dept.key, cat.key), -1)">&#8722;</button>
+                        <span>{{ getQty(dept.key, cat.key) }}</span>
+                        <button (click)="adjust(key(dept.key, cat.key), 1)">+</button>
                       </div>
                     </div>
-                  }
-                </div>
-              }
+                    @if ((cat.subCategories ?? []).length > 0) {
+                      <div class="cat-sub-grid">
+                        @for (sub of (cat.subCategories ?? []); track sub.key) {
+                          <div class="cat-card cat-card-sub"
+                               [class.has-items]="getQty(dept.key, cat.key, sub.key) > 0"
+                               (click)="adjust(key(dept.key, cat.key, sub.key), 1)">
+                            <span class="cat-type-chip cat-type-sub">Sub</span>
+                            <div class="cat-name">{{ sub.name }}</div>
+                            <div class="qty-ctrl" (click)="$event.stopPropagation()">
+                              <button (click)="adjust(key(dept.key, cat.key, sub.key), -1)">&#8722;</button>
+                              <span>{{ getQty(dept.key, cat.key, sub.key) }}</span>
+                              <button (click)="adjust(key(dept.key, cat.key, sub.key), 1)">+</button>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
 
             </div>
           }
@@ -507,75 +515,106 @@
   <!-- ─── Review Step ─── -->
   @if (isReviewStep()) {
     <div class="page-content anim-in">
+
+      <!-- Summary header -->
+      <div class="rs-header">
+        <div class="rs-header-icon"><app-icon name="check-circle" size="22" /></div>
+        <div>
+          <div class="rs-header-title">Review Summary</div>
+          <div class="rs-header-sub">Confirm all details before completing the donation</div>
+        </div>
+      </div>
+
       <div class="review-grid" [class.single-col]="st.donationType() === DT.Monetary">
 
+        <!-- ── Left column: items ── -->
         @if (st.donationType() !== DT.Monetary) {
-          <div class="card receipt-card">
-            <div class="receipt-hdr">
-              <div>
-                <div class="receipt-title">Donation Receipt</div>
-                <div class="receipt-num">{{ receiptNum }}</div>
+          <div class="card rs-items-card">
+
+            <!-- Donor chip -->
+            @if (st.donor(); as donor) {
+              <div class="rs-donor-chip">
+                <div class="rs-donor-avatar">{{ donor.initials }}</div>
+                <div class="rs-donor-info">
+                  <div class="rs-donor-name">{{ donor.displayName }}</div>
+                  <div class="rs-donor-meta">{{ tierCfg(donor.tier).label }} · {{ donor.points | number }} pts</div>
+                </div>
+                <div class="rs-points-badge">+{{ st.estPoints() }} pts</div>
               </div>
-            </div>
-            <div class="receipt-items">
+            }
+
+            <!-- Items table -->
+            <div class="rs-section-label">Items to Donate</div>
+            <div class="rs-items-list">
               @for (item of reviewItems(); track item.key) {
-                <div class="receipt-item-row">
-                  <span>{{ item.name }}</span>
-                  <span class="ri-qty">×{{ item.qty }}</span>
+                <div class="rs-item-row">
+                  <div class="rs-item-name">{{ item.name }}</div>
+                  <div class="rs-item-right">
+                    <span class="rs-item-qty">× {{ item.qty }}</span>
+                  </div>
                 </div>
               }
             </div>
-            <div class="receipt-totals">
-              <div class="rt-row">
+
+            <!-- Totals -->
+            <div class="rs-totals">
+              <div class="rs-total-row">
                 <span>Total Items</span>
                 <strong>{{ st.totalItems() }}</strong>
               </div>
-              @if (st.donor()) {
-                <div class="rt-row points">
-                  <span>Points Earned</span>
-                  <strong>+{{ st.estPoints() }}</strong>
-                </div>
-              }
             </div>
           </div>
         }
 
+        <!-- ── Right column: payment + delivery + CTA ── -->
         <div class="review-right">
 
+          <!-- Payment block -->
           @if (st.donationType() !== DT.Items) {
-            <div class="card">
-              <div class="card-header"><div class="card-title">Payment</div></div>
-              <div class="money-summary">
-                <div class="ms-amount">${{ (monetary() ?? 0).toFixed(2) }}</div>
-                <div class="ms-method">
-                  @if (paymentMethod() === 'cash') { &#128181; Cash }
-                  @if (paymentMethod() === 'card') { &#128179; Card / Tap }
+            <div class="card rs-payment-card">
+              <div class="rs-section-label">Monetary Donation</div>
+              <div class="rs-pay-row">
+                <div class="rs-pay-amount">${{ (monetary() ?? 0).toFixed(2) }}</div>
+                <div class="rs-pay-method">
+                  @if (paymentMethod() === 'cash') {
+                    <span class="rs-method-badge">💵 Cash</span>
+                  }
+                  @if (paymentMethod() === 'card') {
+                    <span class="rs-method-badge">💳 Card / Tap</span>
+                  }
                 </div>
               </div>
             </div>
           }
 
+          <!-- Receipt delivery -->
           <div class="card">
-            <div class="card-header"><div class="card-title">Receipt Delivery</div></div>
-            @for (opt of deliveryOpts; track opt.value) {
-              <label class="delivery-opt" [class.active]="delivery() === opt.value">
-                <input
-                  type="radio"
-                  name="del"
-                  [value]="opt.value"
-                  [checked]="delivery() === opt.value"
-                  (change)="delivery.set(opt.value)"
-                />
-                <app-icon [name]="opt.icon" [size]="14"></app-icon>
-                {{ opt.label }}
-              </label>
-            }
+            <div class="rs-section-label">Receipt Delivery</div>
+            <div class="rs-delivery-opts">
+              @for (opt of deliveryOpts; track opt.value) {
+                <label class="delivery-opt" [class.active]="delivery() === opt.value">
+                  <input
+                    type="radio"
+                    name="del"
+                    [value]="opt.value"
+                    [checked]="delivery() === opt.value"
+                    (change)="delivery.set(opt.value)"
+                  />
+                  <app-icon [name]="opt.icon" [size]="14"></app-icon>
+                  {{ opt.label }}
+                </label>
+              }
+            </div>
           </div>
 
-          <button class="btn btn-success btn-lg complete-btn" (click)="complete()" [disabled]="!canComplete()">
-            <app-icon name="check-circle" [size]="16"></app-icon>
-            Complete Donation
-          </button>
+          <!-- Complete CTA -->
+          <div class="rs-cta-block">
+            <button class="btn btn-success btn-lg complete-btn" (click)="complete()" [disabled]="!canComplete()">
+              <app-icon name="check-circle" [size]="18"></app-icon>
+              Complete Donation
+            </button>
+            <div class="rs-cta-hint">Receipt will be sent after completion</div>
+          </div>
         </div>
       </div>
     </div>
@@ -651,13 +690,13 @@
     <div class="cm-id-row">
       <div class="cm-id-block">
         <div class="cm-label">Reference #</div>
-        <div class="cm-id-val">{{ donationId() }}</div>
+        <div class="cm-id-val">{{ donationRefNumber() }}</div>
         <div class="cm-label" style="margin-top: 10px">Receipt #</div>
         <div class="cm-receipt-val">{{ receiptNum }}</div>
       </div>
       <div class="cm-qr-block">
         <div class="cm-qr-frame">
-          <app-qr-code [value]="donationId().toString()" [size]="110"></app-qr-code>
+          <app-qr-code [value]="donationRefNumber()" [size]="110"></app-qr-code>
         </div>
         <div class="cm-qr-hint">Scan for details</div>
       </div>

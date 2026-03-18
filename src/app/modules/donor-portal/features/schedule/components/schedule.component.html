@@ -177,13 +177,13 @@
       <!-- Scheduled Donation ID -->
       <div class="apt-id-block">
         <div class="apt-id-label">Reference #</div>
-        <div class="apt-id-value">{{ selectedVisit()!.id }}</div>
+        <div class="apt-id-value">{{ selectedVisit()!.referenceNumber }}</div>
       </div>
 
       <!-- QR Code -->
       <div class="qr-wrap">
         <div class="qr-frame">
-          <app-qr-code [value]="selectedVisit()!.id" [size]="162"></app-qr-code>
+          <app-qr-code [value]="selectedVisit()!.referenceNumber" [size]="162"></app-qr-code>
         </div>
         <div class="qr-hint">Show this at check-in to speed up processing</div>
       </div>

@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MockDataService } from '../../../../../core/services/mock-data.service';
 import { ToastService } from '../../../../../core/services/toast.service';
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
@@ -9,7 +9,7 @@ import { Donation } from '../../../../../core/models/domain.models';
 @Component({
   selector: 'app-receipts',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, ModalComponent, IconComponent],
+  imports: [DatePipe, ModalComponent, IconComponent],
   templateUrl: './receipts.component.html',
   styleUrl: './receipts.component.scss'
 })

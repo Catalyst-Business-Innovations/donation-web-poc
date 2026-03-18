@@ -47,11 +47,6 @@
     </div>
     <div class="ys-div"></div>
     <div class="ys-stat">
-      <div class="ys-val">${{ summary().value | number: '1.0-0' }}</div>
-      <div class="ys-lbl">Est. Value</div>
-    </div>
-    <div class="ys-div"></div>
-    <div class="ys-stat">
       <div class="ys-val">{{ summary().points }}</div>
       <div class="ys-lbl">Points Earned</div>
     </div>
@@ -75,8 +70,7 @@
           </div>
         </div>
         <div style="text-align: right; margin-right: 14px">
-          <div style="font-weight: 800; font-size: 16px; color: var(--secondary)">${{ d.totalEstimatedValue }}</div>
-          <div style="font-size: 11px; color: var(--gray-500)">{{ d.totalItems }} items</div>
+          <div style="font-size: 13px; color: var(--gray-500)">{{ d.totalItems }} items</div>
         </div>
         <div class="hc-badges">
           <span class="badge {{ d.status === DS.Completed ? 'badge-success' : 'badge-warning' }}">{{ DSL[d.status] }}</span>
@@ -106,15 +100,8 @@
             <div class="hc-item-row">
               <span style="font-weight: 600; flex: 1">{{ item.categoryName }}</span>
               <span>{{ item.quantity }} items</span>
-              <span style="font-weight: 700; color: var(--secondary); min-width: 80px; text-align: right">
-                ${{ item.totalEstimatedValue | number: '1.2-2' }}
-              </span>
             </div>
           }
-          <div class="hc-total">
-            <span>Total Estimated Value</span>
-            <span>${{ d.totalEstimatedValue | number: '1.2-2' }}</span>
-          </div>
         </div>
       }
     </div>

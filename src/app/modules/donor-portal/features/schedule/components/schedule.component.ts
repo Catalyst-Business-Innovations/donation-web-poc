@@ -60,8 +60,8 @@ export class ScheduleComponent {
     { value: 'monthly', label: 'Monthly' }
   ];
   readonly upcoming: ScheduledVisit[] = [
-    { id: 'APT-20260322-001', date: '2026-03-22', day: '22', month: 'MAR', location: 'Downtown Store', time: '10:00 AM', items: 8,  recurring: 'One-time' },
-    { id: 'APT-20260405-002', date: '2026-04-05', day: '5',  month: 'APR', location: 'Downtown Store', time: '2:00 PM',  items: 3,  recurring: 'Monthly' }
+    { referenceNumber: 'APT-20260322-001', date: '2026-03-22', day: '22', month: 'MAR', location: 'Downtown Store', time: '10:00 AM', items: 8,  recurring: 'One-time' },
+    { referenceNumber: 'APT-20260405-002', date: '2026-04-05', day: '5',  month: 'APR', location: 'Downtown Store', time: '2:00 PM',  items: 3,  recurring: 'Monthly' }
   ];
 
   get totalCartItems(): number {
@@ -93,7 +93,7 @@ export class ScheduleComponent {
     if (!this.selLocation || !this.selDate) return;
     const loc = this.svc.locations.find(l => l.id === this.selLocation);
     // Generate appointment ID
-    const scheduledDonationId = `APT${Date.now()}`;
+    const scheduledDonationId = `APT-${Date.now()}`;
     this.confirmationId.set(scheduledDonationId);
     this.confirmationData.set({
       location: loc?.name || '',

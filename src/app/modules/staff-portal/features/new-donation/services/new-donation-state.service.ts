@@ -12,7 +12,7 @@ export class NewDonationStateService {
     donor: undefined,
     selectedItems: {},
     monetaryAmount: null,
-    receiptDelivery: ReceiptDelivery.Email,
+    receiptDelivery: ReceiptDelivery.Print,
     isPreSorted: false,
     notes: ''
   });
@@ -90,7 +90,7 @@ export class NewDonationStateService {
       donor: undefined,
       selectedItems: {},
       monetaryAmount: null,
-      receiptDelivery: ReceiptDelivery.Email,
+      receiptDelivery: ReceiptDelivery.Print,
       isPreSorted: false,
       notes: ''
     });

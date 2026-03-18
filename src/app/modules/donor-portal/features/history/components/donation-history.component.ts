@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { MockDataService } from '../../../../../core/services/mock-data.service';
 import { ToastService } from '../../../../../core/services/toast.service';
@@ -9,7 +9,7 @@ import { DonationStatus, DonationStatusLabel } from '../../../../../core/models/
 @Component({
   selector: 'app-donation-history',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, IconComponent],
+  imports: [DatePipe, IconComponent],
   templateUrl: './donation-history.component.html',
   styleUrl: './donation-history.component.scss'
 })

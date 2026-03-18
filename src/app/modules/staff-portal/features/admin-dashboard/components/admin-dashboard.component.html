@@ -131,7 +131,6 @@
             <th>Donor</th>
             <th>Store</th>
             <th>Items</th>
-            <th>Value</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -143,7 +142,6 @@
               <td>{{ d.donorName ?? 'Anonymous' }}</td>
               <td>{{ d.locationName }}</td>
               <td style="font-weight: 700">{{ d.totalItems }}</td>
-              <td style="font-weight: 700; color: var(--secondary)">${{ d.totalEstimatedValue }}</td>
               <td>
                 <span class="badge {{ d.status === DS.Completed ? 'badge-success' : 'badge-warning' }}">
                   {{ DSL[d.status] }}
