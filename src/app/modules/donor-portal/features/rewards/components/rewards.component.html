@@ -156,12 +156,14 @@
 
     @if (giftStep() === 'search') {
       <p class="gift-search-hint">Search for the donor you want to gift this reward to.</p>
-      <input
-        class="form-input gift-search-input"
-        placeholder="Name or phone number..."
-        [ngModel]="giftSearchQuery()"
-        (ngModelChange)="giftSearchQuery.set($event)"
-      />
+      <div class="search-bar gift-search-input">
+        <span class="search-icon"><app-icon name="search" [size]="14"></app-icon></span>
+        <input
+          placeholder="Name or phone number..."
+          [ngModel]="giftSearchQuery()"
+          (ngModelChange)="giftSearchQuery.set($event)"
+        />
+      </div>
       @if (giftSearchQuery().length >= 2 && giftSearchResults().length === 0) {
         <div class="empty-state-inline">No donors found.</div>
       }

@@ -348,6 +348,15 @@
     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
   </ng-container>
 
+  <!-- Scan / QR Icon -->
+  <ng-container *ngIf="name === 'scan'">
+    <path d="M4 8V5a1 1 0 0 1 1-1h3"></path>
+    <path d="M16 4h3a1 1 0 0 1 1 1v3"></path>
+    <path d="M4 16v3a1 1 0 0 0 1 1h3"></path>
+    <path d="M16 20h3a1 1 0 0 0 1-1v-3"></path>
+    <line x1="4" y1="12" x2="20" y2="12"></line>
+  </ng-container>
+
   <!-- Cart Icon -->
   <ng-container *ngIf="name === 'cart'">
     <circle cx="9" cy="21" r="1"></circle>

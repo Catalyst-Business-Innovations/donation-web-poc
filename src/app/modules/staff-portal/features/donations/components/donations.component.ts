@@ -32,9 +32,10 @@ export class DonationsComponent {
 
   protected activeTab = signal<'scheduled-donations' | 'completions'>('scheduled-donations');
 
-  protected query = '';
-  protected statusFilter: DonationStatus | '' = '';
-  protected dateFilter = '';
+  protected query = signal('');
+  protected methodFilter = signal<DonationMethod | ''>('');
+  protected statusFilter = signal<DonationStatus | ''>('');
+  protected dateFilter = signal('');
 
   // ── Completed-Donations tab ──────────────────────────────────────────────
   protected donQuery = '';
@@ -68,16 +69,20 @@ export class DonationsComponent {
   readonly allScheduledDonations = computed(() => this.mockData.getScheduledDonations());
 
   readonly filtered = computed(() => {
-    const q = this.query.toLowerCase();
+    const q = this.query().toLowerCase();
+    const mf = this.methodFilter();
+    const sf = this.statusFilter();
+    const df = this.dateFilter();
     return this.allScheduledDonations().filter(a => {
       const mQ = !q
         || a.donorName.toLowerCase().includes(q)
         || a.referenceNumber.toLowerCase().includes(q)
         || (a.locationName ?? '').toLowerCase().includes(q)
         || (a.notes ?? '').toLowerCase().includes(q);
-      const mS = !this.statusFilter || a.status === this.statusFilter;
-      const mD = !this.dateFilter || a.date.toISOString().startsWith(this.dateFilter);
-      return mQ && mS && mD;
+      const mM = !mf || a.method === mf;
+      const mS = !sf || a.status === sf;
+      const mD = !df || a.date.toISOString().startsWith(df);
+      return mQ && mM && mS && mD;
     });
   });
 

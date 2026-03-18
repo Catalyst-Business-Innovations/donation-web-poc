@@ -22,18 +22,19 @@ export class DonorManagementComponent {
   protected toast = inject(ToastService);
   protected mapper = DonorMgmtMapper;
 
-  protected query = '';
-  protected tierFilter: DonorTier | '' = '';
+  protected query = signal('');
+  protected tierFilter = signal<DonorTier | ''>('');
   protected readonly DT = DonorTier;
   protected mode = signal<ModalMode>(null);
   protected active = signal<Donor | null>(null);
   protected form: DonorEditForm = DonorMgmtMapper.emptyForm();
 
   readonly donors = computed(() => {
-    const q = this.query.toLowerCase();
+    const q = this.query().toLowerCase();
+    const tf = this.tierFilter();
     return this.svc.donors.filter(d => {
       const mQ = !q || `${d.firstName} ${d.lastName} ${d.phone} ${d.email}`.toLowerCase().includes(q);
-      return mQ && (!this.tierFilter || d.loyaltyTier === this.tierFilter);
+      return mQ && (!tf || d.loyaltyTier === tf);
     });
   });
 
@@ -94,7 +95,7 @@ export class DonorManagementComponent {
   }
 
   get modalTitle(): string {
-    return { view: '👤 Donor Details', add: '+ Add New Donor', edit: '✏️ Edit Donor' }[this.mode()!] ?? '';
+    return { view: 'Donor Details', add: 'Add New Donor', edit: 'Edit Donor' }[this.mode()!] ?? '';
   }
   get confirmLabel(): string {
     return { view: 'Edit Donor', add: 'Create Donor', edit: 'Save Changes' }[this.mode()!] ?? 'Save';

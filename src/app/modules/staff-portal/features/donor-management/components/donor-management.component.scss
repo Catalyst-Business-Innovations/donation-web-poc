@@ -6,23 +6,17 @@
   overflow: hidden;
 }
 
-.filters-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 16px;
+// ── Topbar ─────────────────────────────────────────────────────────────────
+.donors-topbar {
+  .topbar-actions { flex-wrap: nowrap; gap: 8px; }
 }
-.search-bar {
-  &--grow {
-    flex: 1;
-    max-width: 400px;
-  }
+.donors-search {
+  width: 240px;
+  flex-shrink: 0;
+  input { padding-right: 12px; }
 }
-.f-sel {
-  width: 155px;
-  height: 40px;
-  font-size: 13px;
-}
+.topbar-divider { width: 1px; height: 20px; background: var(--gray-200); flex-shrink: 0; }
+.f-sel { width: 140px; height: 36px; font-size: 13px; flex-shrink: 0; }
 .donor-cell {
   display: flex;
   align-items: center;

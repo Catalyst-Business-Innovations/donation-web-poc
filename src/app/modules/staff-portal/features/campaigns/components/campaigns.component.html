@@ -263,11 +263,11 @@
         <div class="wiz-card-section">
           <div class="wiz-card-section-title"><app-icon name="file-text" size="14" /> Identity</div>
           <div class="form-grid">
-            <div class="form-group" style="grid-column: span 2">
+            <div class="form-group" class="form-group--full">
               <label class="form-label">Campaign Name *</label>
               <input class="form-input" [(ngModel)]="form.name" placeholder="e.g., Spring Clothing Drive" [disabled]="isViewMode" />
             </div>
-            <div class="form-group" style="grid-column: span 2">
+            <div class="form-group" class="form-group--full">
               <label class="form-label">Description</label>
               <textarea class="form-input" rows="2" [(ngModel)]="form.description" placeholder="Brief campaign summary…" [disabled]="isViewMode"></textarea>
             </div>
@@ -761,7 +761,7 @@
                 <div class="review-value">{{ form.toDate || 'Not set' }}</div>
               </div>
               @if (form.description) {
-                <div class="review-detail-item" style="grid-column: span 2">
+                <div class="review-detail-item" class="form-group--full">
                   <div class="review-label">Description</div>
                   <div class="review-value">{{ form.description }}</div>
                 </div>

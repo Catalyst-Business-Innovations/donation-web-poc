@@ -39,10 +39,10 @@ export class ContainersComponent {
   protected readonly ICL = ItemConditionLabel;
 
   // ── List / filter state ────────────────────────────────────────────────────
-  protected query = '';
-  protected statusFilter = '' as ContainerStatus | '';
-  protected destFilter = '' as ContainerDest | '';
-  protected deptFilter = '';
+  protected query = signal('');
+  protected statusFilter = signal<ContainerStatus | ''>('');
+  protected destFilter = signal<ContainerDest | ''>('');
+  protected deptFilter = signal('');
 
   readonly pipeline = computed(() => {
     const cnts = this.mockData.containers;
@@ -56,22 +56,24 @@ export class ContainersComponent {
   });
 
   readonly filtered = computed(() => {
-    const q = this.query.toLowerCase();
+    const q = this.query().toLowerCase();
+    const sf = this.statusFilter();
+    const df = this.destFilter();
+    const dept = this.deptFilter();
     return this.mockData.containers.filter(c => {
-
       const mQ = !q || c.barcode.toLowerCase().includes(q)
         || c.locationName.toLowerCase().includes(q)
         || (c.deptName ?? '').toLowerCase().includes(q)
         || (c.catName ?? '').toLowerCase().includes(q);
-      const mS = !this.statusFilter || c.status === this.statusFilter;
-      const mD = !this.destFilter || c.destination === this.destFilter;
-      const mDept = !this.deptFilter || c.deptKey === this.deptFilter;
+      const mS = !sf || c.status === sf;
+      const mD = !df || c.destination === df;
+      const mDept = !dept || c.deptKey === dept;
       return mQ && mS && mD && mDept;
     });
   });
 
   setStatusFilter(s: ContainerStatus | ''): void {
-    this.statusFilter = this.statusFilter === s ? '' : s;
+    this.statusFilter.set(this.statusFilter() === s ? '' : s);
   }
 
   fillPct(c: Container): number {

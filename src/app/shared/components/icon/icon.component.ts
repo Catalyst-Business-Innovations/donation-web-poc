@@ -52,7 +52,8 @@ export type IconName =
   | 'award'
   | 'sliders'
   | 'bell'
-  | 'cart';
+  | 'cart'
+  | 'scan';
 
 @Component({
   selector: 'app-icon',

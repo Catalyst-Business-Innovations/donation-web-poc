@@ -1,9 +1,21 @@
-<div class="topbar">
+<div class="topbar donors-topbar">
   <div>
     <div class="topbar-title">Donors</div>
     <div class="topbar-subtitle">{{ svc.donors.length | number }} registered donors</div>
   </div>
   <div class="topbar-actions">
+    <div class="search-bar donors-search">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search by name, email, or phone..." />
+    </div>
+    <select class="form-select f-sel" [ngModel]="tierFilter()" (ngModelChange)="tierFilter.set($event)">
+      <option [ngValue]="''">All Tiers</option>
+      <option [ngValue]="DT.Platinum">Platinum</option>
+      <option [ngValue]="DT.Gold">Gold</option>
+      <option [ngValue]="DT.Silver">Silver</option>
+      <option [ngValue]="DT.Bronze">Bronze</option>
+    </select>
+    <div class="topbar-divider"></div>
     <button class="btn btn-secondary" (click)="toast.success('Export', 'CSV exported.')">
       <app-icon name="upload" [size]="14"></app-icon>
       Export CSV
@@ -13,19 +25,6 @@
 </div>
 
 <div class="page-content">
-  <div class="filters-row">
-    <div class="search-bar search-bar--grow">
-      <span class="search-icon"><app-icon name="search" size="14" /></span>
-      <input [(ngModel)]="query" placeholder="Search by name, email, or phone..." />
-    </div>
-    <select class="form-select f-sel" [(ngModel)]="tierFilter">
-      <option value="">All Tiers</option>
-      <option [value]="DT.Platinum">Platinum</option>
-      <option [value]="DT.Gold">Gold</option>
-      <option [value]="DT.Silver">Silver</option>
-      <option [value]="DT.Bronze">Bronze</option>
-    </select>
-  </div>
 
   <div class="card">
     <div class="table-wrapper">

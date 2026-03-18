@@ -1,9 +1,21 @@
-<div class="topbar">
+<div class="topbar containers-topbar">
   <div>
-    <div class="topbar-title">Container Management</div>
+    <div class="topbar-title">Containers</div>
     <div class="topbar-subtitle">Track containers through the full production chain</div>
   </div>
   <div class="topbar-actions">
+    <div class="search-bar containers-search">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search barcode, dept, or location..." />
+    </div>
+    <select class="form-select f-sel" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+      <option [ngValue]="''">All Statuses</option>
+      <option [ngValue]="CS.Available">Available</option>
+      <option [ngValue]="CS.InUse">In Use</option>
+      <option [ngValue]="CS.ReadyForSorting">Ready for Sorting</option>
+      <option [ngValue]="CS.Sorting">Sorting</option>
+    </select>
+    <div class="topbar-divider"></div>
     @if (selectionCount() > 0) {
       <span class="sel-count">{{ selectionCount() }} selected</span>
       <button class="btn btn-secondary btn-sm" (click)="clearSelection()">Deselect All</button>
@@ -16,37 +28,6 @@
 </div>
 
 <div class="page-content">
-
-
-  <!-- Filters -->
-  <div class="filters-row">
-    <div class="search-bar search-bar--fluid">
-      <span class="search-icon"><app-icon name="search" size="14" /></span>
-      <input [(ngModel)]="query" placeholder="Search barcode, dept, or location..." />
-    </div>
-    <select class="form-select f-sel" [(ngModel)]="deptFilter">
-      <option value="">All Departments</option>
-      @for (d of mockData.departments; track d.key) {
-        <option [value]="d.key">{{ d.name }}</option>
-      }
-    </select>
-    <select class="form-select f-sel" [(ngModel)]="statusFilter">
-      <option [value]="''">All Statuses</option>
-      <option [value]="CS.Available">Available</option>
-      <option [value]="CS.InUse">In Use</option>
-      <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
-      <option [value]="CS.Sorting">Sorting</option>
-    </select>
-    <select class="form-select f-sel" [(ngModel)]="destFilter">
-      <option [value]="''">All Destinations</option>
-      <option [value]="CD.Production">Production</option>
-      <option [value]="CD.Reserve">Reserve</option>
-      <option [value]="CD.Warehouse">Warehouse</option>
-      <option [value]="CD.Ecommerce">E-Commerce</option>
-      <option [value]="CD.Salvage">Salvage</option>
-      <option [value]="CD.Transfer">Transfer</option>
-    </select>
-  </div>
 
   <div class="card">
     <div class="table-wrapper">
@@ -306,20 +287,20 @@
     <div class="form-group">
       <label class="form-label">Container Type</label>
       <select class="form-select" [(ngModel)]="cType">
-        <option [value]="CT.Gaylord">Gaylord (large cardboard box)</option>
-        <option [value]="CT.CartRack">Cart / Z-Rack</option>
-        <option [value]="CT.Pallet">Pallet</option>
-        <option [value]="CT.Tote">Tote / Bin</option>
-        <option [value]="CT.Baler">Baler</option>
+        <option [ngValue]="CT.Gaylord">Gaylord (large cardboard box)</option>
+        <option [ngValue]="CT.CartRack">Cart / Z-Rack</option>
+        <option [ngValue]="CT.Pallet">Pallet</option>
+        <option [ngValue]="CT.Tote">Tote / Bin</option>
+        <option [ngValue]="CT.Baler">Baler</option>
       </select>
     </div>
     <div class="form-group">
       <label class="form-label">Status</label>
       <select class="form-select" [(ngModel)]="cStatus">
-        <option [value]="CS.Available">Available</option>
-        <option [value]="CS.InUse">In Use</option>
-        <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
-        <option [value]="CS.Sorting">Sorting</option>
+        <option [ngValue]="CS.Available">Available</option>
+        <option [ngValue]="CS.InUse">In Use</option>
+        <option [ngValue]="CS.ReadyForSorting">Ready for Sorting</option>
+        <option [ngValue]="CS.Sorting">Sorting</option>
       </select>
     </div>
   </div>
@@ -353,13 +334,13 @@
     <div class="form-group">
       <label class="form-label">Destination <span class="form-hint">optional  set after presort</span></label>
       <select class="form-select" [(ngModel)]="cDest">
-        <option [value]="null">TBD</option>
-        <option [value]="CD.Production">Production Floor</option>
-        <option [value]="CD.Reserve">Reserve / Backstock</option>
-        <option [value]="CD.Warehouse">Warehouse</option>
-        <option [value]="CD.Ecommerce">E-Commerce</option>
-        <option [value]="CD.Salvage">Salvage / Recycling</option>
-        <option [value]="CD.Transfer">Transfer to another store</option>
+        <option [ngValue]="null">TBD</option>
+        <option [ngValue]="CD.Production">Production Floor</option>
+        <option [ngValue]="CD.Reserve">Reserve / Backstock</option>
+        <option [ngValue]="CD.Warehouse">Warehouse</option>
+        <option [ngValue]="CD.Ecommerce">E-Commerce</option>
+        <option [ngValue]="CD.Salvage">Salvage / Recycling</option>
+        <option [ngValue]="CD.Transfer">Transfer to another store</option>
       </select>
     </div>
     @if (cDest === CD.Transfer) {
@@ -368,7 +349,7 @@
         <select class="form-select" [(ngModel)]="cTransferTo">
           <option value="">Select Store</option>
           @for (loc of mockData.locations; track loc.id) {
-            <option [value]="loc.id">{{ loc.name }}</option>
+            <option [ngValue]="loc.id">{{ loc.name }}</option>
           }
         </select>
       </div>
@@ -445,22 +426,22 @@
       <div class="form-group">
         <label class="form-label">Status</label>
         <select class="form-select" [(ngModel)]="eStatus">
-          <option [value]="CS.Available">Available</option>
-          <option [value]="CS.InUse">In Use</option>
-          <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
-          <option [value]="CS.Sorting">Sorting</option>
+          <option [ngValue]="CS.Available">Available</option>
+          <option [ngValue]="CS.InUse">In Use</option>
+          <option [ngValue]="CS.ReadyForSorting">Ready for Sorting</option>
+          <option [ngValue]="CS.Sorting">Sorting</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Destination</label>
         <select class="form-select" [(ngModel)]="eDest">
-          <option [value]="null">TBD</option>
-          <option [value]="CD.Production">Production Floor</option>
-          <option [value]="CD.Reserve">Reserve / Backstock</option>
-          <option [value]="CD.Warehouse">Warehouse</option>
-          <option [value]="CD.Ecommerce">E-Commerce</option>
-          <option [value]="CD.Salvage">Salvage / Recycling</option>
-          <option [value]="CD.Transfer">Transfer</option>
+          <option [ngValue]="null">TBD</option>
+          <option [ngValue]="CD.Production">Production Floor</option>
+          <option [ngValue]="CD.Reserve">Reserve / Backstock</option>
+          <option [ngValue]="CD.Warehouse">Warehouse</option>
+          <option [ngValue]="CD.Ecommerce">E-Commerce</option>
+          <option [ngValue]="CD.Salvage">Salvage / Recycling</option>
+          <option [ngValue]="CD.Transfer">Transfer</option>
         </select>
       </div>
     </div>
@@ -471,7 +452,7 @@
         <select class="form-select" [(ngModel)]="eTransferTo">
           <option value=""> select store </option>
           @for (loc of mockData.locations; track loc.id) {
-            <option [value]="loc.id">{{ loc.name }}</option>
+            <option [ngValue]="loc.id">{{ loc.name }}</option>
           }
         </select>
       </div>
@@ -507,11 +488,11 @@
     <div class="form-group">
       <label class="form-label">Container Type</label>
       <select class="form-select" [(ngModel)]="mType">
-        <option [value]="CT.Gaylord">Gaylord</option>
-        <option [value]="CT.CartRack">Cart / Z-Rack</option>
-        <option [value]="CT.Pallet">Pallet</option>
-        <option [value]="CT.Tote">Tote / Bin</option>
-        <option [value]="CT.Baler">Baler</option>
+        <option [ngValue]="CT.Gaylord">Gaylord</option>
+        <option [ngValue]="CT.CartRack">Cart / Z-Rack</option>
+        <option [ngValue]="CT.Pallet">Pallet</option>
+        <option [ngValue]="CT.Tote">Tote / Bin</option>
+        <option [ngValue]="CT.Baler">Baler</option>
       </select>
     </div>
     <div class="form-group">
@@ -538,13 +519,13 @@
     <div class="form-group">
       <label class="form-label">Destination</label>
       <select class="form-select" [(ngModel)]="mDest">
-        <option [value]="null">TBD</option>
-        <option [value]="CD.Production">Production Floor</option>
-        <option [value]="CD.Reserve">Reserve / Backstock</option>
-        <option [value]="CD.Warehouse">Warehouse</option>
-        <option [value]="CD.Ecommerce">E-Commerce</option>
-        <option [value]="CD.Salvage">Salvage / Recycling</option>
-        <option [value]="CD.Transfer">Transfer to another store</option>
+        <option [ngValue]="null">TBD</option>
+        <option [ngValue]="CD.Production">Production Floor</option>
+        <option [ngValue]="CD.Reserve">Reserve / Backstock</option>
+        <option [ngValue]="CD.Warehouse">Warehouse</option>
+        <option [ngValue]="CD.Ecommerce">E-Commerce</option>
+        <option [ngValue]="CD.Salvage">Salvage / Recycling</option>
+        <option [ngValue]="CD.Transfer">Transfer to another store</option>
       </select>
     </div>
   </div>
@@ -555,7 +536,7 @@
       <select class="form-select" [(ngModel)]="mTransferTo">
         <option value=""> select store </option>
         @for (loc of mockData.locations; track loc.id) {
-          <option [value]="loc.id">{{ loc.name }}</option>
+          <option [ngValue]="loc.id">{{ loc.name }}</option>
         }
       </select>
     </div>
@@ -588,10 +569,10 @@
   <div class="form-group">
     <label class="form-label">New Status</label>
     <select class="form-select" [(ngModel)]="bulkStatus">
-      <option [value]="CS.Available">Available</option>
-      <option [value]="CS.InUse">In Use</option>
-      <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
-      <option [value]="CS.Sorting">Sorting</option>
+      <option [ngValue]="CS.Available">Available</option>
+      <option [ngValue]="CS.InUse">In Use</option>
+      <option [ngValue]="CS.ReadyForSorting">Ready for Sorting</option>
+      <option [ngValue]="CS.Sorting">Sorting</option>
     </select>
   </div>
 </app-modal>

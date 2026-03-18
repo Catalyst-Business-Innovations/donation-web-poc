@@ -6,6 +6,19 @@
   overflow: hidden;
 }
 
+// ── Topbar ─────────────────────────────────────────────────────────────────
+.containers-topbar {
+  .topbar-actions { flex-wrap: nowrap; gap: 8px; }
+}
+.containers-search {
+  width: 220px;
+  flex-shrink: 0;
+  input { padding-right: 12px; }
+}
+.topbar-divider { width: 1px; height: 20px; background: var(--gray-200); flex-shrink: 0; }
+.f-sel { width: 130px; height: 36px; font-size: 13px; flex-shrink: 0; }
+.sel-count { font-size: 13px; font-weight: 600; color: var(--gray-600); white-space: nowrap; }
+
 .pipeline {
   display: flex;
   align-items: center;

@@ -32,19 +32,29 @@
 .sum-red   { color: var(--danger); &.active { background: var(--danger-light); } }
 .sum-gray  { color: var(--gray-600); &.active { background: var(--gray-50); } }
 
-// ── Filters row ────────────────────────────────────────────────────────────
-.filters-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-.f-sel { width: 155px; height: 40px; font-size: 13px; }
-.f-date { font-size: 13px; }
-
-// ── Search bar modifier ────────────────────────────────────────────────────
-.search-bar--grow {
-  flex: 1;
-  max-width: 380px;
+// ── Topbar: single-row with all controls ─────────────────────────────────────
+.donations-topbar {
+  gap: 10px;
+  flex-wrap: nowrap;
+  .topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 }
-.search-bar--mb {
-  margin-bottom: 8px;
+.topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--gray-200);
+  flex-shrink: 0;
 }
+.donations-search {
+  width: 240px;
+  flex-shrink: 0;
+}
+.f-sel  { width: 140px; height: 36px; font-size: 13px; flex-shrink: 0; }
+.f-date { font-size: 13px; width: 140px; flex-shrink: 0; }
 
 // ── Table ─────────────────────────────────────────────────────────────────
 .appt-row {

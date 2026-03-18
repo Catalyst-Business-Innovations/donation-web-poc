@@ -1,63 +1,67 @@
-<div class="topbar">
+<div class="topbar donations-topbar">
   <div>
     <div class="topbar-title">Donations</div>
-    <div class="topbar-subtitle">Scheduled donations, walk-ins, and completed donations</div>
+    <div class="topbar-subtitle">Scheduled &amp; completed</div>
   </div>
-  <div class="tab-switcher">
-    <button class="tab-btn" [class.active]="activeTab() === 'scheduled-donations'" (click)="activeTab.set('scheduled-donations')">
-      <app-icon name="calendar" size="14" /> Scheduled Donations
-    </button>
-    <button class="tab-btn" [class.active]="activeTab() === 'completions'" (click)="activeTab.set('completions')">
-      <app-icon name="check-circle" size="14" /> Completed Donations
-    </button>
+
+  <div class="topbar-actions">
+    <div class="search-bar donations-search">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search donor, Ref #, store…" />
+    </div>
+
+    <div class="topbar-divider"></div>
+
+    <select class="form-select f-sel" [ngModel]="methodFilter()" (ngModelChange)="methodFilter.set($event)">
+      <option [ngValue]="''">All Methods</option>
+      <option [ngValue]="AT.Scheduled">Scheduled</option>
+      <option [ngValue]="AT.WalkIn">Walk-In</option>
+      <option [ngValue]="AT.Pickup">Pickup</option>
+    </select>
+
+    <select class="form-select f-sel" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+      <option [ngValue]="''">All Statuses</option>
+      <option [ngValue]="AS.Scheduled">Scheduled</option>
+      <option [ngValue]="AS.CheckedIn">Checked In</option>
+      <option [ngValue]="AS.Completed">Completed</option>
+      <option [ngValue]="AS.Cancelled">Cancelled</option>
+      <option [ngValue]="AS.NoShow">No Show</option>
+    </select>
+
+    <input class="form-select f-sel f-date" type="date" [ngModel]="dateFilter()" (ngModelChange)="dateFilter.set($event)" />
+
+    @if (dateFilter()) {
+      <button class="btn btn-secondary btn-sm" (click)="dateFilter.set('')">
+        <app-icon name="close" size="13" /> Clear
+      </button>
+    }
   </div>
 </div>
 
 <div class="page-content">
 
-@if (activeTab() === 'scheduled-donations') {
-  <!-- Summary cards -->
+<!-- Summary cards -->
   <div class="summary-row">
-    <div class="sum-card sum-blue" [class.active]="statusFilter === AS.Scheduled" (click)="statusFilter = statusFilter === AS.Scheduled ? '' : AS.Scheduled">
+    <div class="sum-card sum-blue" [class.active]="statusFilter() === AS.Scheduled" (click)="statusFilter.set(statusFilter() === AS.Scheduled ? '' : AS.Scheduled)">
       <div class="sum-num">{{ counts().scheduled }}</div>
       <div class="sum-lbl">Scheduled</div>
     </div>
-    <div class="sum-card sum-yellow" [class.active]="statusFilter === AS.CheckedIn" (click)="statusFilter = statusFilter === AS.CheckedIn ? '' : AS.CheckedIn">
+    <div class="sum-card sum-yellow" [class.active]="statusFilter() === AS.CheckedIn" (click)="statusFilter.set(statusFilter() === AS.CheckedIn ? '' : AS.CheckedIn)">
       <div class="sum-num">{{ counts().checkedIn }}</div>
       <div class="sum-lbl">Checked In</div>
     </div>
-    <div class="sum-card sum-green" [class.active]="statusFilter === AS.Completed" (click)="statusFilter = statusFilter === AS.Completed ? '' : AS.Completed">
+    <div class="sum-card sum-green" [class.active]="statusFilter() === AS.Completed" (click)="statusFilter.set(statusFilter() === AS.Completed ? '' : AS.Completed)">
       <div class="sum-num">{{ counts().completed }}</div>
       <div class="sum-lbl">Completed</div>
     </div>
-    <div class="sum-card sum-red" [class.active]="statusFilter === AS.Cancelled" (click)="statusFilter = statusFilter === AS.Cancelled ? '' : AS.Cancelled">
+    <div class="sum-card sum-red" [class.active]="statusFilter() === AS.Cancelled" (click)="statusFilter.set(statusFilter() === AS.Cancelled ? '' : AS.Cancelled)">
       <div class="sum-num">{{ counts().cancelled }}</div>
       <div class="sum-lbl">Cancelled</div>
     </div>
-    <div class="sum-card sum-gray" [class.active]="statusFilter === ''" (click)="statusFilter = ''">
+    <div class="sum-card sum-gray" [class.active]="statusFilter() === ''" (click)="statusFilter.set('')">
       <div class="sum-num">{{ counts().total }}</div>
       <div class="sum-lbl">All</div>
     </div>
-  </div>
-
-  <!-- Filters -->
-  <div class="filters-row">
-    <div class="search-bar search-bar--grow">
-      <span class="search-icon"><app-icon name="search" size="14" /></span>
-      <input [(ngModel)]="query" placeholder="Search donor, Ref #, store, notes…" />
-    </div>
-    <select class="form-select f-sel" [(ngModel)]="statusFilter">
-      <option [value]="''">All Statuses</option>
-      <option [value]="AS.Scheduled">Scheduled</option>
-      <option [value]="AS.CheckedIn">Checked In</option>
-      <option [value]="AS.Completed">Completed</option>
-      <option [value]="AS.Cancelled">Cancelled</option>
-      <option [value]="AS.NoShow">No Show</option>
-    </select>
-    <input class="form-select f-sel f-date" type="date" [(ngModel)]="dateFilter" />
-    @if (dateFilter) {
-      <button class="btn btn-secondary" (click)="dateFilter = ''">Clear Date</button>
-    }
   </div>
 
   <!-- Table -->
@@ -132,84 +136,9 @@
       }
     </div>
   </div>
-} @else {
-  <!-- ═══════════════════════════════════════════════════
-       COMPLETED DONATIONS TAB
-  ════════════════════════════════════════════════════ -->
-  <div class="filters-row">
-    <div class="search-bar search-bar--grow">
-      <span class="search-icon"><app-icon name="search" size="14" /></span>
-      <input [(ngModel)]="donQuery" placeholder="Search ID, donor name…" />
-    </div>
-  </div>
-  <div class="card">
-    <div class="table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Reference #</th>
-            <th>Donor</th>
-            <th>Date</th>
-            <th>Store</th>
-            <th>Items</th>
-            <th>Status</th>
-            <th>Linked Donor</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (d of filteredDonations(); track d.id) {
-            <tr>
-              <td><span class="apt-id-cell">{{ d.id }}</span></td>
-              <td>
-                <div class="donor-cell">
-                  <div class="donor-name">{{ d.donorName }}</div>
-                  @if (d.donorTier) {
-                    <div class="donor-sub">Tier {{ d.donorTier }}</div>
-                  }
-                </div>
-              </td>
-              <td class="td-text-sm">{{ d.timestamp | date: 'MMM d, yyyy h:mm a' }}</td>
-              <td class="td-text-sm">{{ d.locationName }}</td>
-              <td class="td-bold">{{ d.totalItems }}</td>
-              <td><span class="badge {{ donationStatusBadge(d.status) }}">{{ statusLabel(d.status) }}</span></td>
-              <td>
-                @if (d.associatedDonorName) {
-                  <span class="badge badge-success badge--sm">{{ d.associatedDonorName }}</span>
-                } @else if (d.donorId) {
-                  <span class="badge badge-info badge--sm">{{ d.donorName }}</span>
-                } @else {
-                  <span class="anon-label">Anonymous</span>
-                }
-              </td>
-              <td>
-                <div class="table-actions">
-                  @if (mockData.canAssociateDonor(d)) {
-                    <button class="btn btn-secondary btn-sm" title="Link to Donor" (click)="openLinkModal(d, $event)">
-                      <app-icon name="user" size="13" /> Link Donor
-                    </button>
-                  }
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-      @if (filteredDonations().length === 0) {
-        <div class="empty-state">
-          <div class="empty-state-icon"><app-icon name="check-circle" [size]="40"></app-icon></div>
-          <div class="empty-state-title">No completed donations found</div>
-          <div class="empty-state-text">Donations created via the New Donation flow will appear here.</div>
-        </div>
-      }
-    </div>
-  </div>
-}
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     APPOINTMENT DETAIL MODAL
-════════════════════════════════════════════════════ -->
+<!-- ═══ APPOINTMENT DETAIL MODAL ═══ -->
 <app-modal
   [open]="!!selected()"
   [title]="selected()?.referenceNumber ?? 'Scheduled Donation'"
@@ -324,9 +253,7 @@
   }
 </app-modal>
 
-<!-- ═══════════════════════════════════════════════════
-     LINK DONOR MODAL (Req 1 / 3C)
-════════════════════════════════════════════════════ -->
+<!-- ═══ LINK DONOR MODAL ═══ -->
 <app-modal
   [open]="!!linkingDonation()"
   title="Link Donation to Donor Account"
