@@ -392,7 +392,8 @@ export interface ToastModel {
 
 // DonationStatus and DonationMethod are declared as enums above.
 export interface ScheduledDonation {
-  id: string;
+  id: number;
+  referenceNumber: string;
   donorId?: string;
   donorName: string;
   donorPhone?: string;

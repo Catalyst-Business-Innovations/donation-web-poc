@@ -182,7 +182,7 @@ export class NewDonationComponent {
     const q = raw.toLowerCase();
     const qDigits = q.replace(/\D/g, '');
     const results = this.mockData.getScheduledDonations().filter(a =>
-      a.id.toLowerCase().includes(q) ||
+      a.referenceNumber.toLowerCase().includes(q) ||
       a.donorName.toLowerCase().includes(q) ||
       (qDigits.length >= 3 && (a.donorPhone ?? '').replace(/\D/g, '').includes(qDigits))
     );
@@ -193,9 +193,9 @@ export class NewDonationComponent {
   demoScanSdQR(): void {
     const scheduled = this.mockData.getScheduledDonations().filter(a => a.status === DonationStatus.Scheduled);
     if (scheduled.length) {
-      this.sdQ = scheduled[0].id;
+      this.sdQ = scheduled[0].referenceNumber;
       this.lookupScheduledDonation();
-      this.toast.info('QR Scanned', `Scheduled donation ID read: ${scheduled[0].id}`);
+      this.toast.info('QR Scanned', `Scheduled donation ID read: ${scheduled[0].referenceNumber}`);
     }
   }
 
@@ -215,7 +215,7 @@ export class NewDonationComponent {
       }
     }
 
-    this.toast.success('Scheduled Donation Loaded', `${appt.id} — ${appt.donorName}`);
+    this.toast.success('Scheduled Donation Loaded', `${appt.referenceNumber} — ${appt.donorName}`);
     this.sdResults.set([]);
     this.sdQ = '';
     this.sdNotFound.set(false);

@@ -72,7 +72,7 @@ export class DonationsComponent {
     return this.allScheduledDonations().filter(a => {
       const mQ = !q
         || a.donorName.toLowerCase().includes(q)
-        || a.id.toLowerCase().includes(q)
+        || a.referenceNumber.toLowerCase().includes(q)
         || (a.locationName ?? '').toLowerCase().includes(q)
         || (a.notes ?? '').toLowerCase().includes(q);
       const mS = !this.statusFilter || a.status === this.statusFilter;
@@ -135,13 +135,13 @@ export class DonationsComponent {
   }
 
   markComplete(a: ScheduledDonation): void {
-    this.toast.success('Completed', `Scheduled donation ${a.id} marked as completed.`);
+    this.toast.success('Completed', `Scheduled donation ${a.referenceNumber} marked as completed.`);
     this.selected.set(null);
   }
 
   markCancelled(a: ScheduledDonation, event: Event): void {
     event.stopPropagation();
-    this.toast.info('Cancelled', `Scheduled donation ${a.id} cancelled.`);
+    this.toast.info('Cancelled', `Scheduled donation ${a.referenceNumber} cancelled.`);
   }
 
   // ── Link-Donor modal actions ──────────────────────────────────────────────

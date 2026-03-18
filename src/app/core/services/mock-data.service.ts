@@ -1601,7 +1601,8 @@ export class MockDataService {
   getScheduledDonations(donorId?: string): import('../models/domain.models').ScheduledDonation[] {
     const appts: import('../models/domain.models').ScheduledDonation[] = [
       {
-        id: 'APT-20260320-001',
+        id: 1,
+        referenceNumber: 'APT-20260320-001',
         donorId: 'd-001',
         donorName: 'Michael Johnson',
         donorPhone: '(555) 101-2020',
@@ -1620,7 +1621,8 @@ export class MockDataService {
         createdAt: new Date('2026-03-12')
       },
       {
-        id: 'APT-20260322-002',
+        id: 2,
+        referenceNumber: 'APT-20260322-002',
         donorId: 'd-002',
         donorName: 'Sarah Williams',
         donorPhone: '(555) 234-5678',
@@ -1639,7 +1641,8 @@ export class MockDataService {
         createdAt: new Date('2026-03-14')
       },
       {
-        id: 'APT-20260318-003',
+        id: 3,
+        referenceNumber: 'APT-20260318-003',
         donorId: 'd-005',
         donorName: 'David Chen',
         donorPhone: '(555) 555-9900',
@@ -1658,7 +1661,8 @@ export class MockDataService {
         createdAt: new Date('2026-03-10')
       },
       {
-        id: 'APT-20260325-004',
+        id: 4,
+        referenceNumber: 'APT-20260325-004',
         donorId: 'd-006',
         donorName: 'Jennifer Taylor',
         donorPhone: '(555) 321-6543',
@@ -1677,7 +1681,8 @@ export class MockDataService {
         createdAt: new Date('2026-03-15')
       },
       {
-        id: 'APT-20260319-005',
+        id: 5,
+        referenceNumber: 'APT-20260319-005',
         donorId: 'd-009',
         donorName: 'Thomas Brown',
         donorPhone: '(555) 777-1234',
@@ -1696,7 +1701,8 @@ export class MockDataService {
         createdAt: new Date('2026-03-11')
       },
       {
-        id: 'APT-20260328-006',
+        id: 6,
+        referenceNumber: 'APT-20260328-006',
         donorName: 'Anonymous',
         locationId: 'loc-002',
         locationName: 'Westside Thrift',
@@ -1711,7 +1717,8 @@ export class MockDataService {
         createdAt: new Date('2026-03-16')
       },
       {
-        id: 'APT-20260401-007',
+        id: 7,
+        referenceNumber: 'APT-20260401-007',
         donorId: 'd-003',
         donorName: 'Robert Martinez',
         donorPhone: '(555) 456-7890',

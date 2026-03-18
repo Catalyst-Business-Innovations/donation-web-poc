@@ -142,7 +142,7 @@
           @for (appt of sdResults(); track appt.id) {
             <div class="appt-result">
               <div class="appt-res-body">
-                <div class="appt-res-id">{{ appt.id }}</div>
+                <div class="appt-res-id">{{ appt.referenceNumber }}</div>
                 <div class="appt-res-name">{{ appt.donorName }}</div>
                 <div class="appt-res-meta">
                   <app-icon name="map-pin" [size]="11"></app-icon> {{ appt.locationName }}

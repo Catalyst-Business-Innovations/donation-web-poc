@@ -44,7 +44,7 @@
   <div class="filters-row">
     <div class="search-bar" style="flex: 1; max-width: 380px">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
-      <input [(ngModel)]="query" placeholder="Search donor, ID, store, notes…" />
+      <input [(ngModel)]="query" placeholder="Search donor, Ref #, store, notes…" />
     </div>
     <select class="form-select f-sel" [(ngModel)]="statusFilter">
       <option [value]="''">All Statuses</option>
@@ -66,7 +66,7 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Scheduled Donation ID</th>
+            <th>Reference #</th>
             <th>Donor</th>
             <th>Date &amp; Time</th>
             <th>Store</th>
@@ -80,7 +80,7 @@
         <tbody>
           @for (a of filtered(); track a.id) {
             <tr class="appt-row" (click)="openDetail(a)">
-              <td><span class="apt-id-cell">{{ a.id }}</span></td>
+              <td><span class="apt-id-cell">{{ a.referenceNumber }}</span></td>
               <td>
                 <div class="donor-cell">
                   <div class="donor-name">{{ a.donorName }}</div>
@@ -212,7 +212,7 @@
 ════════════════════════════════════════════════════ -->
 <app-modal
   [open]="!!selected()"
-  [title]="selected()?.id ?? 'Appointment'"
+  [title]="selected()?.referenceNumber ?? 'Scheduled Donation'"
   [confirmLabel]="selected()?.status === AS.Scheduled ? 'Check In & Start Donation' : 'Close'"
   cancelLabel="Close"
   [showCancel]="selected()?.status === AS.Scheduled"
@@ -222,11 +222,11 @@
   @if (selected()) {
     <div class="detail-layout">
 
-      <!-- Left: QR + ID -->
+      <!-- Left: QR + Reference # -->
       <div class="detail-left">
-        <div class="apt-id-badge">{{ selected()!.id }}</div>
+        <div class="apt-id-badge">{{ selected()!.referenceNumber }}</div>
         <div class="qr-frame">
-          <app-qr-code [value]="selected()!.id" [size]="150"></app-qr-code>
+          <app-qr-code [value]="selected()!.referenceNumber" [size]="150"></app-qr-code>
         </div>
         <div class="qr-hint">Scan at check-in</div>
 
