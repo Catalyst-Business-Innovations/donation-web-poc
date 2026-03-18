@@ -1,11 +1,11 @@
 <div class="topbar">
   <div>
     <div class="topbar-title">Donations</div>
-    <div class="topbar-subtitle">Appointments, walk-ins, and completed donations</div>
+    <div class="topbar-subtitle">Scheduled donations, walk-ins, and completed donations</div>
   </div>
   <div class="tab-switcher">
-    <button class="tab-btn" [class.active]="activeTab() === 'appointments'" (click)="activeTab.set('appointments')">
-      <app-icon name="calendar" size="14" /> Appointments
+    <button class="tab-btn" [class.active]="activeTab() === 'scheduled-donations'" (click)="activeTab.set('scheduled-donations')">
+      <app-icon name="calendar" size="14" /> Scheduled Donations
     </button>
     <button class="tab-btn" [class.active]="activeTab() === 'completions'" (click)="activeTab.set('completions')">
       <app-icon name="check-circle" size="14" /> Completed Donations
@@ -15,7 +15,7 @@
 
 <div class="page-content">
 
-@if (activeTab() === 'appointments') {
+@if (activeTab() === 'scheduled-donations') {
   <!-- Summary cards -->
   <div class="summary-row">
     <div class="sum-card sum-blue" [class.active]="statusFilter === AS.Scheduled" (click)="statusFilter = statusFilter === AS.Scheduled ? '' : AS.Scheduled">
@@ -66,7 +66,7 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Appointment ID</th>
+            <th>Scheduled Donation ID</th>
             <th>Donor</th>
             <th>Date &amp; Time</th>
             <th>Store</th>
@@ -126,7 +126,7 @@
       @if (filtered().length === 0) {
         <div class="empty-state">
           <div class="empty-state-icon"><app-icon name="calendar" [size]="40"></app-icon></div>
-          <div class="empty-state-title">No appointments match</div>
+          <div class="empty-state-title">No scheduled donations match</div>
           <div class="empty-state-text">Try adjusting your search or filters.</div>
         </div>
       }
@@ -172,7 +172,7 @@
               <td style="font-size: 13px">{{ d.timestamp | date: 'MMM d, yyyy h:mm a' }}</td>
               <td style="font-size: 13px">{{ d.locationName }}</td>
               <td style="font-weight: 700">{{ d.totalItems }}</td>
-              <td><span class="badge {{ donationStatusBadge(d.status) }}">{{ d.status === DS.Completed ? 'Completed' : d.status === DS.Cancelled ? 'Cancelled' : d.status === DS.Processing ? 'Processing' : 'Pending' }}</span></td>
+              <td><span class="badge {{ donationStatusBadge(d.status) }}">{{ statusLabel(d.status) }}</span></td>
               <td>
                 @if (d.associatedDonorName) {
                   <span class="badge badge-success" style="font-size: 11px">{{ d.associatedDonorName }}</span>
@@ -269,7 +269,7 @@
           }
         </div>
 
-        <div class="detail-section-hdr">Appointment</div>
+        <div class="detail-section-hdr">Scheduled Donation</div>
         <div class="detail-grid">
           <div class="dg-row">
             <span class="dg-key">Date</span>

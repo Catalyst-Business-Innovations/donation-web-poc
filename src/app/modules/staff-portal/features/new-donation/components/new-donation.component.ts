@@ -6,7 +6,7 @@ import { MockDataService } from '../../../../../core/services/mock-data.service'
 import { ToastService } from '../../../../../core/services/toast.service';
 import { NewDonationMapper } from '../models/new-donation.mapper';
 import { SelectedDonor, EnrollForm } from '../models/new-donation.state';
-import { DonorTier, ScheduledAppointment, AppointmentStatus, AppointmentStatusLabel, Container, ContainerStatus, ContainerStatusLabel, ContainerType, ContainerTypeLabel, DonationType, ReceiptDelivery, Donor } from '../../../../../core/models/domain.models';
+import { DonorTier, ScheduledDonation, DonationStatus, DonationStatusLabel, Container, ContainerStatus, ContainerStatusLabel, ContainerType, ContainerTypeLabel, DonationType, ReceiptDelivery, Donor } from '../../../../../core/models/domain.models';
 
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { IconComponent, IconName } from '../../../../../shared/components/icon/icon.component';
@@ -26,9 +26,9 @@ export class NewDonationComponent {
 
   protected searchQ = signal<string>('');
   protected showEnroll = signal(false);
-  protected apptQ = '';
-  protected apptResults = signal<ScheduledAppointment[]>([]);
-  protected apptNotFound = signal(false);
+  protected sdQ = '';
+  protected sdResults = signal<ScheduledDonation[]>([]);
+  protected sdNotFound = signal(false);
   protected activeDept = signal('clothes');
   protected selectedContainer = signal<Container | null>(null);
   protected showContainerPicker = signal(false);
@@ -39,7 +39,7 @@ export class NewDonationComponent {
   protected cashTendered = signal<number | null>(null);
   protected cardApproved = signal(false);
   protected delivery = signal<ReceiptDelivery>(ReceiptDelivery.Email);
-  protected readonly AS = AppointmentStatus;
+  protected readonly AS = DonationStatus;
   protected readonly RD = ReceiptDelivery;
   protected readonly CS = ContainerStatus;
   protected readonly DT = DonationType;
@@ -165,7 +165,7 @@ export class NewDonationComponent {
 
   protected containerTypeLabel(t: ContainerType): string { return ContainerTypeLabel[t] ?? String(t); }
   protected containerStatusLabel(s: ContainerStatus): string { return ContainerStatusLabel[s] ?? String(s); }
-  protected apptStatusLabel(s: AppointmentStatus): string { return AppointmentStatusLabel[s] ?? String(s); }
+  protected sdStatusLabel(s: DonationStatus): string { return DonationStatusLabel[s] ?? String(s); }
 
   tierCfg(t: DonorTier) {
     return this.mockData.getTier(t);
@@ -176,35 +176,35 @@ export class NewDonationComponent {
     this.st.nextStep();
   }
 
-  lookupAppointment(): void {
-    const raw = this.apptQ.trim();
+  lookupScheduledDonation(): void {
+    const raw = this.sdQ.trim();
     if (!raw) return;
     const q = raw.toLowerCase();
     const qDigits = q.replace(/\D/g, '');
-    const results = this.mockData.getAppointments().filter(a =>
+    const results = this.mockData.getScheduledDonations().filter(a =>
       a.id.toLowerCase().includes(q) ||
       a.donorName.toLowerCase().includes(q) ||
       (qDigits.length >= 3 && (a.donorPhone ?? '').replace(/\D/g, '').includes(qDigits))
     );
-    this.apptResults.set(results);
-    this.apptNotFound.set(results.length === 0);
+    this.sdResults.set(results);
+    this.sdNotFound.set(results.length === 0);
   }
 
-  demoScanApptQR(): void {
-    const scheduled = this.mockData.getAppointments().filter(a => a.status === AppointmentStatus.Scheduled);
+  demoScanSdQR(): void {
+    const scheduled = this.mockData.getScheduledDonations().filter(a => a.status === DonationStatus.Scheduled);
     if (scheduled.length) {
-      this.apptQ = scheduled[0].id;
-      this.lookupAppointment();
-      this.toast.info('QR Scanned', `Appointment ID read: ${scheduled[0].id}`);
+      this.sdQ = scheduled[0].id;
+      this.lookupScheduledDonation();
+      this.toast.info('QR Scanned', `Scheduled donation ID read: ${scheduled[0].id}`);
     }
   }
 
-  loadAppointment(appt: ScheduledAppointment): void {
+  loadScheduledDonation(appt: ScheduledDonation): void {
     // Set donor
     const donor = appt.donorId ? this.mockData.donors.find(d => d.id === appt.donorId) : null;
     this.st.setDonor(donor ? NewDonationMapper.donorToSelected(donor) : null);
 
-    // Pre-fill items from appointment categories (1 qty each)
+    // Pre-fill items from scheduled donation categories (1 qty each)
     for (const catName of appt.categories ?? []) {
       for (const dept of this.mockData.departments) {
         const cat = dept.categories.find(c => c.name.toLowerCase() === catName.toLowerCase());
@@ -215,21 +215,21 @@ export class NewDonationComponent {
       }
     }
 
-    this.toast.success('Appointment Loaded', `${appt.id} — ${appt.donorName}`);
-    this.apptResults.set([]);
-    this.apptQ = '';
-    this.apptNotFound.set(false);
+    this.toast.success('Scheduled Donation Loaded', `${appt.id} — ${appt.donorName}`);
+    this.sdResults.set([]);
+    this.sdQ = '';
+    this.sdNotFound.set(false);
     this.st.setDonationType(DonationType.Items);
     this.st.goToStep(3);
   }
 
-  apptStatusBadge(status: AppointmentStatus): string {
-    const map: Record<AppointmentStatus, string> = {
-      [AppointmentStatus.Scheduled]:  'badge-info',
-      [AppointmentStatus.CheckedIn]:  'badge-warning',
-      [AppointmentStatus.Completed]:  'badge-success',
-      [AppointmentStatus.Cancelled]:  'badge-danger',
-      [AppointmentStatus.NoShow]:     'badge-danger'
+  sdStatusBadge(status: DonationStatus): string {
+    const map: Record<DonationStatus, string> = {
+      [DonationStatus.Scheduled]:  'badge-info',
+      [DonationStatus.CheckedIn]:  'badge-warning',
+      [DonationStatus.Completed]:  'badge-success',
+      [DonationStatus.Cancelled]:  'badge-danger',
+      [DonationStatus.NoShow]:     'badge-danger'
     };
     return map[status] ?? 'badge-gray';
   }
@@ -362,9 +362,9 @@ export class NewDonationComponent {
     this.delivery.set(ReceiptDelivery.Email);
     this.showEnroll.set(false);
     this.searchQ.set('');
-    this.apptQ = '';
-    this.apptResults.set([]);
-    this.apptNotFound.set(false);
+    this.sdQ = '';
+    this.sdResults.set([]);
+    this.sdNotFound.set(false);
     this.showAssociateModal.set(false);
     this.associatedDonor.set(null);
     this.associateSearchQ.set('');
@@ -390,8 +390,8 @@ export class NewDonationComponent {
     this.delivery.set(ReceiptDelivery.Email);
     this.showEnroll.set(false);
     this.searchQ.set('');
-    this.apptQ = '';
-    this.apptResults.set([]);
-    this.apptNotFound.set(false);
+    this.sdQ = '';
+    this.sdResults.set([]);
+    this.sdNotFound.set(false);
   }
 }

@@ -122,7 +122,7 @@
           </div>
         </div>
 
-        <!-- ─── Appointment Lookup ─── -->
+        <!-- ─── Scheduled Donation Lookup ─── -->
         <div class="card">
           <div class="card-header">
             <div>
@@ -131,15 +131,15 @@
             </div>
           </div>
           <div class="appt-lookup-row">
-            <input class="form-input" [(ngModel)]="apptQ" placeholder="Reference #, donor name or phone..."
-              (keyup.enter)="lookupAppointment()" />
-            <button class="btn btn-primary" (click)="lookupAppointment()">Search</button>
-            <button class="btn btn-secondary" (click)="demoScanApptQR()">
+            <input class="form-input" [(ngModel)]="sdQ" placeholder="Reference #, donor name or phone..."
+              (keyup.enter)="lookupScheduledDonation()" />
+            <button class="btn btn-primary" (click)="lookupScheduledDonation()">Search</button>
+            <button class="btn btn-secondary" (click)="demoScanSdQR()">
               <app-icon name="search" [size]="14"></app-icon> Scan QR
             </button>
           </div>
 
-          @for (appt of apptResults(); track appt.id) {
+          @for (appt of sdResults(); track appt.id) {
             <div class="appt-result">
               <div class="appt-res-body">
                 <div class="appt-res-id">{{ appt.id }}</div>
@@ -157,18 +157,18 @@
                 </div>
               </div>
               <div class="appt-res-actions">
-                <span class="badge {{ apptStatusBadge(appt.status) }}">{{ apptStatusLabel(appt.status) }}</span>
+                <span class="badge {{ sdStatusBadge(appt.status) }}">{{ sdStatusLabel(appt.status) }}</span>
                 @if (appt.status === AS.Scheduled) {
-                  <button class="btn btn-success" (click)="loadAppointment(appt)">Load &amp; Continue</button>
+                  <button class="btn btn-success" (click)="loadScheduledDonation(appt)">Load &amp; Continue</button>
                 } @else {
-                  <span class="appt-res-warn">Cannot load — appointment is {{ apptStatusLabel(appt.status) }}</span>
+                  <span class="appt-res-warn">Cannot load — scheduled donation is {{ sdStatusLabel(appt.status) }}</span>
                 }
               </div>
             </div>
           }
 
-          @if (apptNotFound()) {
-            <div class="appt-not-found">⚠ No appointments found for "{{ apptQ }}"</div>
+          @if (sdNotFound()) {
+            <div class="appt-not-found">⚠ No scheduled donations found for "{{ sdQ }}"</div>
           }
         </div>
       </div>

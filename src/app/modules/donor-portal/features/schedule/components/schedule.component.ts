@@ -93,8 +93,8 @@ export class ScheduleComponent {
     if (!this.selLocation || !this.selDate) return;
     const loc = this.svc.locations.find(l => l.id === this.selLocation);
     // Generate appointment ID
-    const appointmentId = `APT${Date.now()}`;
-    this.confirmationId.set(appointmentId);
+    const scheduledDonationId = `APT${Date.now()}`;
+    this.confirmationId.set(scheduledDonationId);
     this.confirmationData.set({
       location: loc?.name || '',
       date: this.selDate,

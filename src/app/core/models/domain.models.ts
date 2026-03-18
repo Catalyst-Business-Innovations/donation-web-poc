@@ -1,7 +1,6 @@
 import { IconName } from '../../shared/components/icon/icon.component';
 
 export enum DonorTier       { Bronze = 1, Silver, Gold, Platinum }
-export enum DonationStatus  { Pending = 1, Processing, Completed, Cancelled }
 export enum ContainerStatus { Available = 1, ReadyForSorting, Sorting, InUse }
 export enum ContainerDest   { Production = 1, Reserve, Warehouse, Transfer, Salvage, Ecommerce }
 export enum ItemCondition   { Sellable = 1, NeedsRefurbishment, Salvage, Dispose }
@@ -11,8 +10,8 @@ export enum PaymentMethod   { CreditCard = 1, DebitCard, ApplePay, GooglePay, Ca
 export enum ReceiptDelivery { Email = 1, SMS, Print, None }
 export enum LocationStatus  { Open = 1, Closed, Busy }
 export enum StaffRole       { Attendant = 1, PresortWorker, Manager, Admin }
-export enum AppointmentStatus { Scheduled = 1, CheckedIn, Completed, Cancelled, NoShow }
-export enum AppointmentType   { WalkIn = 1, Scheduled, Pickup }
+export enum DonationStatus { Scheduled = 1, CheckedIn, Completed, Cancelled, NoShow }
+export enum ScheduledDonationType   { WalkIn = 1, Scheduled, Pickup }
 export enum DonationType      { Items = 1, Monetary, Both }
 
 // ── Phase 1 enums ────────────────────────────────────────────────────────────
@@ -29,10 +28,11 @@ export const DonorTierLabel: Record<DonorTier, string> = {
   [DonorTier.Platinum]: 'Platinum',
 };
 export const DonationStatusLabel: Record<DonationStatus, string> = {
-  [DonationStatus.Pending]:    'Pending',
-  [DonationStatus.Processing]: 'Processing',
-  [DonationStatus.Completed]:  'Completed',
-  [DonationStatus.Cancelled]:  'Cancelled',
+  [DonationStatus.Scheduled]: 'Scheduled',
+  [DonationStatus.CheckedIn]: 'Checked In',
+  [DonationStatus.Completed]: 'Completed',
+  [DonationStatus.Cancelled]: 'Cancelled',
+  [DonationStatus.NoShow]:    'No Show',
 };
 export const ContainerStatusLabel: Record<ContainerStatus, string> = {
   [ContainerStatus.Available]:       'Available',
@@ -76,17 +76,10 @@ export const LocationStatusLabel: Record<LocationStatus, string> = {
   [LocationStatus.Closed]: 'Closed',
   [LocationStatus.Busy]:   'Busy',
 };
-export const AppointmentStatusLabel: Record<AppointmentStatus, string> = {
-  [AppointmentStatus.Scheduled]: 'Scheduled',
-  [AppointmentStatus.CheckedIn]: 'Checked In',
-  [AppointmentStatus.Completed]: 'Completed',
-  [AppointmentStatus.Cancelled]: 'Cancelled',
-  [AppointmentStatus.NoShow]:    'No Show',
-};
-export const AppointmentTypeLabel: Record<AppointmentType, string> = {
-  [AppointmentType.WalkIn]:    'Walk-in',
-  [AppointmentType.Scheduled]: 'Scheduled',
-  [AppointmentType.Pickup]:    'Pickup',
+export const ScheduledDonationTypeLabel: Record<ScheduledDonationType, string> = {
+  [ScheduledDonationType.WalkIn]:    'Walk-in',
+  [ScheduledDonationType.Scheduled]: 'Scheduled',
+  [ScheduledDonationType.Pickup]:    'Pickup',
 };
 export const DonationTypeLabel: Record<DonationType, string> = {
   [DonationType.Items]:    'Donate Items',
@@ -397,8 +390,8 @@ export interface ToastModel {
   message: string;
 }
 
-// AppointmentStatus and AppointmentType are declared as enums above with the other enums.
-export interface ScheduledAppointment {
+// DonationStatus and ScheduledDonationType are declared as enums above.
+export interface ScheduledDonation {
   id: string;
   donorId?: string;
   donorName: string;
@@ -407,10 +400,10 @@ export interface ScheduledAppointment {
   address?: string;
   locationId?: string;
   locationName?: string;
-  type: AppointmentType;
+  type: ScheduledDonationType;
   date: Date;
   timeSlot: string;
-  status: AppointmentStatus;
+  status: DonationStatus;
   itemCount?: number;
   categories?: string[];
   recurring?: string;

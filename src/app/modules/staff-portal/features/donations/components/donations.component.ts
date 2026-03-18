@@ -8,9 +8,9 @@ import { ModalComponent } from '../../../../../shared/components/modal/modal.com
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { QrCodeComponent } from '../../../../../shared/components/qr-code/qr-code.component';
 import {
-  ScheduledAppointment, AppointmentStatus, AppointmentType,
-  AppointmentStatusLabel, AppointmentTypeLabel,
-  Donation, DonationStatus, Donor, DonorTier
+  ScheduledDonation, DonationStatus, ScheduledDonationType,
+  DonationStatusLabel, ScheduledDonationTypeLabel,
+  Donation, Donor, DonorTier
 } from '../../../../../core/models/domain.models';
 
 @Component({
@@ -26,14 +26,14 @@ export class DonationsComponent {
   private router = inject(Router);
 
   // expose for template
-  protected readonly AS = AppointmentStatus;
-  protected readonly AT = AppointmentType;
+  protected readonly AS = DonationStatus;
+  protected readonly AT = ScheduledDonationType;
   protected readonly DS = DonationStatus;
 
-  protected activeTab = signal<'appointments' | 'completions'>('appointments');
+  protected activeTab = signal<'scheduled-donations' | 'completions'>('scheduled-donations');
 
   protected query = '';
-  protected statusFilter: AppointmentStatus | '' = '';
+  protected statusFilter: DonationStatus | '' = '';
   protected dateFilter = '';
 
   // ── Completed-Donations tab ──────────────────────────────────────────────
@@ -63,13 +63,13 @@ export class DonationsComponent {
     );
   });
 
-  protected selected = signal<ScheduledAppointment | null>(null);
+  protected selected = signal<ScheduledDonation | null>(null);
 
-  readonly allAppointments = computed(() => this.mockData.getAppointments());
+  readonly allScheduledDonations = computed(() => this.mockData.getScheduledDonations());
 
   readonly filtered = computed(() => {
     const q = this.query.toLowerCase();
-    return this.allAppointments().filter(a => {
+    return this.allScheduledDonations().filter(a => {
       const mQ = !q
         || a.donorName.toLowerCase().includes(q)
         || a.id.toLowerCase().includes(q)
@@ -82,45 +82,45 @@ export class DonationsComponent {
   });
 
   readonly counts = computed(() => {
-    const appts = this.allAppointments();
+    const appts = this.allScheduledDonations();
     return {
-      scheduled: appts.filter(a => a.status === AppointmentStatus.Scheduled).length,
-      checkedIn: appts.filter(a => a.status === AppointmentStatus.CheckedIn).length,
-      completed: appts.filter(a => a.status === AppointmentStatus.Completed).length,
-      cancelled: appts.filter(a => a.status === AppointmentStatus.Cancelled).length,
+      scheduled: appts.filter(a => a.status === DonationStatus.Scheduled).length,
+      checkedIn: appts.filter(a => a.status === DonationStatus.CheckedIn).length,
+      completed: appts.filter(a => a.status === DonationStatus.Completed).length,
+      cancelled: appts.filter(a => a.status === DonationStatus.Cancelled).length,
       total: appts.length,
     };
   });
 
-  statusLabel(s: AppointmentStatus): string {
-    return AppointmentStatusLabel[s] ?? String(s);
+  statusLabel(s: DonationStatus): string {
+    return DonationStatusLabel[s] ?? String(s);
   }
 
-  statusBadge(s: AppointmentStatus): string {
-    const m: Record<AppointmentStatus, string> = {
-      [AppointmentStatus.Scheduled]: 'badge-info',
-      [AppointmentStatus.CheckedIn]: 'badge-warning',
-      [AppointmentStatus.Completed]: 'badge-success',
-      [AppointmentStatus.Cancelled]: 'badge-danger',
-      [AppointmentStatus.NoShow]:    'badge-gray',
+  statusBadge(s: DonationStatus): string {
+    const m: Record<DonationStatus, string> = {
+      [DonationStatus.Scheduled]: 'badge-info',
+      [DonationStatus.CheckedIn]: 'badge-warning',
+      [DonationStatus.Completed]: 'badge-success',
+      [DonationStatus.Cancelled]: 'badge-danger',
+      [DonationStatus.NoShow]:    'badge-gray',
     };
     return m[s] ?? 'badge-gray';
   }
 
-  typeBadge(type: AppointmentType): string {
-    const m: Record<AppointmentType, string> = {
-      [AppointmentType.Scheduled]: 'badge-purple',
-      [AppointmentType.WalkIn]:    'badge-gray',
-      [AppointmentType.Pickup]:    'badge-warning',
+  typeBadge(type: ScheduledDonationType): string {
+    const m: Record<ScheduledDonationType, string> = {
+      [ScheduledDonationType.Scheduled]: 'badge-purple',
+      [ScheduledDonationType.WalkIn]:    'badge-gray',
+      [ScheduledDonationType.Pickup]:    'badge-warning',
     };
     return m[type] ?? 'badge-gray';
   }
 
-  typeLabel(type: AppointmentType): string {
-    return AppointmentTypeLabel[type] ?? String(type);
+  typeLabel(type: ScheduledDonationType): string {
+    return ScheduledDonationTypeLabel[type] ?? String(type);
   }
 
-  openDetail(a: ScheduledAppointment): void {
+  openDetail(a: ScheduledDonation): void {
     this.selected.set(a);
   }
 
@@ -128,20 +128,20 @@ export class DonationsComponent {
     this.selected.set(null);
   }
 
-  checkIn(a: ScheduledAppointment): void {
+  checkIn(a: ScheduledDonation): void {
     this.toast.success('Checked In', `${a.donorName} has been checked in.`);
     this.selected.set(null);
     this.router.navigate(['/staff/new-donation']);
   }
 
-  markComplete(a: ScheduledAppointment): void {
-    this.toast.success('Completed', `Appointment ${a.id} marked as completed.`);
+  markComplete(a: ScheduledDonation): void {
+    this.toast.success('Completed', `Scheduled donation ${a.id} marked as completed.`);
     this.selected.set(null);
   }
 
-  markCancelled(a: ScheduledAppointment, event: Event): void {
+  markCancelled(a: ScheduledDonation, event: Event): void {
     event.stopPropagation();
-    this.toast.info('Cancelled', `Appointment ${a.id} cancelled.`);
+    this.toast.info('Cancelled', `Scheduled donation ${a.id} cancelled.`);
   }
 
   // ── Link-Donor modal actions ──────────────────────────────────────────────
@@ -176,10 +176,11 @@ export class DonationsComponent {
 
   donationStatusBadge(s: DonationStatus): string {
     const m: Record<DonationStatus, string> = {
-      [DonationStatus.Pending]:    'badge-info',
-      [DonationStatus.Processing]: 'badge-warning',
+      [DonationStatus.Scheduled]:  'badge-info',
+      [DonationStatus.CheckedIn]:  'badge-warning',
       [DonationStatus.Completed]:  'badge-success',
       [DonationStatus.Cancelled]:  'badge-danger',
+      [DonationStatus.NoShow]:     'badge-gray',
     };
     return m[s] ?? 'badge-gray';
   }

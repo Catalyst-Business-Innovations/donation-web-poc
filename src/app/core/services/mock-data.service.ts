@@ -19,8 +19,7 @@ import {
   ReceiptDelivery,
   LocationStatus,
   StaffRole,
-  AppointmentStatus,
-  AppointmentType,
+  ScheduledDonationType,
   AppConfig,
   PointsCalcMethod,
   RewardDefinition,
@@ -750,7 +749,7 @@ export class MockDataService {
       locationName: 'Downtown Store',
       attendantId: 'staff-001',
       timestamp: new Date('2026-03-15T14:15:00'),
-      status: DonationStatus.Processing,
+      status: DonationStatus.CheckedIn,
       items: [
         {
           id: 'i-006',
@@ -1596,11 +1595,11 @@ export class MockDataService {
   }
 
   getScheduledPickups(donorId?: string) {
-    return this.getAppointments(donorId);
+    return this.getScheduledDonations(donorId);
   }
 
-  getAppointments(donorId?: string): import('../models/domain.models').ScheduledAppointment[] {
-    const appts: import('../models/domain.models').ScheduledAppointment[] = [
+  getScheduledDonations(donorId?: string): import('../models/domain.models').ScheduledDonation[] {
+    const appts: import('../models/domain.models').ScheduledDonation[] = [
       {
         id: 'APT-20260320-001',
         donorId: 'd-001',
@@ -1610,10 +1609,10 @@ export class MockDataService {
         address: '123 Main St, Springfield',
         locationId: 'loc-001',
         locationName: 'Downtown Store',
-        type: AppointmentType.Scheduled,
+        type: ScheduledDonationType.Scheduled,
         date: new Date('2026-03-20'),
         timeSlot: '9:00 AM',
-        status: AppointmentStatus.Scheduled,
+        status: DonationStatus.Scheduled,
         itemCount: 12,
         categories: ['Furniture', 'Home Décor'],
         recurring: 'One-time',
@@ -1629,10 +1628,10 @@ export class MockDataService {
         address: '456 Oak Ave, Springfield',
         locationId: 'loc-001',
         locationName: 'Downtown Store',
-        type: AppointmentType.Scheduled,
+        type: ScheduledDonationType.Scheduled,
         date: new Date('2026-03-22'),
         timeSlot: '1:00 PM',
-        status: AppointmentStatus.Scheduled,
+        status: DonationStatus.Scheduled,
         itemCount: 8,
         categories: ['Clothing', 'Shoes'],
         recurring: 'Monthly',
@@ -1648,10 +1647,10 @@ export class MockDataService {
         address: '555 Maple Dr, Springfield',
         locationId: 'loc-002',
         locationName: 'Westside Thrift',
-        type: AppointmentType.Scheduled,
+        type: ScheduledDonationType.Scheduled,
         date: new Date('2026-03-18'),
         timeSlot: '9:00 AM',
-        status: AppointmentStatus.Completed,
+        status: DonationStatus.Completed,
         itemCount: 5,
         categories: ['Electronics', 'Books'],
         recurring: 'One-time',
@@ -1667,10 +1666,10 @@ export class MockDataService {
         address: '111 Cedar Ln, Springfield',
         locationId: 'loc-001',
         locationName: 'Downtown Store',
-        type: AppointmentType.Scheduled,
+        type: ScheduledDonationType.Scheduled,
         date: new Date('2026-03-25'),
         timeSlot: '2:00 PM',
-        status: AppointmentStatus.Scheduled,
+        status: DonationStatus.Scheduled,
         itemCount: 20,
         categories: ['Books', 'Home Décor', 'Toys & Games'],
         recurring: 'One-time',
@@ -1686,10 +1685,10 @@ export class MockDataService {
         address: '444 Willow Ct, Springfield',
         locationId: 'loc-003',
         locationName: 'Eastside Thrift',
-        type: AppointmentType.Scheduled,
+        type: ScheduledDonationType.Scheduled,
         date: new Date('2026-03-19'),
         timeSlot: '10:00 AM',
-        status: AppointmentStatus.Cancelled,
+        status: DonationStatus.Cancelled,
         itemCount: 3,
         categories: ['Clothing'],
         recurring: 'One-time',
@@ -1701,10 +1700,10 @@ export class MockDataService {
         donorName: 'Anonymous',
         locationId: 'loc-002',
         locationName: 'Westside Thrift',
-        type: AppointmentType.WalkIn,
+        type: ScheduledDonationType.WalkIn,
         date: new Date('2026-03-28'),
         timeSlot: '11:00 AM',
-        status: AppointmentStatus.Scheduled,
+        status: DonationStatus.Scheduled,
         itemCount: 6,
         categories: ['Clothing', 'Shoes'],
         recurring: 'One-time',
@@ -1720,10 +1719,10 @@ export class MockDataService {
         address: '789 Elm St, Springfield',
         locationId: 'loc-001',
         locationName: 'Downtown Store',
-        type: AppointmentType.Scheduled,
+        type: ScheduledDonationType.Scheduled,
         date: new Date('2026-04-01'),
         timeSlot: '3:00 PM',
-        status: AppointmentStatus.Scheduled,
+        status: DonationStatus.Scheduled,
         itemCount: 15,
         categories: ['Furniture', 'Clothing', 'Electronics'],
         recurring: 'Every 2 Weeks',
@@ -1739,7 +1738,7 @@ export class MockDataService {
     return {
       id: `p-${Date.now()}`,
       ...pickup,
-      status: AppointmentStatus.Scheduled,
+      status: DonationStatus.Scheduled,
       createdAt: new Date()
     };
   }

@@ -166,7 +166,7 @@
 <!-- Visit Detail Modal -->
 <app-modal
   [open]="!!selectedVisit()"
-  title="Appointment Details"
+  title="Scheduled Donation Details"
   confirmLabel="Close"
   [showCancel]="false"
   (closed)="closeVisitDetail()"
@@ -174,9 +174,9 @@
 >
   @if (selectedVisit()) {
     <div class="visit-detail">
-      <!-- Appointment ID -->
+      <!-- Scheduled Donation ID -->
       <div class="apt-id-block">
-        <div class="apt-id-label">Appointment ID</div>
+        <div class="apt-id-label">Scheduled Donation ID</div>
         <div class="apt-id-value">{{ selectedVisit()!.id }}</div>
       </div>
 
@@ -234,7 +234,7 @@
 >
   <div style="text-align: center; padding: 20px">
     <div style="margin-bottom: 24px">
-      <h3 style="color: var(--secondary); margin-bottom: 8px">Appointment ID</h3>
+      <h3 style="color: var(--secondary); margin-bottom: 8px">Scheduled Donation ID</h3>
       <div
         style="font-size: 24px; font-weight: 800; color: var(--primary); font-family: monospace; letter-spacing: 2px"
       >
@@ -262,7 +262,7 @@
       "
     >
       <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--primary)">
-        📍 Appointment Details
+        📍 Scheduled Donation Details
       </div>
       <div style="display: grid; gap: 8px">
         <div style="display: flex; justify-content: space-between">
@@ -295,7 +295,7 @@
         <span style="font-size: 18px">✅</span>
         <div style="font-size: 12px; color: var(--gray-700); text-align: left">
           <strong>Confirmation sent!</strong>
-          Check your email for appointment details and directions. You'll receive a reminder 24 hours before your
+          Check your email for scheduled donation details and directions. You'll receive a reminder 24 hours before your
           scheduled time.
         </div>
       </div>
