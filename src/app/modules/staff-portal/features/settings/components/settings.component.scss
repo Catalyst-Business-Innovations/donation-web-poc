@@ -440,3 +440,90 @@
   color: var(--danger) !important;
   &:hover { background: var(--danger-light, #fef2f2); }
 }
+
+/* ── Reward table name cell ── */
+.reward-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+.reward-desc-cell {
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-top: 2px;
+}
+
+/* ── Settings card header flex-grow body ── */
+.settings-card-header-body {
+  flex: 1;
+}
+
+/* ── Reward / transaction table cell variants ── */
+.td-value {
+  font-weight: 700;
+}
+.td-points-required {
+  font-weight: 700;
+  color: var(--primary);
+}
+.td-points-used {
+  font-weight: 700;
+  color: var(--danger);
+}
+.td-limits {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+.td-empty {
+  color: var(--gray-400);
+}
+.td-donor-name {
+  font-weight: 600;
+}
+.td-voucher-code {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.td-date {
+  font-size: 12px;
+}
+.td-empty-state {
+  text-align: center;
+  padding: 24px;
+  color: var(--gray-400);
+}
+
+/* ── Action button color modifiers ── */
+.btn-icon-approve {
+  color: var(--success);
+  &:hover { background: var(--success-light, #f0fdf4); color: var(--success); }
+}
+.btn-icon-reject {
+  color: var(--danger);
+  &:hover { background: var(--danger-light, #fef2f2); color: var(--danger); }
+}
+.btn-icon-muted {
+  color: var(--gray-500);
+}
+
+/* ── Rule row modifier: no border ── */
+.rule-row {
+  &--borderless {
+    border: none;
+    padding-top: 4px;
+  }
+}
+
+/* ── Modal form layout ── */
+.modal-form-body {
+  padding: 4px 0;
+}
+.modal-form-group {
+  margin-bottom: 12px;
+}
+.modal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}

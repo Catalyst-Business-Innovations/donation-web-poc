@@ -145,7 +145,7 @@
             </button>
           </div>
           <div class="id-divider">or search</div>
-          <div class="search-bar" style="margin-bottom: 8px">
+          <div class="search-bar search-bar--mb-8">
             <span class="search-icon"><app-icon name="search" size="14" /></span>
             <input [ngModel]="searchQ()" (ngModelChange)="searchQ.set($event)" placeholder="Name or phone number..." />
           </div>
@@ -168,7 +168,7 @@
           @if (searchQ().length > 1 && searchResults().length === 0) {
             <div class="no-results">
               <div>No donors found</div>
-              <button class="btn btn-primary" style="margin-top: 10px; width: 100%" (click)="showEnroll.set(true)">
+              <button class="btn btn-primary btn-enroll-cta" (click)="showEnroll.set(true)">
                 + Enroll New Donor
               </button>
             </div>
@@ -432,7 +432,7 @@
             <button class="preset-btn" [class.active]="customMon()" (click)="customMon.set(true)">Custom</button>
           </div>
           @if (customMon()) {
-            <div class="input-prefix-wrap" style="margin-top: 10px">
+            <div class="input-prefix-wrap input-prefix-wrap--mt">
               <span class="input-prefix">$</span>
               <input
                 class="form-input input-with-prefix"
@@ -539,14 +539,14 @@
           <div class="rs-header-title">Review Summary</div>
           <div class="rs-header-sub">Confirm all details before completing the donation</div>
         </div>
-        <button class="sb-back-btn" style="margin-left: auto" (click)="st.prevStep()">Back</button>
+        <button class="sb-back-btn sb-back-btn--ml-auto" (click)="st.prevStep()">Back</button>
       </div>
 
       <div class="review-two-col">
         <!-- ── Card 1: Summary ── -->
         <div class="card">
           <!-- Donor -->
-          <div class="rs-overview-bar" style="margin-bottom: 16px">
+          <div class="rs-overview-bar rs-overview-bar--mb">
             @if (st.donor() === null) {
               <div class="sb-donor-chip sb-donor-anon">
                 <div class="sb-donor-avatar sb-donor-avatar-anon">👤</div>
@@ -568,7 +568,7 @@
               </div>
             }
             @if (st.donor() && st.estPoints() > 0) {
-              <div class="rs-points-badge" style="margin-left: auto">+{{ st.estPoints() }} pts</div>
+              <div class="rs-points-badge rs-points-badge--ml-auto">+{{ st.estPoints() }} pts</div>
             }
           </div>
 
@@ -699,7 +699,7 @@
   (confirmed)="showContainerPicker.set(false)"
 >
   <div class="cpicker-body">
-    <div class="search-bar" style="margin-bottom: 12px">
+    <div class="search-bar search-bar--mb-12">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
       <input
         [ngModel]="containerSearchQ()"
@@ -774,7 +774,7 @@
       <div class="cm-id-block">
         <div class="cm-label">Reference #</div>
         <div class="cm-id-val">{{ donationRefNumber() }}</div>
-        <div class="cm-label" style="margin-top: 10px">Receipt #</div>
+        <div class="cm-label cm-label--mt">Receipt #</div>
         <div class="cm-receipt-val">{{ receiptNum }}</div>
       </div>
       <div class="cm-qr-block">
@@ -835,7 +835,7 @@
     <!-- Link to donor (anonymous) -->
     @if (st.donor() === null && donationId()) {
       @if (!associatedDonor()) {
-        <button class="btn btn-secondary" style="width: 100%; margin-top: 4px" (click)="showAssociateModal.set(true)">
+        <button class="btn btn-secondary btn-link-donor" (click)="showAssociateModal.set(true)">
           <app-icon name="user" size="14" />
           Link to Donor Account
         </button>
@@ -883,12 +883,12 @@
   (closed)="showAssociateModal.set(false); associatedDonor.set(null); associateSearchQ.set('')"
   (confirmed)="confirmAssociation()"
 >
-  <div style="padding: 4px 0">
-    <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px">
+  <div class="assoc-modal-body">
+    <p class="assoc-modal-hint">
       Search for the donor to associate with this anonymous donation. Loyalty points will be recalculated and awarded
       upon confirmation.
     </p>
-    <div class="search-bar" style="margin-bottom: 10px">
+    <div class="search-bar search-bar--mb-8">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
       <input
         [ngModel]="associateSearchQ()"
@@ -912,7 +912,7 @@
       </div>
     }
     @if (associateSearchQ().length > 1 && associateResults().length === 0) {
-      <div style="text-align: center; padding: 20px; color: var(--gray-500); font-size: 13px">
+      <div class="assoc-no-results">
         No donors found for "{{ associateSearchQ() }}"
       </div>
     }

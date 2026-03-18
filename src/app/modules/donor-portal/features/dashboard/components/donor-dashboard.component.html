@@ -28,12 +28,12 @@
       </div>
       @if (nextTier) {
         <div class="lh-progress">
-          <div style="font-size: 12px; opacity: 0.8; margin-bottom: 6px">
+          <div class="lh-progress-hint">
             {{ donationsToNext }} more visits to
-            <app-icon [name]="nextTier.icon" [size]="14" style="margin: 0 2px"></app-icon>
+            <app-icon [name]="nextTier.icon" [size]="14" class="lh-progress-hint-icon"></app-icon>
             {{ nextTier.label }}
           </div>
-          <div class="progress-bar" style="background: rgba(255, 255, 255, 0.2)">
+          <div class="progress-bar progress-bar--muted">
             <div class="progress-fill gradient" [style.width]="tierProgress + '%'"></div>
           </div>
         </div>
@@ -92,15 +92,15 @@
       @for (d of svc.getDonationsByDonor(donor.id); track d.id) {
         <div class="don-row">
           <div class="don-icon"><app-icon name="package" [size]="20"></app-icon></div>
-          <div style="flex: 1">
-            <div style="font-weight: 700">{{ d.locationName }}</div>
-            <div style="font-size: 12px; color: var(--gray-500)">
+          <div class="don-content">
+            <div class="don-location">{{ d.locationName }}</div>
+            <div class="don-meta">
               {{ d.timestamp | date: 'MMM d, yyyy' }} · {{ d.totalItems }} items
             </div>
           </div>
-          <div style="text-align: right">
+          <div class="don-pts-col">
             @if (d.loyaltyPointsEarned) {
-              <div style="font-size: 11px; color: var(--primary)">+{{ d.loyaltyPointsEarned }} pts</div>
+              <div class="don-pts">+{{ d.loyaltyPointsEarned }} pts</div>
             }
           </div>
         </div>
@@ -109,50 +109,46 @@
 
     <div class="side-col">
       <div class="card impact-card">
-        <div class="card-title" style="margin-bottom: 14px">Your Impact</div>
+        <div class="card-title card-title--spaced">Your Impact</div>
         @for (item of impact; track item.label) {
           <div class="impact-row">
-            <app-icon [name]="item.icon" [size]="26" style="width: 36px; flex-shrink: 0"></app-icon>
+            <app-icon [name]="item.icon" [size]="26" class="impact-icon"></app-icon>
             <div>
-              <div style="font-weight: 700; font-size: 15px">{{ item.value }}</div>
-              <div style="font-size: 12px; color: var(--gray-600)">{{ item.label }}</div>
+              <div class="impact-value">{{ item.value }}</div>
+              <div class="impact-label">{{ item.label }}</div>
             </div>
           </div>
         }
       </div>
 
       <div class="card">
-        <div class="card-title" style="margin-bottom: 12px">Quick Actions</div>
+        <div class="card-title card-title--spaced-sm">Quick Actions</div>
         <button
-          class="btn btn-primary"
+          class="btn btn-primary quick-action-btn quick-action-btn--mb"
           routerLink="/donor/schedule"
-          style="width: 100%; justify-content: flex-start; margin-bottom: 8px"
         >
-          <app-icon name="calendar" [size]="14" style="margin-right: 6px"></app-icon>
+          <app-icon name="calendar" [size]="14" class="btn-icon"></app-icon>
           Schedule Pickup
         </button>
         <button
-          class="btn btn-secondary"
+          class="btn btn-secondary quick-action-btn quick-action-btn--mb"
           routerLink="/donor/receipts"
-          style="width: 100%; justify-content: flex-start; margin-bottom: 8px"
         >
-          <app-icon name="file-text" [size]="14" style="margin-right: 6px"></app-icon>
+          <app-icon name="file-text" [size]="14" class="btn-icon"></app-icon>
           Download Tax Receipt
         </button>
         <button
-          class="btn btn-secondary"
+          class="btn btn-secondary quick-action-btn quick-action-btn--mb"
           routerLink="/donor/rewards"
-          style="width: 100%; justify-content: flex-start; margin-bottom: 8px"
         >
-          <app-icon name="star" [size]="14" style="margin-right: 6px"></app-icon>
+          <app-icon name="star" [size]="14" class="btn-icon"></app-icon>
           View Rewards
         </button>
         <button
-          class="btn btn-ghost"
-          style="width: 100%; justify-content: flex-start"
+          class="btn btn-ghost quick-action-btn"
           (click)="toast.info('Finder', 'Opening store finder...')"
         >
-          <app-icon name="map-pin" [size]="14" style="margin-right: 6px"></app-icon>
+          <app-icon name="map-pin" [size]="14" class="btn-icon"></app-icon>
           Find a Store
         </button>
       </div>

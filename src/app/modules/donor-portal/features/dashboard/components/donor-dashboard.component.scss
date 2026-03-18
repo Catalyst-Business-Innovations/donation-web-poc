@@ -60,6 +60,16 @@
 .lh-progress {
   max-width: 360px;
 }
+.lh-progress-hint {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 8px;
+}
+.lh-progress-hint-icon {
+  margin: 0 4px;
+}
 .lh-right {
   display: flex;
   flex-direction: column;
@@ -80,6 +90,13 @@
   opacity: 0.6;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+// ── Progress bar variant ──
+.progress-bar {
+  &--muted {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
 // ── Active Campaigns Strip ──
@@ -107,7 +124,7 @@
   background: #fff;
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
-  transition: border-color 0.15s;
+  transition: var(--transition);
   &:hover {
     border-color: var(--primary);
   }
@@ -158,6 +175,7 @@
   gap: 14px;
 }
 
+// ── Donation rows ──
 .don-row {
   display: flex;
   align-items: center;
@@ -179,7 +197,25 @@
   font-size: 20px;
   flex-shrink: 0;
 }
+.don-content {
+  flex: 1;
+}
+.don-location {
+  font-weight: 700;
+}
+.don-meta {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+.don-pts-col {
+  text-align: right;
+}
+.don-pts {
+  font-size: 11px;
+  color: var(--primary);
+}
 
+// ── Impact card ──
 .impact-card {
   background: linear-gradient(135deg, var(--success-50), var(--success-100)) !important;
 }
@@ -188,6 +224,40 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
+}
+.impact-icon {
+  width: 36px;
+  flex-shrink: 0;
+}
+.impact-value {
+  font-weight: 700;
+  font-size: 15px;
+}
+.impact-label {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+// ── Card title spacing variants ──
+.card-title {
+  &--spaced {
+    margin-bottom: 16px;
+  }
+  &--spaced-sm {
+    margin-bottom: 12px;
+  }
+}
+
+// ── Quick action buttons ──
+.quick-action-btn {
+  width: 100%;
+  justify-content: flex-start;
+  &--mb {
+    margin-bottom: 8px;
+  }
+}
+.btn-icon {
+  margin-right: 8px;
 }
 
 .badges-grid {

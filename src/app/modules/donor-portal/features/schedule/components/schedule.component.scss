@@ -11,6 +11,7 @@
   grid-template-columns: 1fr 340px;
   gap: 16px;
 }
+
 .loc-preview {
   display: flex;
   justify-content: space-between;
@@ -20,17 +21,33 @@
   border: 1px solid var(--secondary);
   border-radius: var(--radius-lg);
   margin-bottom: 14px;
+
+  &__name {
+    font-weight: 700;
+  }
+
+  &__meta {
+    font-size: 12px;
+    color: var(--gray-600);
+
+    &--hours {
+      margin-top: 2px;
+    }
+  }
 }
+
 .date-time-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
+
 .recurring-opts {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
 }
+
 .recur-opt {
   display: flex;
   align-items: center;
@@ -39,11 +56,28 @@
   font-size: 13px;
   font-weight: 600;
 }
+
 .right-col {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
+
+// ── Empty state overrides ───────────────────────────────────────────────────
+.empty-state {
+  &--padded {
+    padding: 24px;
+  }
+
+  &-icon {
+    // dynamic font-size overrides (static values acceptable as design intent)
+    &--lg {
+      font-size: 36px;
+    }
+  }
+}
+
+// ── Cart ────────────────────────────────────────────────────────────────────
 .cart-row {
   display: flex;
   align-items: center;
@@ -52,7 +86,27 @@
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-sm);
   margin-bottom: 6px;
+
+  &__info {
+    flex: 1;
+  }
+
+  &__category {
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  &__desc {
+    font-size: 11px;
+    color: var(--gray-500);
+  }
+
+  &__qty {
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
 }
+
 .cart-total {
   font-size: 12px;
   font-weight: 700;
@@ -61,43 +115,93 @@
   border-top: 1px solid var(--gray-200);
   margin-top: 4px;
 }
+
 .add-item-form {
   margin-top: 12px;
   padding: 14px;
   background: var(--gray-50);
   border-radius: var(--radius-lg);
 }
+
 .add-row {
   display: flex;
   gap: 8px;
   margin-top: 10px;
+
+  &__group {
+    &--flex {
+      flex: 1;
+      margin: 0;
+    }
+
+    &--qty {
+      width: 80px;
+      margin: 0;
+    }
+  }
 }
+
 .add-actions {
   display: flex;
   gap: 8px;
   margin-top: 10px;
 }
+
+// ── Card title variant ──────────────────────────────────────────────────────
+.card-title {
+  &--spaced {
+    margin-bottom: 12px;
+  }
+}
+
+// ── Upcoming donations ──────────────────────────────────────────────────────
 .upcoming-row {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 0;
   border-bottom: 1px solid var(--gray-100);
+
   &:last-child {
     border-bottom: none;
   }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__location {
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  &__meta {
+    font-size: 11px;
+    color: var(--gray-500);
+  }
+
+  &__arrow {
+    color: var(--gray-400);
+  }
 }
+
 .upcoming-row-click {
   cursor: pointer;
   border-radius: var(--radius-sm);
   padding: 10px 6px;
   margin: 0 -6px;
-  transition: background 0.15s;
-  &:hover { background: var(--gray-50); }
-  &:active { background: var(--primary-light); }
+  transition: background var(--transition);
+
+  &:hover {
+    background: var(--gray-50);
+  }
+
+  &:active {
+    background: var(--primary-light);
+  }
 }
 
-// ── Visit detail modal ─────────────────────────────────────────────────────
+// ── Visit detail modal ──────────────────────────────────────────────────────
 .visit-detail {
   display: flex;
   flex-direction: column;
@@ -105,8 +209,10 @@
   gap: 20px;
   padding: 8px 0;
 }
+
 .apt-id-block {
   text-align: center;
+
   .apt-id-label {
     font-size: 11px;
     font-weight: 700;
@@ -115,6 +221,7 @@
     color: var(--gray-500);
     margin-bottom: 6px;
   }
+
   .apt-id-value {
     font-size: 22px;
     font-weight: 900;
@@ -123,23 +230,27 @@
     color: var(--primary);
   }
 }
+
 .qr-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
 }
+
 .qr-frame {
   padding: 14px;
-  background: #fff;
+  background: var(--white);
   border: 2px solid var(--gray-200);
-  border-radius: 10px;
+  border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
 }
+
 .qr-hint {
   font-size: 11px;
   color: var(--gray-500);
 }
+
 .apt-detail-grid {
   width: 100%;
   background: var(--gray-50);
@@ -150,22 +261,26 @@
   flex-direction: column;
   gap: 10px;
 }
+
 .apt-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
 }
+
 .apt-key {
   font-size: 13px;
   color: var(--gray-600);
   white-space: nowrap;
 }
+
 .apt-val {
   font-size: 13px;
   font-weight: 700;
   text-align: right;
 }
+
 .apt-reminder {
   width: 100%;
   display: flex;
@@ -178,6 +293,7 @@
   font-size: 12px;
   color: var(--gray-700);
 }
+
 .up-date {
   background: var(--primary-light);
   border-radius: var(--radius-sm);
@@ -185,16 +301,118 @@
   text-align: center;
   min-width: 50px;
 }
+
 .up-day {
   font-size: 18px;
   font-weight: 900;
   color: var(--primary);
 }
+
 .up-month {
   font-size: 10px;
   font-weight: 700;
   color: var(--primary-dark);
 }
+
+// ── Confirmation modal ──────────────────────────────────────────────────────
+.confirm-modal {
+  text-align: center;
+  padding: 20px;
+
+  &__ref {
+    margin-bottom: 24px;
+  }
+
+  &__ref-label {
+    color: var(--secondary);
+    margin-bottom: 8px;
+  }
+
+  &__ref-id {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+    font-family: var(--font-mono);
+    letter-spacing: 2px;
+  }
+
+  &__qr {
+    margin-bottom: 24px;
+  }
+
+  &__qr-frame {
+    display: inline-block;
+    padding: 16px;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--gray-200);
+  }
+
+  &__qr-hint {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 8px;
+  }
+
+  &__details {
+    background: var(--info-light);
+    border: 1px solid var(--info);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  &__details-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--primary);
+  }
+
+  &__details-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  &__detail-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__detail-key {
+    color: var(--gray-600);
+    font-size: 13px;
+  }
+
+  &__detail-val {
+    font-size: 13px;
+  }
+
+  &__notice {
+    background: var(--success-light);
+    border: 1px solid var(--success);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  &__notice-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  &__notice-icon {
+    font-size: 18px;
+  }
+
+  &__notice-text {
+    font-size: 12px;
+    color: var(--gray-700);
+    text-align: left;
+  }
+}
+
 @media (max-width: 900px) {
   .sched-grid {
     grid-template-columns: 1fr;

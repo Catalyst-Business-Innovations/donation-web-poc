@@ -39,6 +39,9 @@
   height: 36px;
   background: rgba(255, 255, 255, 0.15);
 }
+.ys-action {
+  margin-left: auto;
+}
 
 .h-card {
   background: #fff;
@@ -74,17 +77,44 @@
   font-size: 20px;
   flex-shrink: 0;
 }
+.hc-info {
+  flex: 1;
+}
+.hc-location {
+  font-weight: 700;
+  font-size: 15px;
+}
+.hc-timestamp {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+.hc-meta {
+  text-align: right;
+  margin-right: 14px;
+}
+.hc-items-count {
+  font-size: 13px;
+  color: var(--gray-500);
+}
 .hc-badges {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
 }
+.hc-pts {
+  font-size: 11px;
+  color: var(--primary);
+  font-weight: 700;
+}
 .hc-chevron {
   font-size: 18px;
   color: var(--gray-400);
   margin-left: 8px;
-  transition: transform 0.2s ease;
+  transition: transform var(--transition);
+  &.is-open {
+    transform: rotate(180deg);
+  }
 }
 .hc-body {
   padding: 0 18px 16px;
@@ -97,6 +127,11 @@
   padding: 10px 0;
   margin-bottom: 8px;
 }
+.hc-receipt-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gray-500);
+}
 .hc-item-row {
   display: flex;
   gap: 14px;
@@ -105,6 +140,10 @@
   border-radius: var(--radius-sm);
   font-size: 13px;
   margin-bottom: 4px;
+}
+.hc-item-name {
+  font-weight: 600;
+  flex: 1;
 }
 .hc-total {
   display: flex;
@@ -115,4 +154,10 @@
   border-radius: var(--radius-sm);
   margin-top: 6px;
   color: var(--primary-dark);
+}
+.icon-mr-sm {
+  margin-right: 8px;
+}
+.icon-mr-xs {
+  margin-right: 4px;
 }

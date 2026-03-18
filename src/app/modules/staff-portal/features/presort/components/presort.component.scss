@@ -661,3 +661,28 @@
   font-size: 12px;
   margin-bottom: 4px;
 }
+
+/* ── Inline-style replacements ── */
+
+// form-label with zero margin (used inside items-header)
+.form-label--flush { margin: 0; }
+
+// add-category select fills remaining width
+.add-cat-select { flex: 1; }
+
+// complete button in ps-actions stretches to fill available space
+.ps-actions__complete { flex: 1; }
+
+// card-title with bottom spacing (16px grid-aligned, nearest to original 14px)
+.card-title--spaced { margin-bottom: 16px; }
+
+// last thru-row removes the bottom border
+.thru-row--last { border: none; }
+
+// quick-complete modal note paragraph
+.quick-complete-note {
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 1.6;
+  margin-top: 16px;
+}

@@ -1,4 +1,4 @@
-﻿<div class="topbar">
+<div class="topbar">
   <div>
     <div class="topbar-title">Container Management</div>
     <div class="topbar-subtitle">Track containers through the full production chain</div>
@@ -16,11 +16,11 @@
 </div>
 
 <div class="page-content">
-  
+
 
   <!-- Filters -->
   <div class="filters-row">
-    <div class="search-bar" style="flex: 1; max-width: 360px">
+    <div class="search-bar search-bar--fluid">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
       <input [(ngModel)]="query" placeholder="Search barcode, dept, or location..." />
     </div>
@@ -82,14 +82,14 @@
               <td><span class="type-badge">{{ CTL[c.containerType] }}</span></td>
               <td>
                 @if (c.deptName) {
-                  <span class="badge badge-info" style="font-size: 11px">{{ c.deptName }}</span>
+                  <span class="badge badge-info badge--xs">{{ c.deptName }}</span>
                 } @else {
                   <span class="text-muted"></span>
                 }
               </td>
               <td>
                 @if (c.catName) {
-                  <span style="font-size: 12px">{{ c.catName }}</span>
+                  <span class="cat-name">{{ c.catName }}</span>
                 } @else {
                   <span class="text-muted">Any</span>
                 }
@@ -100,11 +100,11 @@
               <td>
                 @if (c.destination) {
                   <span class="badge {{ mapper.destBadge(c.destination) }}">
-                    <app-icon [name]="mapper.destIcon(c.destination)" [size]="12" style="margin-right: 3px"></app-icon>
+                    <app-icon [name]="mapper.destIcon(c.destination)" [size]="12" class="dest-icon"></app-icon>
                     {{ c.destination }}
                   </span>
                   @if (c.transferToLocationName) {
-                    <div style="font-size: 10px; color: var(--gray-500); margin-top: 2px">â†’ {{ c.transferToLocationName }}</div>
+                    <div class="transfer-location">→ {{ c.transferToLocationName }}</div>
                   }
                 } @else {
                   <span class="text-muted">TBD</span>
@@ -117,10 +117,10 @@
                   </div>
                   <div class="fill-label">{{ c.totalItems }} <span class="fill-cap">/ {{ CAPACITY[c.containerType] }}</span></div>
                 } @else {
-                  <span style="font-weight: 700">{{ c.totalItems || '' }}</span>
+                  <span class="items-count">{{ c.totalItems || '' }}</span>
                 }
               </td>
-              <td style="font-size: 12px; color: var(--gray-500)">{{ c.updatedAt | date: 'M/d h:mm a' }}</td>
+              <td class="updated-at">{{ c.updatedAt | date: 'M/d h:mm a' }}</td>
               <td>
                 <div class="table-actions">
                   @if (nextStatus(c)) {
@@ -184,7 +184,7 @@
     </div>
 
     <!-- Info grid -->
-    <div class="edit-info-grid" style="margin-top: 16px">
+    <div class="edit-info-grid edit-info-grid--spaced">
       <div class="ei-cell">
         <div class="form-label">Type</div>
         <span class="type-badge">{{ CTL[viewing()!.containerType] }}</span>
@@ -239,19 +239,19 @@
 
     <!-- Fill bar -->
     @if (fillPct(viewing()!) > 0) {
-      <div class="form-section-hdr" style="margin-top: 16px">
+      <div class="form-section-hdr form-section-hdr--spaced">
         Fill Level
         <span class="section-count">{{ fillPct(viewing()!) }}%</span>
       </div>
       <div class="fill-bar-lg">
         <div class="fill-bar-inner" [style.width.%]="fillPct(viewing()!)" [class.fill-full]="fillPct(viewing()!) >= 90"></div>
       </div>
-      <div class="fill-label" style="margin-top: 4px">{{ viewing()!.totalItems }} of {{ CAPACITY[viewing()!.containerType] }} items</div>
+      <div class="fill-label fill-label--spaced">{{ viewing()!.totalItems }} of {{ CAPACITY[viewing()!.containerType] }} items</div>
     }
 
     <!-- Contents -->
     @if (viewing()!.contents.length > 0) {
-      <div class="form-section-hdr" style="margin-top: 16px">
+      <div class="form-section-hdr form-section-hdr--spaced">
         Contents
         <span class="section-count">{{ viewing()!.contents.length }}</span>
       </div>
@@ -260,9 +260,9 @@
           <div class="cb-row">
             <span class="cb-name">{{ item.categoryName }}</span>
             <span class="cb-qty">{{ item.quantity }}</span>
-            <span class="badge {{ mapper.condBadge(item.condition) }}" style="font-size: 10px">{{ ICL[item.condition] }}</span>
+            <span class="badge badge--xs {{ mapper.condBadge(item.condition) }}">{{ ICL[item.condition] }}</span>
             @if (item.ecommerceQty) {
-              <span class="badge badge-warning" style="font-size: 10px">{{ item.ecommerceQty }} e-com</span>
+              <span class="badge badge--xs badge-warning">{{ item.ecommerceQty }} e-com</span>
             }
           </div>
         }
@@ -324,7 +324,7 @@
     </div>
   </div>
 
-  <div class="form-section-hdr" style="margin-top: 20px">Classification</div>
+  <div class="form-section-hdr form-section-hdr--lg-spaced">Classification</div>
 
   <div class="form-row-2">
     <div class="form-group">
@@ -347,7 +347,7 @@
     </div>
   </div>
 
-  <div class="form-section-hdr" style="margin-top: 20px">Routing</div>
+  <div class="form-section-hdr form-section-hdr--lg-spaced">Routing</div>
 
   <div class="form-row-2">
     <div class="form-group">
@@ -384,7 +384,7 @@
     }
   </div>
 
-  <div class="form-group" style="margin-top: 12px">
+  <div class="form-group form-group--spaced-sm">
     <label class="form-label">Notes <span class="form-hint">optional</span></label>
     <textarea class="form-textarea" rows="2" [(ngModel)]="cNotes" placeholder="Any notes about this container"></textarea>
   </div>
@@ -439,7 +439,7 @@
     </div>
 
     <!-- Editable fields -->
-    <div class="form-section-hdr" style="margin-top: 20px">Update</div>
+    <div class="form-section-hdr form-section-hdr--lg-spaced">Update</div>
 
     <div class="form-row-2">
       <div class="form-group">
@@ -484,7 +484,7 @@
   }
 </app-modal>
 
-<!-- 
+<!--
      MERGE MODAL
 -->
 <app-modal
@@ -497,11 +497,11 @@
   (confirmed)="saveMerge()"
 >
   <div class="merge-summary">
-    Merging <strong>{{ selectionCount() }}</strong> containers 
+    Merging <strong>{{ selectionCount() }}</strong> containers
     <strong>{{ mergeTotal() }}</strong> combined items into one new container.
   </div>
 
-  <div class="form-section-hdr" style="margin-top: 16px">New Container Properties</div>
+  <div class="form-section-hdr form-section-hdr--spaced">New Container Properties</div>
 
   <div class="form-row-2">
     <div class="form-group">
@@ -561,7 +561,7 @@
     </div>
   }
 
-  <div class="form-group" style="margin-top: 8px">
+  <div class="form-group form-group--spaced-xs">
     <label class="form-label">Notes <span class="form-hint">optional</span></label>
     <textarea class="form-textarea" rows="2" [(ngModel)]="mNotes" placeholder="Reason for merge"></textarea>
   </div>

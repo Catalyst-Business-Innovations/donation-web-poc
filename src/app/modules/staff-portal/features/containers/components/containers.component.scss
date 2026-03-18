@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-lg);
   padding: 16px;
@@ -25,7 +25,7 @@
   cursor: pointer;
   padding: 8px;
   border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
+  transition: all var(--transition);
   &:hover {
     background: var(--gray-50);
   }
@@ -65,6 +65,45 @@
   font-size: 13px;
 }
 
+// ── Search bar fluid modifier ───────────────────────────────────────────────
+.search-bar {
+  &--fluid {
+    flex: 1;
+    max-width: 360px;
+  }
+}
+
+// ── Table cell helpers ──────────────────────────────────────────────────────
+.cat-name {
+  font-size: 12px;
+}
+
+.dest-icon {
+  margin-right: 3px;
+}
+
+.transfer-location {
+  font-size: 10px;
+  color: var(--gray-500);
+  margin-top: 2px;
+}
+
+.items-count {
+  font-weight: 700;
+}
+
+.updated-at {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+// ── Badge size modifier ─────────────────────────────────────────────────────
+.badge {
+  &--xs {
+    font-size: 10px;
+  }
+}
+
 .barcode-cell {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -86,7 +125,7 @@
   padding: 2px 7px;
   background: var(--gray-100);
   color: var(--gray-700);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   text-transform: capitalize;
   white-space: nowrap;
 }
@@ -114,6 +153,16 @@
   display: flex;
   align-items: center;
   gap: 8px;
+
+  // Modifier: top spacing matching 16px grid step
+  &--spaced {
+    margin-top: 16px;
+  }
+
+  // Modifier: top spacing matching 20px (between 16px and 24px grid steps)
+  &--lg-spaced {
+    margin-top: 24px;
+  }
 }
 .section-count {
   font-size: 11px;
@@ -121,7 +170,7 @@
   color: var(--primary);
   background: var(--primary-light);
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   text-transform: none;
   letter-spacing: 0;
 }
@@ -141,7 +190,7 @@
   font-size: 13px;
   font-family: inherit;
   color: var(--gray-900);
-  background: #fff;
+  background: var(--white);
   box-sizing: border-box;
   &:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
 }
@@ -156,6 +205,17 @@
   resize: vertical;
   box-sizing: border-box;
   &:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+}
+
+// ── Form group spacing modifiers ───────────────────────────────────────────
+.form-group {
+  &--spaced-xs {
+    margin-top: 8px;
+  }
+
+  &--spaced-sm {
+    margin-top: 16px;
+  }
 }
 
 // ── Contents table inside create modal ────────────────────────────────────
@@ -209,7 +269,7 @@
   height: 30px;
   padding: 0 6px;
   border: 1px solid var(--gray-200);
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   font-size: 13px;
   text-align: center;
   &:focus { outline: none; border-color: var(--primary); }
@@ -236,18 +296,18 @@
   .toggle-track {
     width: 36px; height: 20px;
     background: var(--gray-200);
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     position: relative;
-    transition: background 0.2s;
+    transition: background var(--transition);
   }
   .toggle-thumb {
     position: absolute;
     top: 3px; left: 3px;
     width: 14px; height: 14px;
-    background: #fff;
+    background: var(--white);
     border-radius: 50%;
-    transition: left 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    transition: left var(--transition);
+    box-shadow: var(--shadow-xs);
   }
   &.on .toggle-track { background: var(--primary); }
   &.on .toggle-thumb { left: 19px; }
@@ -264,6 +324,11 @@
   border-radius: var(--radius-sm);
   padding: 12px;
   margin-bottom: 4px;
+
+  // Modifier: add top spacing when rendered below the timeline
+  &--spaced {
+    margin-top: 16px;
+  }
 }
 .ei-cell {
   .form-label { margin-bottom: 3px; }
@@ -285,7 +350,7 @@
 // ── Danger icon button ─────────────────────────────────────────────────────
 .btn-icon-danger {
   color: var(--danger) !important;
-  &:hover { background: #fff0f0 !important; }
+  &:hover { background: var(--danger-light) !important; }
 }
 
 // ── Small btn ─────────────────────────────────────────────────────────────
@@ -305,7 +370,7 @@
   color: var(--primary);
   padding: 4px 10px;
   background: var(--primary-light);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 .clickable-cell {
   cursor: pointer;
@@ -317,7 +382,7 @@
   width: 80px;
   height: 6px;
   background: var(--gray-200);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   overflow: hidden;
   margin-bottom: 3px;
 }
@@ -325,21 +390,26 @@
   width: 100%;
   height: 10px;
   background: var(--gray-200);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   overflow: hidden;
   margin-bottom: 4px;
 }
 .fill-bar-inner {
   height: 100%;
   background: var(--primary);
-  border-radius: 999px;
-  transition: width 0.3s ease;
+  border-radius: var(--radius-full);
+  transition: width var(--transition-slow);
   &.fill-full { background: var(--danger); }
 }
 .fill-label {
   font-size: 11px;
   color: var(--gray-600);
   font-weight: 600;
+
+  // Modifier: small top spacing after fill bar in detail modal
+  &--spaced {
+    margin-top: 4px;
+  }
 }
 .fill-cap {
   color: var(--gray-400);
@@ -353,13 +423,13 @@
   padding: 2px 8px;
   height: 24px;
   background: var(--primary);
-  color: #fff;
+  color: var(--white);
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s;
-  &:hover { background: #0050cc; }
+  transition: background var(--transition);
+  &:hover { background: var(--primary-dark); }
 }
 
 // ── Timeline ───────────────────────────────────────────────────────────────
@@ -388,7 +458,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--white);
   .tl-done & { background: var(--primary); }
 }
 .tl-body { text-align: center; }
@@ -436,7 +506,7 @@
   color: var(--gray-700);
   background: var(--gray-100);
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 
 // ── Detail panel extras ────────────────────────────────────────────────────
@@ -465,7 +535,7 @@
   font-size: 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  &:hover { background: #fff0f0; }
+  &:hover { background: var(--danger-light); }
 }
 
 // ── Merge modal ────────────────────────────────────────────────────────────
@@ -483,9 +553,9 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #b45309;
-  background: #fffbeb;
-  border: 1px solid #fcd34d;
+  color: var(--warning-200);
+  background: var(--warning-50);
+  border: 1px solid var(--warning-200);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   margin-top: 12px;

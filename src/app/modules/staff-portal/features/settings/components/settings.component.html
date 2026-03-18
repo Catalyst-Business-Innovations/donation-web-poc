@@ -183,7 +183,7 @@
       <div class="settings-card">
         <div class="settings-card-header">
           <div class="settings-card-icon"><app-icon name="gift" [size]="20"></app-icon></div>
-          <div style="flex: 1">
+          <div class="settings-card-header-body">
             <div class="settings-card-title">Reward Definitions</div>
             <div class="settings-card-desc">Create and manage rewards that donors can redeem with their points</div>
           </div>
@@ -225,18 +225,18 @@
               @for (r of filteredRewards(); track r.id) {
                 <tr>
                   <td>
-                    <div style="display: flex; align-items: center; gap: 6px; font-weight: 600">
+                    <div class="reward-name-cell">
                       {{ r.name }}
                       @if (r.isGiftable) {
-                        <span class="badge badge-info" style="font-size: 9px; padding: 1px 6px">Giftable</span>
+                        <span class="badge badge-info">Giftable</span>
                       }
                     </div>
-                    <div style="font-size: 11px; color: var(--gray-500)">{{ r.description }}</div>
+                    <div class="reward-desc-cell">{{ r.description }}</div>
                   </td>
                   <td><span class="type-badge">{{ RTL[r.rewardType] }}</span></td>
-                  <td style="font-weight: 700">${{ r.value | number }}</td>
-                  <td style="font-weight: 700; color: var(--primary)">{{ r.pointsRequired | number }}</td>
-                  <td style="font-size: 12px; color: var(--gray-600)">
+                  <td class="td-value">${{ r.value | number }}</td>
+                  <td class="td-points-required">{{ r.pointsRequired | number }}</td>
+                  <td class="td-limits">
                     @if (r.maxRedemptionsPerUser) {
                       <div>{{ r.maxRedemptionsPerUser }}/user</div>
                     }
@@ -244,10 +244,10 @@
                       <div>{{ r.totalRedemptions }}/{{ r.totalRedemptionLimit }} total</div>
                     }
                     @if (!r.maxRedemptionsPerUser && !r.totalRedemptionLimit) {
-                      <span style="color: var(--gray-400)">&mdash;</span>
+                      <span class="td-empty">&mdash;</span>
                     }
                   </td>
-                  <td style="font-weight: 700">{{ r.totalRedemptions }}</td>
+                  <td class="td-value">{{ r.totalRedemptions }}</td>
                   <td>
                     <span class="badge" [class.badge-success]="r.isActive" [class.badge-gray]="!r.isActive">
                       {{ r.isActive ? 'Active' : 'Inactive' }}
@@ -270,7 +270,7 @@
               }
               @if (filteredRewards().length === 0) {
                 <tr>
-                  <td colspan="8" style="text-align: center; padding: 24px; color: var(--gray-400)">No rewards match the current filters.</td>
+                  <td colspan="8" class="td-empty-state">No rewards match the current filters.</td>
                 </tr>
               }
             </tbody>
@@ -304,33 +304,33 @@
             <tbody>
               @for (txn of allTransactions(); track txn.id) {
                 <tr>
-                  <td style="font-weight: 600">{{ txn.donorName }}</td>
+                  <td class="td-donor-name">{{ txn.donorName }}</td>
                   <td>
                     <div>{{ txn.rewardName }}</div>
                     @if (txn.voucherCode) {
-                      <div style="font-size: 11px; color: var(--gray-500)">Code: {{ txn.voucherCode }}</div>
+                      <div class="td-voucher-code">Code: {{ txn.voucherCode }}</div>
                     }
                   </td>
                   <td><span class="type-badge">{{ RTL[txn.rewardType] }}</span></td>
-                  <td style="font-weight: 700">${{ txn.rewardValue | number }}</td>
-                  <td style="font-weight: 700; color: var(--danger)">{{ txn.pointsUsed | number }}</td>
-                  <td style="font-size: 12px">{{ txn.createdAt | date: 'MMM d, yyyy' }}</td>
+                  <td class="td-value">${{ txn.rewardValue | number }}</td>
+                  <td class="td-points-used">{{ txn.pointsUsed | number }}</td>
+                  <td class="td-date">{{ txn.createdAt | date: 'MMM d, yyyy' }}</td>
                   <td>
                     <span class="badge {{ txnStatusBadge(txn.status) }}">{{ RSL[txn.status] }}</span>
                   </td>
                   <td>
                     <div class="row-actions">
                       @if (txn.status === RS.Pending) {
-                        <button class="btn-icon" style="color: var(--success)" title="Approve" (click)="approveRedemption(txn.id)">
+                        <button class="btn-icon btn-icon-approve" title="Approve" (click)="approveRedemption(txn.id)">
                           <app-icon name="check-circle" [size]="15"></app-icon>
                         </button>
-                        <button class="btn-icon" style="color: var(--danger)" title="Reject" (click)="rejectRedemption(txn.id)">
+                        <button class="btn-icon btn-icon-reject" title="Reject" (click)="rejectRedemption(txn.id)">
                           <app-icon name="x-circle" [size]="15"></app-icon>
                         </button>
                       }
                       @if (txn.status === RS.Approved) {
                         <button class="btn btn-sm btn-success" (click)="fulfillRedemption(txn.id)">Fulfill</button>
-                        <button class="btn-icon" style="color: var(--gray-500)" title="Cancel" (click)="cancelRedemption(txn.id)">
+                        <button class="btn-icon btn-icon-muted" title="Cancel" (click)="cancelRedemption(txn.id)">
                           <app-icon name="close" [size]="15"></app-icon>
                         </button>
                       }
@@ -340,7 +340,7 @@
               }
               @if (allTransactions().length === 0) {
                 <tr>
-                  <td colspan="8" style="text-align: center; padding: 24px; color: var(--gray-400)">No redemption records yet.</td>
+                  <td colspan="8" class="td-empty-state">No redemption records yet.</td>
                 </tr>
               }
             </tbody>
@@ -363,16 +363,16 @@
   (closed)="modalMode.set(null)"
   (confirmed)="confirmRewardModal()"
 >
-  <div style="padding: 4px 0">
-    <div class="form-group" style="margin-bottom: 12px">
+  <div class="modal-form-body">
+    <div class="form-group modal-form-group">
       <label class="form-label">Name *</label>
       <input class="form-input" [(ngModel)]="rewardForm.name" placeholder="e.g. $5 Discount" />
     </div>
-    <div class="form-group" style="margin-bottom: 12px">
+    <div class="form-group modal-form-group">
       <label class="form-label">Description</label>
       <input class="form-input" [(ngModel)]="rewardForm.description" placeholder="Short description" />
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px">
+    <div class="modal-form-grid modal-form-group">
       <div class="form-group">
         <label class="form-label">Type</label>
         <select class="form-input" [(ngModel)]="rewardForm.rewardType">
@@ -386,11 +386,11 @@
         <input class="form-input" type="number" [(ngModel)]="rewardForm.value" min="0" />
       </div>
     </div>
-    <div class="form-group" style="margin-bottom: 12px">
+    <div class="form-group modal-form-group">
       <label class="form-label">Points Required</label>
       <input class="form-input" type="number" [(ngModel)]="rewardForm.pointsRequired" min="1" />
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px">
+    <div class="modal-form-grid modal-form-group">
       <div class="form-group">
         <label class="form-label">Max per User (optional)</label>
         <input class="form-input" type="number" [(ngModel)]="rewardForm.maxRedemptionsPerUser" min="1" placeholder="Unlimited" />
@@ -400,7 +400,7 @@
         <input class="form-input" type="number" [(ngModel)]="rewardForm.totalRedemptionLimit" min="1" placeholder="Unlimited" />
       </div>
     </div>
-    <div class="rule-row" (click)="rewardForm.isActive = !rewardForm.isActive" style="border: none; padding-top: 4px">
+    <div class="rule-row rule-row--borderless" (click)="rewardForm.isActive = !rewardForm.isActive">
       <div>
         <div class="rule-label">Active</div>
         <div class="rule-desc">Visible and redeemable by donors</div>
@@ -410,7 +410,7 @@
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
       </label>
     </div>
-    <div class="rule-row" (click)="rewardForm.isGiftable = !rewardForm.isGiftable" style="border: none; padding-top: 4px">
+    <div class="rule-row rule-row--borderless" (click)="rewardForm.isGiftable = !rewardForm.isGiftable">
       <div>
         <div class="rule-label">Giftable</div>
         <div class="rule-desc">Allow donors to gift this reward to others</div>

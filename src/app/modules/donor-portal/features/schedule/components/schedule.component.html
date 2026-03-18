@@ -27,9 +27,9 @@
           @if (loc.id === selLocation) {
             <div class="loc-preview">
               <div>
-                <div style="font-weight: 700">{{ loc.name }}</div>
-                <div style="font-size: 12px; color: var(--gray-600)">{{ loc.address }}</div>
-                <div style="font-size: 12px; color: var(--gray-600); margin-top: 2px">🕐 {{ loc.hours }}</div>
+                <div class="loc-preview__name">{{ loc.name }}</div>
+                <div class="loc-preview__meta">{{ loc.address }}</div>
+                <div class="loc-preview__meta loc-preview__meta--hours">🕐 {{ loc.hours }}</div>
               </div>
               <span class="badge {{ loc.status === LS.Open ? 'badge-success' : 'badge-warning' }}">
                 {{ LSL[loc.status] }}
@@ -64,8 +64,7 @@
         ></textarea>
       </div>
       <button
-        class="btn btn-success btn-lg"
-        style="width: 100%"
+        class="btn btn-success btn-lg w-full"
         [disabled]="!selLocation || !selDate"
         (click)="submit()"
       >
@@ -84,21 +83,21 @@
         </div>
 
         @if (cart().length === 0) {
-          <div class="empty-state" style="padding: 24px">
-            <div class="empty-state-icon" style="font-size: 36px">🛒</div>
+          <div class="empty-state empty-state--padded">
+            <div class="empty-state-icon empty-state-icon--lg">🛒</div>
             <div class="empty-state-title">Cart is empty</div>
             <div class="empty-state-text">Add items you plan to bring.</div>
           </div>
         } @else {
           @for (item of cart(); track item.id) {
             <div class="cart-row">
-              <div style="flex: 1">
-                <div style="font-weight: 700; font-size: 13px">{{ item.category }}</div>
+              <div class="cart-row__info">
+                <div class="cart-row__category">{{ item.category }}</div>
                 @if (item.description) {
-                  <div style="font-size: 11px; color: var(--gray-500)">{{ item.description }}</div>
+                  <div class="cart-row__desc">{{ item.description }}</div>
                 }
               </div>
-              <span style="font-family: var(--font-mono); font-weight: 700">×{{ item.qty }}</span>
+              <span class="cart-row__qty">×{{ item.qty }}</span>
               <button class="btn-icon danger" (click)="removeCartItem(item.id)">
                 <app-icon name="close" size="14" />
               </button>
@@ -119,11 +118,11 @@
               </select>
             </div>
             <div class="add-row">
-              <div class="form-group" style="flex: 1; margin: 0">
+              <div class="form-group add-row__group--flex">
                 <label class="form-label">Description</label>
                 <input class="form-input" [(ngModel)]="newItem.description" placeholder="e.g. Winter jackets" />
               </div>
-              <div class="form-group" style="width: 80px; margin: 0">
+              <div class="form-group add-row__group--qty">
                 <label class="form-label">Qty</label>
                 <input class="form-input" type="number" min="1" [(ngModel)]="newItem.qty" />
               </div>
@@ -137,18 +136,18 @@
       </div>
 
       <div class="card">
-        <div class="card-title" style="margin-bottom: 12px">Upcoming Donations</div>
+        <div class="card-title card-title--spaced">Upcoming Donations</div>
         @for (s of upcoming; track s.date) {
           <div class="upcoming-row upcoming-row-click" (click)="viewVisit(s)">
             <div class="up-date">
               <div class="up-day">{{ s.day }}</div>
               <div class="up-month">{{ s.month }}</div>
             </div>
-            <div style="flex: 1">
-              <div style="font-weight: 700; font-size: 13px">{{ s.location }}</div>
-              <div style="font-size: 11px; color: var(--gray-500)">{{ s.time }} · {{ s.items }} items planned</div>
+            <div class="upcoming-row__info">
+              <div class="upcoming-row__location">{{ s.location }}</div>
+              <div class="upcoming-row__meta">{{ s.time }} · {{ s.items }} items planned</div>
             </div>
-            <app-icon name="arrow-right" size="14" style="color: var(--gray-400)" />
+            <app-icon name="arrow-right" size="14" class="upcoming-row__arrow" />
             <button
               class="btn-icon danger"
               (click)="$event.stopPropagation(); toast.info('Cancelled', 'Scheduled donation cancelled.')"
@@ -232,68 +231,51 @@
   (closed)="closeConfirmation()"
   (confirmed)="closeConfirmation()"
 >
-  <div style="text-align: center; padding: 20px">
-    <div style="margin-bottom: 24px">
-      <h3 style="color: var(--secondary); margin-bottom: 8px">Reference #</h3>
-      <div
-        style="font-size: 24px; font-weight: 800; color: var(--primary); font-family: monospace; letter-spacing: 2px"
-      >
-        {{ confirmationId() }}
-      </div>
+  <div class="confirm-modal">
+    <div class="confirm-modal__ref">
+      <h3 class="confirm-modal__ref-label">Reference #</h3>
+      <div class="confirm-modal__ref-id">{{ confirmationId() }}</div>
     </div>
 
-      <div style="margin-bottom: 24px">
-        <div style="display: inline-block; padding: 16px; background: white; border-radius: 8px; border: 2px solid var(--gray-200)">
-          <app-qr-code [value]="confirmationId()" [size]="160"></app-qr-code>
-        </div>
-        <div style="font-size: 11px; color: var(--gray-500); margin-top: 8px">
-          Scan at check-in to speed up processing
-        </div>
+    <div class="confirm-modal__qr">
+      <div class="confirm-modal__qr-frame">
+        <app-qr-code [value]="confirmationId()" [size]="160"></app-qr-code>
       </div>
+      <div class="confirm-modal__qr-hint">Scan at check-in to speed up processing</div>
+    </div>
 
-    <div
-      style="
-        background: var(--info-light);
-        border: 1px solid var(--info);
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 16px;
-        text-align: left;
-      "
-    >
-      <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--primary)">
-        📍 Scheduled Donation Details
-      </div>
-      <div style="display: grid; gap: 8px">
-        <div style="display: flex; justify-content: space-between">
-          <span style="color: var(--gray-600); font-size: 13px">Store:</span>
-          <strong style="font-size: 13px">{{ confirmationData().location }}</strong>
+    <div class="confirm-modal__details">
+      <div class="confirm-modal__details-title">📍 Scheduled Donation Details</div>
+      <div class="confirm-modal__details-grid">
+        <div class="confirm-modal__detail-row">
+          <span class="confirm-modal__detail-key">Store:</span>
+          <strong class="confirm-modal__detail-val">{{ confirmationData().location }}</strong>
         </div>
-        <div style="display: flex; justify-content: space-between">
-          <span style="color: var(--gray-600); font-size: 13px">Date:</span>
-          <strong style="font-size: 13px">{{ confirmationData().date | date: 'MMMM d, yyyy' }}</strong>
+        <div class="confirm-modal__detail-row">
+          <span class="confirm-modal__detail-key">Date:</span>
+          <strong class="confirm-modal__detail-val">{{ confirmationData().date | date: 'MMMM d, yyyy' }}</strong>
         </div>
-        <div style="display: flex; justify-content: space-between">
-          <span style="color: var(--gray-600); font-size: 13px">Time:</span>
-          <strong style="font-size: 13px">{{ confirmationData().time }}</strong>
+        <div class="confirm-modal__detail-row">
+          <span class="confirm-modal__detail-key">Time:</span>
+          <strong class="confirm-modal__detail-val">{{ confirmationData().time }}</strong>
         </div>
-        <div style="display: flex; justify-content: space-between">
-          <span style="color: var(--gray-600); font-size: 13px">Frequency:</span>
-          <strong style="font-size: 13px">{{ confirmationData().recurring }}</strong>
+        <div class="confirm-modal__detail-row">
+          <span class="confirm-modal__detail-key">Frequency:</span>
+          <strong class="confirm-modal__detail-val">{{ confirmationData().recurring }}</strong>
         </div>
         @if (confirmationData().items > 0) {
-          <div style="display: flex; justify-content: space-between">
-            <span style="color: var(--gray-600); font-size: 13px">Items in Cart:</span>
-            <strong style="font-size: 13px">{{ confirmationData().items }}</strong>
+          <div class="confirm-modal__detail-row">
+            <span class="confirm-modal__detail-key">Items in Cart:</span>
+            <strong class="confirm-modal__detail-val">{{ confirmationData().items }}</strong>
           </div>
         }
       </div>
     </div>
 
-    <div style="background: var(--success-light); border: 1px solid var(--success); border-radius: 8px; padding: 12px">
-      <div style="display: flex; align-items: start; gap: 8px">
-        <span style="font-size: 18px">✅</span>
-        <div style="font-size: 12px; color: var(--gray-700); text-align: left">
+    <div class="confirm-modal__notice">
+      <div class="confirm-modal__notice-inner">
+        <span class="confirm-modal__notice-icon">✅</span>
+        <div class="confirm-modal__notice-text">
           <strong>Confirmation sent!</strong>
           Check your email for scheduled donation details and directions. You'll receive a reminder 24 hours before your
           scheduled time.

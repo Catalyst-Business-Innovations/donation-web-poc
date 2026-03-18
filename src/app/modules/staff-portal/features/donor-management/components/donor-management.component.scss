@@ -12,6 +12,12 @@
   align-items: center;
   margin-bottom: 16px;
 }
+.search-bar {
+  &--grow {
+    flex: 1;
+    max-width: 400px;
+  }
+}
 .f-sel {
   width: 155px;
   height: 40px;
@@ -38,6 +44,23 @@
 .mono-pts {
   font-family: var(--font-mono);
   font-weight: 600;
+}
+.td-contact-phone {
+  font-size: 13px;
+}
+.td-contact-email {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.td-visits {
+  font-weight: 700;
+}
+.td-lifetime {
+  font-weight: 700;
+  color: var(--secondary);
+}
+.td-date {
+  font-size: 13px;
 }
 
 .donor-profile-hero {
@@ -107,9 +130,22 @@
   background: var(--gray-50);
   border-radius: var(--radius-sm);
   margin-bottom: 6px;
+  &__date {
+    font-size: 12px;
+    color: var(--gray-500);
+  }
+}
+.section-label {
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+.form-group {
+  &--full {
+    grid-column: span 2;
+  }
 }

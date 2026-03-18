@@ -33,7 +33,7 @@
         @for (t of a.trends; track t.label) {
           <div class="bar-col">
             <div class="bar-val">{{ t.count }}</div>
-            <div class="bar" [class.hi]="$last" [style.height]="(t.count / maxT) * 100 + '%'"></div>
+            <div class="bar" [class.hi]="$last" [style.--bar-h]="(t.count / maxT) * 100 + '%'"></div>
             <div class="bar-lbl">{{ t.label }}</div>
           </div>
         }
@@ -67,7 +67,7 @@
         <div class="donut-legend">
           @for (cat of a.categoryBreakdown; track cat.categoryKey) {
             <div class="donut-legend-item">
-              <div class="donut-dot" [style.background]="cat.color"></div>
+              <div class="donut-dot" [style.--dot-color]="cat.color"></div>
               {{ cat.categoryName }} — {{ cat.percentage }}%
             </div>
           }
@@ -141,7 +141,7 @@
               <td>{{ d.timestamp | date: 'h:mm a' }}</td>
               <td>{{ d.donorName ?? 'Anonymous' }}</td>
               <td>{{ d.locationName }}</td>
-              <td style="font-weight: 700">{{ d.totalItems }}</td>
+              <td class="td--bold">{{ d.totalItems }}</td>
               <td>
                 <span class="badge {{ d.status === DS.Completed ? 'badge-success' : 'badge-warning' }}">
                   {{ DSL[d.status] }}

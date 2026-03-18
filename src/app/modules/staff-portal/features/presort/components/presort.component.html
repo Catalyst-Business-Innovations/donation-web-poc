@@ -109,7 +109,7 @@
           <!-- Category rows -->
           <div class="items-section">
             <div class="items-header">
-              <span class="form-label" style="margin:0">Categories</span>
+              <span class="form-label form-label--flush">Categories</span>
               <span class="items-total">{{ totalItemCount() }} items</span>
             </div>
 
@@ -164,7 +164,7 @@
             }
 
             <div class="add-cat-row">
-              <select class="form-select" style="flex: 1" [(ngModel)]="addCatKey">
+              <select class="form-select add-cat-select" [(ngModel)]="addCatKey">
                 <option value="">+ Add Category...</option>
                 @for (cat of mockData.categories; track cat.key) {
                   <option [value]="cat.key">{{ cat.icon }} {{ cat.name }}</option>
@@ -234,7 +234,7 @@
                 Split ({{ ps().items.length }})
               </button>
             }
-            <button class="btn btn-success" style="flex:1" (click)="complete()">
+            <button class="btn btn-success ps-actions__complete" (click)="complete()">
               <app-icon name="check-circle" [size]="16"></app-icon>
               Complete &amp; Label
             </button>
@@ -254,7 +254,7 @@
     <!-- ══ Stats Column ════════════════════════════════════ -->
     <div class="stats-col">
       <div class="card">
-        <div class="card-title" style="margin-bottom:14px">Today's Throughput</div>
+        <div class="card-title card-title--spaced">Today's Throughput</div>
         <div class="thru-row">
           <span>Sorted Today</span>
           <strong>{{ stats().sortedToday }}</strong>
@@ -275,7 +275,7 @@
           <span>Salvage Rate</span>
           <strong>{{ stats().salvageRate }}%</strong>
         </div>
-        <div class="thru-row" style="border:none">
+        <div class="thru-row thru-row--last">
           <span>E-Com Diverted</span>
           <strong>{{ stats().ecommerceItems }} items</strong>
         </div>
@@ -429,7 +429,7 @@
         <div class="confirm-hero-sub">This container was sorted at the dock intake. No detail entry needed.</div>
       </div>
     </div>
-    <p style="font-size:13px; color: var(--gray-600); line-height:1.6; margin-top:12px">
+    <p class="quick-complete-note">
       Container will be marked <strong>Presorted</strong> and routed directly to <strong>Production</strong>.
     </p>
   </div>

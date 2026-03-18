@@ -1772,3 +1772,67 @@
   color: var(--secondary-dark, #15803d) !important;
 }
 
+// ── Inline-style replacement classes ─────────────────────────────────────────
+
+// Search bar spacing modifiers
+.search-bar {
+  &--mb-8  { margin-bottom: 8px; }
+  &--mb-12 { margin-bottom: 12px; }
+}
+
+// Enroll CTA button — full-width with top gap
+.btn-enroll-cta {
+  margin-top: 8px;
+  width: 100%;
+}
+
+// Custom amount input wrapper — top spacing
+.input-prefix-wrap {
+  &--mt { margin-top: 8px; }
+}
+
+// Back button pushed to the right edge of a flex row
+.sb-back-btn {
+  &--ml-auto { margin-left: auto; }
+}
+
+// Review overview bar — bottom spacing
+.rs-overview-bar {
+  &--mb { margin-bottom: 16px; }
+}
+
+// Points badge pushed to the right edge of a flex row
+.rs-points-badge {
+  &--ml-auto { margin-left: auto; }
+}
+
+// Confirmation modal: receipt label top spacing
+.cm-label {
+  &--mt { margin-top: 8px; }
+}
+
+// Link-donor button — full-width with small top gap
+.btn-link-donor {
+  width: 100%;
+  margin-top: 4px;
+}
+
+// Associate-donor modal body
+.assoc-modal-body {
+  padding: 4px 0;
+}
+
+// Associate-donor modal introductory hint text
+.assoc-modal-hint {
+  font-size: 13px;
+  color: var(--gray-600);
+  margin-bottom: 12px;
+}
+
+// Associate-donor modal empty-state message
+.assoc-no-results {
+  text-align: center;
+  padding: 16px;
+  color: var(--gray-500);
+  font-size: 13px;
+}

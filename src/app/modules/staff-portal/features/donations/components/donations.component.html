@@ -42,7 +42,7 @@
 
   <!-- Filters -->
   <div class="filters-row">
-    <div class="search-bar" style="flex: 1; max-width: 380px">
+    <div class="search-bar search-bar--grow">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
       <input [(ngModel)]="query" placeholder="Search donor, Ref #, store, notes…" />
     </div>
@@ -54,7 +54,7 @@
       <option [value]="AS.Cancelled">Cancelled</option>
       <option [value]="AS.NoShow">No Show</option>
     </select>
-    <input class="form-select f-sel" type="date" [(ngModel)]="dateFilter" style="font-size: 13px" />
+    <input class="form-select f-sel f-date" type="date" [(ngModel)]="dateFilter" />
     @if (dateFilter) {
       <button class="btn btn-secondary" (click)="dateFilter = ''">Clear Date</button>
     }
@@ -90,19 +90,19 @@
                 </div>
               </td>
               <td>
-                <div style="font-weight: 700; font-size: 13px">{{ a.date | date: 'MMM d, yyyy' }}</div>
-                <div style="font-size: 11px; color: var(--gray-500)">{{ a.timeSlot }}</div>
+                <div class="td-date-primary">{{ a.date | date: 'MMM d, yyyy' }}</div>
+                <div class="td-date-secondary">{{ a.timeSlot }}</div>
               </td>
-              <td style="font-size: 13px">{{ a.locationName ?? '—' }}</td>
+              <td class="td-text-sm">{{ a.locationName ?? '—' }}</td>
               <td><span class="badge {{ typeBadge(a.method) }}">{{ typeLabel(a.method) }}</span></td>
-              <td style="font-weight: 700">{{ a.itemCount ?? '—' }}</td>
+              <td class="td-bold">{{ a.itemCount ?? '—' }}</td>
               <td>
                 <div class="cat-pills">
                   @for (cat of (a.categories ?? []).slice(0, 2); track cat) {
-                    <span class="badge badge-gray" style="font-size: 10px">{{ cat }}</span>
+                    <span class="badge badge-gray badge--xs">{{ cat }}</span>
                   }
                   @if ((a.categories ?? []).length > 2) {
-                    <span class="badge badge-gray" style="font-size: 10px">+{{ (a.categories ?? []).length - 2 }}</span>
+                    <span class="badge badge-gray badge--xs">+{{ (a.categories ?? []).length - 2 }}</span>
                   }
                 </div>
               </td>
@@ -136,8 +136,8 @@
   <!-- ═══════════════════════════════════════════════════
        COMPLETED DONATIONS TAB
   ════════════════════════════════════════════════════ -->
-  <div class="filters-row" style="margin-bottom: 16px">
-    <div class="search-bar" style="flex: 1; max-width: 380px">
+  <div class="filters-row">
+    <div class="search-bar search-bar--grow">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
       <input [(ngModel)]="donQuery" placeholder="Search ID, donor name…" />
     </div>
@@ -169,17 +169,17 @@
                   }
                 </div>
               </td>
-              <td style="font-size: 13px">{{ d.timestamp | date: 'MMM d, yyyy h:mm a' }}</td>
-              <td style="font-size: 13px">{{ d.locationName }}</td>
-              <td style="font-weight: 700">{{ d.totalItems }}</td>
+              <td class="td-text-sm">{{ d.timestamp | date: 'MMM d, yyyy h:mm a' }}</td>
+              <td class="td-text-sm">{{ d.locationName }}</td>
+              <td class="td-bold">{{ d.totalItems }}</td>
               <td><span class="badge {{ donationStatusBadge(d.status) }}">{{ statusLabel(d.status) }}</span></td>
               <td>
                 @if (d.associatedDonorName) {
-                  <span class="badge badge-success" style="font-size: 11px">{{ d.associatedDonorName }}</span>
+                  <span class="badge badge-success badge--sm">{{ d.associatedDonorName }}</span>
                 } @else if (d.donorId) {
-                  <span class="badge badge-info" style="font-size: 11px">{{ d.donorName }}</span>
+                  <span class="badge badge-info badge--sm">{{ d.donorName }}</span>
                 } @else {
-                  <span style="font-size: 12px; color: var(--gray-400)">Anonymous</span>
+                  <span class="anon-label">Anonymous</span>
                 }
               </td>
               <td>
@@ -230,12 +230,12 @@
         </div>
         <div class="qr-hint">Scan at check-in</div>
 
-        <span class="badge {{ statusBadge(selected()!.status) }}" style="margin-top: 8px; font-size: 12px; padding: 4px 12px">
+        <span class="badge {{ statusBadge(selected()!.status) }} badge--sm-pad detail-status-badge">
           {{ statusLabel(selected()!.status) }}
         </span>
 
         @if (selected()!.status === AS.Scheduled) {
-          <button class="btn btn-success btn-sm" style="margin-top: 10px; width: 100%" (click)="markComplete(selected()!)">
+          <button class="btn btn-success btn-sm detail-complete-btn" (click)="markComplete(selected()!)">
             Mark Completed
           </button>
         }
@@ -285,7 +285,7 @@
           </div>
           <div class="dg-row">
             <span class="dg-key">Method</span>
-            <span class="badge {{ typeBadge(selected()!.method) }}" style="font-size: 11px">{{ typeLabel(selected()!.method) }}</span>
+            <span class="badge {{ typeBadge(selected()!.method) }} badge--sm">{{ typeLabel(selected()!.method) }}</span>
           </div>
           @if (selected()!.recurring) {
             <div class="dg-row">
@@ -299,14 +299,14 @@
         <div class="detail-grid">
           <div class="dg-row">
             <span class="dg-key">Qty</span>
-            <span class="dg-val" style="font-weight: 800; font-size: 15px">{{ selected()!.itemCount ?? '—' }}</span>
+            <span class="dg-val dg-val--qty">{{ selected()!.itemCount ?? '—' }}</span>
           </div>
           @if ((selected()!.categories ?? []).length > 0) {
             <div class="dg-row dg-wrap">
               <span class="dg-key">Categories</span>
               <div class="cat-pills">
                 @for (cat of selected()!.categories; track cat) {
-                  <span class="badge badge-info" style="font-size: 11px">{{ cat }}</span>
+                  <span class="badge badge-info badge--sm">{{ cat }}</span>
                 }
               </div>
             </div>
@@ -337,17 +337,17 @@
   (closed)="closeLinkModal()"
   (confirmed)="confirmLink()"
 >
-  <div style="padding: 4px 0">
+  <div class="link-modal-body">
     @if (linkingDonation()) {
-      <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 4px">
+      <p class="link-modal-desc">
         Linking <strong>{{ linkingDonation()!.id }}</strong> — {{ linkingDonation()!.totalItems }} items
         on {{ linkingDonation()!.timestamp | date: 'MMM d, yyyy' }}.
       </p>
-      <p style="font-size: 12px; color: var(--gray-500); margin-bottom: 12px">
+      <p class="link-modal-note">
         Loyalty points will be recalculated and awarded on confirmation.
       </p>
     }
-    <div class="search-bar" style="margin-bottom: 10px">
+    <div class="search-bar search-bar--mb">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
       <input [ngModel]="linkSearchQ()" (ngModelChange)="linkSearchQ.set($event)" placeholder="Search donor name or phone…" />
     </div>
@@ -366,7 +366,7 @@
       </div>
     }
     @if (linkSearchQ().length > 1 && linkResults().length === 0) {
-      <div style="text-align: center; padding: 20px; color: var(--gray-500); font-size: 13px">
+      <div class="link-modal-empty">
         No donors found for "{{ linkSearchQ() }}"
       </div>
     }

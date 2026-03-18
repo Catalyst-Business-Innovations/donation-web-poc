@@ -1,4 +1,4 @@
-﻿<div class="topbar">
+<div class="topbar">
   <div>
     <div class="topbar-title">Loyalty &amp; Rewards</div>
     <div class="topbar-subtitle">{{ donor.loyaltyPoints | number }} points available</div>
@@ -10,9 +10,7 @@
     <div class="ph-left">
       <div class="ph-label">Available Points</div>
       <div class="ph-num">{{ donor.loyaltyPoints | number }}</div>
-      <div style="font-size: 13px; opacity: 0.7">
-        Earning at {{ tier.pointsMultiplier }}&times; rate ({{ tier.label }} tier)
-      </div>
+      <div class="ph-rate">Earning at {{ tier.pointsMultiplier }}&times; rate ({{ tier.label }} tier)</div>
     </div>
     <div class="ph-right">
       <div class="ph-stat">
@@ -30,8 +28,8 @@
     </div>
   </div>
 
-  <div class="card" style="margin-bottom: 20px">
-    <div class="card-title" style="margin-bottom: 16px">Tier Progress</div>
+  <div class="card card--mb">
+    <div class="card-title card-title--mb">Tier Progress</div>
     <div class="tier-track">
       @for (t of svc.loyaltyTiers; track t.tier) {
         <div class="tier-stop" [class.current]="t.tier === donor.loyaltyTier" [class.achieved]="isAchieved(t.tier)">
@@ -45,19 +43,19 @@
       }
     </div>
     @if (nextTier) {
-      <div style="margin-top: 14px; font-size: 13px; color: var(--gray-600)">
+      <div class="tier-hint">
         You have <strong>{{ donor.totalDonations }} visits</strong>.
         <strong>{{ nextTier.minDonations - donor.totalDonations }}</strong> more to reach
-        <app-icon [name]="nextTier.icon" [size]="14" style="margin: 0 2px"></app-icon>
+        <app-icon [name]="nextTier.icon" [size]="14" class="tier-hint__icon"></app-icon>
         {{ nextTier.label }}.
       </div>
     }
   </div>
 
   <!-- Available Rewards Catalogue -->
-  <div class="card" style="margin-bottom: 20px">
-    <div class="card-title" style="margin-bottom: 4px">Available Rewards</div>
-    <div class="card-subtitle" style="margin-bottom: 16px">Redeem your points for these rewards</div>
+  <div class="card card--mb">
+    <div class="card-title">Available Rewards</div>
+    <div class="card-subtitle card-subtitle--mb">Redeem your points for these rewards</div>
 
     @if (catalogue().length === 0) {
       <div class="empty-state-inline">No rewards available at this time.</div>
@@ -67,7 +65,7 @@
           <div class="reward-card" [class.can-redeem]="canRedeem(r)">
             <div class="rc-header">
               <span class="rc-type-badge">{{ RTL[r.rewardType] }}</span>
-              <div style="display: flex; align-items: center; gap: 6px">
+              <div class="rc-header-meta">
                 @if (r.isGiftable) {
                   <span class="rc-gift-badge"><app-icon name="gift" [size]="10"></app-icon> Giftable</span>
                 }
@@ -83,21 +81,13 @@
                 <app-icon name="star" [size]="14"></app-icon>
                 {{ r.pointsRequired | number }} pts
               </div>
-              <div style="display: flex; gap: 6px">
+              <div class="rc-actions">
                 @if (r.isGiftable) {
-                  <button
-                    class="btn btn-secondary btn-sm"
-                    [disabled]="!canGift(r)"
-                    (click)="openGiftModal(r)"
-                  >
+                  <button class="btn btn-secondary btn-sm" [disabled]="!canGift(r)" (click)="openGiftModal(r)">
                     <app-icon name="gift" [size]="13"></app-icon> Gift
                   </button>
                 }
-                <button
-                  class="btn btn-primary btn-sm"
-                  [disabled]="!canRedeem(r)"
-                  (click)="openRedeemModal(r)"
-                >
+                <button class="btn btn-primary btn-sm" [disabled]="!canRedeem(r)" (click)="openRedeemModal(r)">
                   Redeem
                 </button>
               </div>
@@ -110,39 +100,33 @@
 
   <!-- Transaction History -->
   <div class="card">
-    <div class="card-title" style="margin-bottom: 12px">Redemption History</div>
+    <div class="card-title card-title--mb">Redemption History</div>
     @for (txn of txnHistory(); track txn.id) {
       <div class="txn-row">
-        <div style="flex: 1">
-          <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px">
+        <div class="txn-info">
+          <div class="txn-name">
             {{ txn.rewardName }}
             @if (txn.isGift && txn.giftedToName) {
               <span class="txn-gift-tag"><app-icon name="gift" [size]="10"></app-icon> Gifted</span>
             }
             @if (txn.isGift && txn.giftedFromName) {
-              <span class="txn-gift-tag txn-gift-received"><app-icon name="gift" [size]="10"></app-icon> Received</span>
+              <span class="txn-gift-tag txn-gift-tag--received"><app-icon name="gift" [size]="10"></app-icon> Received</span>
             }
           </div>
-          <div style="font-size: 11px; color: var(--gray-500)">
+          <div class="txn-meta">
             {{ txn.createdAt | date: 'MMM d, yyyy' }}
-            @if (txn.giftedToName) {
-              &middot; Gifted to <strong>{{ txn.giftedToName }}</strong>
-            }
-            @if (txn.giftedFromName) {
-              &middot; From <strong>{{ txn.giftedFromName }}</strong>
-            }
-            @if (txn.voucherCode) {
-              &middot; Code: <strong>{{ txn.voucherCode }}</strong>
-            }
+            @if (txn.giftedToName) { &middot; Gifted to <strong>{{ txn.giftedToName }}</strong> }
+            @if (txn.giftedFromName) { &middot; From <strong>{{ txn.giftedFromName }}</strong> }
+            @if (txn.voucherCode) { &middot; Code: <strong>{{ txn.voucherCode }}</strong> }
           </div>
         </div>
-        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 3px">
+        <div class="txn-points">
           @if (txn.pointsUsed > 0) {
-            <span style="font-weight: 800; font-size: 13px; color: var(--danger)">-{{ txn.pointsUsed | number }} pts</span>
+            <span class="txn-points__deducted">-{{ txn.pointsUsed | number }} pts</span>
           } @else {
-            <span style="font-weight: 800; font-size: 13px; color: var(--secondary)">Gift</span>
+            <span class="txn-points__gift">Gift</span>
           }
-          <span class="badge {{ txnStatusBadge(txn.status) }}" style="font-size: 10px">{{ txnStatusLabel(txn.status) }}</span>
+          <span class="badge {{ txnStatusBadge(txn.status) }}">{{ txnStatusLabel(txn.status) }}</span>
         </div>
       </div>
     }
@@ -164,24 +148,19 @@
   (confirmed)="confirmGift()"
 >
   @if (selectedGiftReward(); as r) {
-    <!-- Reward summary pill -->
     <div class="gift-reward-summary">
       <span class="rc-type-badge">{{ RTL[r.rewardType] }}</span>
-      <strong style="font-size: 15px; color: var(--primary)">{{ r.name }}</strong>
-      <span style="font-size: 12px; color: var(--gray-500); margin-left: auto">{{ r.pointsRequired | number }} pts</span>
+      <strong class="gift-reward-summary__name">{{ r.name }}</strong>
+      <span class="gift-reward-summary__pts">{{ r.pointsRequired | number }} pts</span>
     </div>
 
     @if (giftStep() === 'search') {
-      <!-- Step 1: Find recipient -->
-      <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px">
-        Search for the donor you want to gift this reward to.
-      </p>
+      <p class="gift-search-hint">Search for the donor you want to gift this reward to.</p>
       <input
-        class="form-input"
+        class="form-input gift-search-input"
         placeholder="Name or phone number..."
         [ngModel]="giftSearchQuery()"
         (ngModelChange)="giftSearchQuery.set($event)"
-        style="margin-bottom: 12px"
       />
       @if (giftSearchQuery().length >= 2 && giftSearchResults().length === 0) {
         <div class="empty-state-inline">No donors found.</div>
@@ -189,42 +168,37 @@
       @for (d of giftSearchResults(); track d.id) {
         <div class="gift-donor-row" (click)="selectRecipient(d)">
           <div class="gift-donor-avatar">{{ d.firstName[0] }}{{ d.lastName[0] }}</div>
-          <div style="flex: 1">
-            <div style="font-weight: 600; font-size: 13px">{{ d.firstName }} {{ d.lastName }}</div>
-            <div style="font-size: 11px; color: var(--gray-500)">{{ d.phone }}</div>
+          <div class="gift-donor-info">
+            <div class="gift-donor-name">{{ d.firstName }} {{ d.lastName }}</div>
+            <div class="gift-donor-phone">{{ d.phone }}</div>
           </div>
-          <app-icon name="arrow-right" [size]="16" style="color: var(--gray-400)"></app-icon>
+          <app-icon name="arrow-right" [size]="16" class="gift-donor-arrow"></app-icon>
         </div>
       }
     } @else {
-      <!-- Step 2: Confirm -->
       @if (selectedRecipient(); as recipient) {
-        <div style="background: var(--gray-50); border-radius: 8px; padding: 16px; margin-bottom: 16px">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
-            <span style="font-weight: 600; color: var(--gray-700)">Recipient:</span>
-            <span style="font-weight: 700">{{ recipient.firstName }} {{ recipient.lastName }}</span>
+        <div class="gift-confirm-panel">
+          <div class="gift-confirm-row">
+            <span class="gift-confirm-label">Recipient</span>
+            <span class="gift-confirm-value">{{ recipient.firstName }} {{ recipient.lastName }}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
-            <span style="font-weight: 600; color: var(--gray-700)">Reward Value:</span>
-            <span style="font-weight: 800; color: var(--primary)">${{ r.value | number }}</span>
+          <div class="gift-confirm-row">
+            <span class="gift-confirm-label">Reward Value</span>
+            <span class="gift-confirm-value gift-confirm-value--primary">${{ r.value | number }}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
-            <span style="font-weight: 600; color: var(--gray-700)">Points Cost:</span>
-            <span style="font-weight: 800; color: var(--danger)">-{{ r.pointsRequired | number }} pts</span>
+          <div class="gift-confirm-row">
+            <span class="gift-confirm-label">Points Cost</span>
+            <span class="gift-confirm-value gift-confirm-value--danger">-{{ r.pointsRequired | number }} pts</span>
           </div>
-          <hr style="margin: 10px 0; border: none; border-top: 1px solid var(--gray-300)" />
-          <div style="display: flex; justify-content: space-between">
-            <span style="font-weight: 700; color: var(--gray-800)">Your Balance After:</span>
-            <span style="font-weight: 800; color: var(--info)">{{ donor.loyaltyPoints - r.pointsRequired | number }} pts</span>
+          <hr class="gift-confirm-divider" />
+          <div class="gift-confirm-row">
+            <span class="gift-confirm-label gift-confirm-label--strong">Balance After</span>
+            <span class="gift-confirm-value gift-confirm-value--info">{{ donor.loyaltyPoints - r.pointsRequired | number }} pts</span>
           </div>
         </div>
-        <div style="background: var(--warning-50); border: 1px solid var(--warning-200); border-radius: 8px; padding: 12px">
-          <div style="display: flex; align-items: start; gap: 8px">
-            <app-icon name="info" [size]="18"></app-icon>
-            <div style="font-size: 12px; color: var(--gray-700)">
-              <strong>Note:</strong> Gifts cannot be undone. Points will be deducted from your account immediately.
-            </div>
-          </div>
+        <div class="gift-warn">
+          <app-icon name="info" [size]="18"></app-icon>
+          <span class="gift-warn__text"><strong>Note:</strong> Gifts cannot be undone. Points will be deducted immediately.</span>
         </div>
       }
     }
@@ -242,42 +216,36 @@
   (confirmed)="confirmRedeem()"
 >
   @if (selectedReward(); as r) {
-    <div style="padding: 20px">
-      <div style="text-align: center; margin-bottom: 24px">
-        <div style="margin-bottom: 8px">
-          <span class="rc-type-badge" style="font-size: 13px; padding: 6px 16px">{{ RTL[r.rewardType] }}</span>
+    <div class="redeem-modal-body">
+      <div class="redeem-hero">
+        <div class="redeem-hero__type">
+          <span class="rc-type-badge rc-type-badge--lg">{{ RTL[r.rewardType] }}</span>
         </div>
-        <h3 style="color: var(--primary); margin-bottom: 6px">{{ r.name }}</h3>
-        <p style="color: var(--gray-600); font-size: 13px">{{ r.description }}</p>
+        <h3 class="redeem-hero__name">{{ r.name }}</h3>
+        <p class="redeem-hero__desc">{{ r.description }}</p>
       </div>
-      <div style="background: var(--gray-50); border-radius: 8px; padding: 16px; margin-bottom: 16px">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 12px">
-          <span style="font-weight: 600; color: var(--gray-700)">Reward Value:</span>
-          <span style="font-weight: 800; color: var(--primary)">${{ r.value | number }}</span>
+      <div class="gift-confirm-panel">
+        <div class="gift-confirm-row">
+          <span class="gift-confirm-label">Reward Value</span>
+          <span class="gift-confirm-value gift-confirm-value--primary">${{ r.value | number }}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 12px">
-          <span style="font-weight: 600; color: var(--gray-700)">Points Required:</span>
-          <span style="font-weight: 800; color: var(--danger)">{{ r.pointsRequired | number }} pts</span>
+        <div class="gift-confirm-row">
+          <span class="gift-confirm-label">Points Required</span>
+          <span class="gift-confirm-value gift-confirm-value--danger">{{ r.pointsRequired | number }} pts</span>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 12px">
-          <span style="font-weight: 600; color: var(--gray-700)">Your Balance:</span>
-          <span style="font-weight: 800; color: var(--secondary)">{{ donor.loyaltyPoints | number }} pts</span>
+        <div class="gift-confirm-row">
+          <span class="gift-confirm-label">Your Balance</span>
+          <span class="gift-confirm-value gift-confirm-value--secondary">{{ donor.loyaltyPoints | number }} pts</span>
         </div>
-        <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--gray-300)" />
-        <div style="display: flex; justify-content: space-between">
-          <span style="font-weight: 700; color: var(--gray-800)">After Redemption:</span>
-          <span style="font-weight: 800; color: var(--info)">
-            {{ donor.loyaltyPoints - r.pointsRequired | number }} pts
-          </span>
+        <hr class="gift-confirm-divider" />
+        <div class="gift-confirm-row">
+          <span class="gift-confirm-label gift-confirm-label--strong">After Redemption</span>
+          <span class="gift-confirm-value gift-confirm-value--info">{{ donor.loyaltyPoints - r.pointsRequired | number }} pts</span>
         </div>
       </div>
-      <div style="background: var(--warning-light, #fffbeb); border: 1px solid var(--warning, #f59e0b); border-radius: 8px; padding: 12px">
-        <div style="display: flex; align-items: start; gap: 8px">
-          <app-icon name="info" [size]="18"></app-icon>
-          <div style="font-size: 12px; color: var(--gray-700)">
-            <strong>Note:</strong> Redemption cannot be undone. Points will be deducted immediately.
-          </div>
-        </div>
+      <div class="gift-warn">
+        <app-icon name="info" [size]="18"></app-icon>
+        <span class="gift-warn__text"><strong>Note:</strong> Redemption cannot be undone. Points will be deducted immediately.</span>
       </div>
     </div>
   }
