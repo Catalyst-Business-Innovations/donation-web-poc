@@ -53,13 +53,13 @@ export const staffRoutes: Routes = [
   },
   {
     path: 'donors',
-    data: { breadcrumb: 'Donor Management' },
+    data: { breadcrumb: 'Donors' },
     loadComponent: () =>
       import('./features/donor-management/components/donor-management.component').then(m => m.DonorManagementComponent)
   },
   {
     path: 'settings',
-    data: { breadcrumb: 'System Settings' },
+    data: { breadcrumb: 'Settings' },
     loadComponent: () => import('./features/settings/components/settings.component').then(m => m.SettingsComponent)
   },
   {

@@ -11,6 +11,20 @@
   gap: 12px;
   margin-bottom: 16px;
 }
+
+.filters-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
 .sum-card {
   flex: 1;
   background: #fff;
@@ -54,3 +68,70 @@
 }
 
 .btn-sm { height: 32px; font-size: 12px; padding: 0 12px; }
+
+// ── Optional label suffix
+.form-label-opt {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--gray-400);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+// ── Criteria chips list
+.criteria-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.criterion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 10px;
+  background: var(--primary-light, #e8f4ff);
+  border: 1px solid var(--brand-blue);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.criterion-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--gray-400);
+  padding: 0 2px;
+  margin-left: 2px;
+  &:hover { color: var(--danger); }
+}
+
+// ── Criterion builder row
+.table-criteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.criterion-builder {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  .crit-select {
+    height: 36px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 0;
+  }
+  .crit-add-btn {
+    height: 36px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}

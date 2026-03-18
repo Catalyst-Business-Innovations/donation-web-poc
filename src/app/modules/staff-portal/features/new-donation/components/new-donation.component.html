@@ -58,7 +58,7 @@
             </div>
           </div>
           <div class="quick-grid">
-            <button class="quick-btn qr-btn" (click)="toast.info('QR Scanner', 'Camera activated')">
+            <button class="quick-btn qr-btn" (click)="demoScanDonorQR()">
               <app-icon name="search" [size]="24"></app-icon>
               <span>Scan QR</span>
             </button>
@@ -75,6 +75,7 @@
           <div class="search-bar" style="margin-bottom: 8px">
             <span class="search-icon"><app-icon name="search" size="14" /></span>
             <input [(ngModel)]="searchQ" placeholder="Name or phone number..." />
+            <button class="btn btn-ghost demo-search-btn" (click)="demoSearch()" title="Fill demo search">Demo</button>
           </div>
           @for (d of searchResults(); track d.id) {
             <div class="donor-result" (click)="selectDonor(d)">
@@ -174,7 +175,7 @@
       @if (st.donor() !== undefined) {
         @if (st.donor() === null) {
           <div class="anon-banner">
-            <span style="font-size: 32px">👤</span>
+            <app-icon name="user" [size]="32"></app-icon>
             <div class="ab-info">
               <div class="ab-title">Anonymous Donation</div>
               <div class="ab-sub">No loyalty points awarded. You can still enroll this donor.</div>
@@ -422,12 +423,12 @@
             <div class="card-header"><div class="card-title">Payment Method</div></div>
             <div class="pay-method-grid">
               @if (isCashAccepted()) {
-                <button class="pay-method-btn" [class.active]="paymentMethod() === 'cash'" (click)="paymentMethod.set('cash')">
+                <button class="pay-method-btn" [class.active]="paymentMethod() === 'cash'" (click)="selectPaymentMethod('cash')">
                   <span class="pm-icon">&#128181;</span>
                   <span class="pm-label">Cash</span>
                 </button>
               }
-              <button class="pay-method-btn" [class.active]="paymentMethod() === 'card'" (click)="paymentMethod.set('card')">
+              <button class="pay-method-btn" [class.active]="paymentMethod() === 'card'" (click)="selectPaymentMethod('card')">
                 <span class="pm-icon">&#128179;</span>
                 <span class="pm-label">Card / Tap</span>
               </button>
@@ -458,11 +459,27 @@
             }
 
             @if (paymentMethod() === 'card') {
-              <div class="card-terminal">
-                <div class="terminal-icon">&#128179;</div>
-                <div class="terminal-msg">Tap or insert card on the terminal</div>
-                <div class="terminal-sub">Waiting for customer to tap or swipe...</div>
-              </div>
+              @if (!cardApproved()) {
+                <div class="card-terminal">
+                  <div class="terminal-icon">&#128179;</div>
+                  <div class="terminal-msg">Tap or insert card on the terminal</div>
+                  <div class="terminal-sub">Waiting for customer to tap or swipe...</div>
+                  <button class="btn btn-secondary" style="margin-top: 14px; width: 100%"
+                          (click)="simulateCardTap()">
+                    <app-icon name="credit-card" [size]="14"></app-icon>
+                    Simulate Card Tap &#10003;
+                  </button>
+                </div>
+              } @else {
+                <div class="card-approved">
+                  <app-icon name="check-circle" [size]="32"></app-icon>
+                  <div class="ca-body">
+                    <div class="ca-title">Card Approved</div>
+                    <div class="ca-sub">Payment authorised successfully</div>
+                  </div>
+                  <button class="btn btn-ghost ca-retry" (click)="cardApproved.set(false)">Retry</button>
+                </div>
+              }
             }
           </div>
         }

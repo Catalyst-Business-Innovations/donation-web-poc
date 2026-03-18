@@ -37,6 +37,7 @@ export class NewDonationComponent {
   protected customMon = signal(false);
   protected paymentMethod = signal<'cash' | 'card' | null>(null);
   protected cashTendered = signal<number | null>(null);
+  protected cardApproved = signal(false);
   protected delivery = signal<ReceiptDelivery>(ReceiptDelivery.Email);
   protected readonly AS = AppointmentStatus;
   protected readonly RD = ReceiptDelivery;
@@ -112,15 +113,15 @@ export class NewDonationComponent {
     const method = this.paymentMethod();
     if (amt <= 0 || !method) return false;
     if (method === 'cash') return (this.cashTendered() ?? 0) >= amt;
-    return true;
+    return this.cardApproved();
   });
 
   protected readonly canComplete = computed(() => {
     const type = this.st.donationType();
     if (!type) return false;
     if (type === DonationType.Items)    return this.st.totalItems() > 0;
-    if (type === DonationType.Monetary) return (this.monetary() ?? 0) > 0 && this.paymentMethod() !== null;
-    return this.st.totalItems() > 0 && (this.monetary() ?? 0) > 0 && this.paymentMethod() !== null;
+    if (type === DonationType.Monetary) return this.canProceedFromMoney();
+    return this.st.totalItems() > 0 && this.canProceedFromMoney();
   });
 
   readonly deliveryOpts: { value: ReceiptDelivery; icon: IconName; label: string }[] = [
@@ -243,10 +244,39 @@ export class NewDonationComponent {
     this.st.setDonor(null);
   }
 
+  demoScanDonorQR(): void {
+    const donors = this.mockData.donors;
+    if (!donors.length) return;
+    const random = donors[Math.floor(Math.random() * donors.length)];
+    const selected = NewDonationMapper.donorToSelected(random);
+    this.toast.info('QR Scanned', `Donor ID read: ${random.id}`);
+    this.selectDonor(selected);
+  }
+
+  demoSearch(): void {
+    const donors = this.mockData.donors;
+    if (!donors.length) return;
+    const random = donors[Math.floor(Math.random() * donors.length)];
+    // Use first 3 chars of first name so multiple results may appear
+    this.searchQ = random.firstName.slice(0, 3);
+    this.toast.info('Demo Search', `Searching for "${this.searchQ}"`);
+  }
+
+  selectPaymentMethod(m: 'cash' | 'card'): void {
+    this.paymentMethod.set(m);
+    this.cardApproved.set(false);
+    this.cashTendered.set(null);
+  }
+
+  simulateCardTap(): void {
+    this.cardApproved.set(true);
+    this.toast.success('Card Approved', 'Payment authorised successfully.');
+  }
+
   quickDonate(type: DonationType): void {
     this.st.setDonor(null);
     this.st.setDonationType(type);
-    this.st.goToStep(type === DonationType.Monetary ? 3 : 3);
+    this.st.goToStep(3);
   }
   clearDonor(): void {
     this.st.setDonor(undefined);
@@ -304,6 +334,7 @@ export class NewDonationComponent {
     this.customMon.set(false);
     this.paymentMethod.set(null);
     this.cashTendered.set(null);
+    this.cardApproved.set(false);
   }
 
   complete(): void {
@@ -327,6 +358,16 @@ export class NewDonationComponent {
     this.customMon.set(false);
     this.paymentMethod.set(null);
     this.cashTendered.set(null);
+    this.cardApproved.set(false);
+    this.delivery.set(ReceiptDelivery.Email);
+    this.showEnroll.set(false);
+    this.searchQ = '';
+    this.apptQ = '';
+    this.apptResult.set(null);
+    this.apptNotFound.set(false);
+    this.showAssociateModal.set(false);
+    this.associatedDonor.set(null);
+    this.associateSearchQ.set('');
   }
 
   confirmAssociation(): void {
@@ -345,5 +386,12 @@ export class NewDonationComponent {
     this.customMon.set(false);
     this.paymentMethod.set(null);
     this.cashTendered.set(null);
+    this.cardApproved.set(false);
+    this.delivery.set(ReceiptDelivery.Email);
+    this.showEnroll.set(false);
+    this.searchQ = '';
+    this.apptQ = '';
+    this.apptResult.set(null);
+    this.apptNotFound.set(false);
   }
 }

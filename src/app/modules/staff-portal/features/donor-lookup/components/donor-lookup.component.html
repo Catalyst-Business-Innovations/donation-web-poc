@@ -3,9 +3,6 @@
     <div class="topbar-title">Donor Lookup</div>
     <div class="topbar-subtitle">Search and manage donor profiles</div>
   </div>
-  <div class="topbar-actions">
-    <button class="btn btn-primary" (click)="openAddModal()">+ Add Donor</button>
-  </div>
 </div>
 
 <div class="page-content">
@@ -73,8 +70,7 @@
     <div class="empty-state">
       <div class="empty-state-icon"><app-icon name="user" [size]="40"></app-icon></div>
       <div class="empty-state-title">No donors found</div>
-      <div class="empty-state-text">Try a different search or add a new donor.</div>
-      <button class="btn btn-primary" (click)="openAddModal()">+ Add Donor</button>
+      <div class="empty-state-text">Try a different search term.</div>
     </div>
   }
 </div>
@@ -122,9 +118,9 @@
   </div>
 }
 
-<!-- Add/Edit Donor Modal -->
+<!-- Edit Donor Modal -->
 <app-modal
-  [open]="modalMode() === 'add' || modalMode() === 'edit'"
+  [open]="modalMode() === 'edit'"
   [title]="modalTitle"
   [confirmLabel]="confirmLabel"
   (closed)="closeModal()"

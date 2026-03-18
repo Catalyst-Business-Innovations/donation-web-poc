@@ -7,15 +7,24 @@ import { ModalComponent } from '../../../../../shared/components/modal/modal.com
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import {
   Campaign, CampaignStatus, CampaignStatusLabel,
+  CampaignTargetCriteria,
   NotificationChannel, NotificationChannelLabel
 } from '../../../../../core/models/domain.models';
 
 interface CampaignForm {
   name: string;
   description: string;
-  startDate: string;
-  endDate: string;
+  effectiveFrom: string;
+  toDate: string;
   channel: NotificationChannel;
+  criteria: CampaignTargetCriteria[];
+}
+
+/** Transient state for the in-progress criterion being built */
+interface CriterionDraft {
+  departmentKey: string;
+  categoryKey: string;
+  subCategoryKey: string;
 }
 
 type ModalMode = 'add' | 'edit' | 'execute' | null;
@@ -43,6 +52,23 @@ export class CampaignsComponent {
   protected executeResults = signal<{ sent: number; failed: number } | null>(null);
 
   protected form: CampaignForm = this.emptyForm();
+  protected criterionDraft: CriterionDraft = this.emptyCriterionDraft();
+
+  // ── Cascading dept/cat/subcat lists for the criterion builder ──
+  get draftCategories() {
+    if (!this.criterionDraft.departmentKey) return [];
+    return this.svc.departments.find(d => d.key === this.criterionDraft.departmentKey)?.categories ?? [];
+  }
+  get draftSubCategories() {
+    return this.draftCategories.find(c => c.key === this.criterionDraft.categoryKey)?.subCategories ?? [];
+  }
+
+  get canSaveCampaign(): boolean {
+    const f = this.form;
+    if (!f.name.trim()) return false;
+    if (f.effectiveFrom && f.toDate && f.toDate < f.effectiveFrom) return false;
+    return true;
+  }
 
   readonly filtered = computed(() => {
     const q = this.query().toLowerCase();
@@ -84,6 +110,7 @@ export class CampaignsComponent {
 
   openAdd(): void {
     this.form = this.emptyForm();
+    this.criterionDraft = this.emptyCriterionDraft();
     this.selectedCampaign.set(null);
     this.modalMode.set('add');
   }
@@ -92,12 +119,14 @@ export class CampaignsComponent {
     event.stopPropagation();
     this.selectedCampaign.set(c);
     this.form = {
-      name:        c.name,
-      description: c.description,
-      startDate:   c.startDate.toISOString().split('T')[0],
-      endDate:     c.endDate.toISOString().split('T')[0],
-      channel:     c.channel,
+      name:          c.name,
+      description:   c.description,
+      effectiveFrom: c.startDate ? c.startDate.toISOString().split('T')[0] : '',
+      toDate:        c.endDate   ? c.endDate.toISOString().split('T')[0]   : '',
+      channel:       c.channel,
+      criteria:      [...(c.targetCriteria ?? [])],
     };
+    this.criterionDraft = this.emptyCriterionDraft();
     this.modalMode.set('edit');
   }
 
@@ -114,16 +143,46 @@ export class CampaignsComponent {
     this.executeResults.set(null);
   }
 
+  addCriterion(): void {
+    const d = this.criterionDraft;
+    if (!d.departmentKey) return;
+    const dept = this.svc.departments.find(dep => dep.key === d.departmentKey);
+    const cat  = this.draftCategories.find(c => c.key === d.categoryKey);
+    const sub  = this.draftSubCategories.find(s => s.key === d.subCategoryKey);
+    const criterion: CampaignTargetCriteria = {
+      departmentKey:   dept?.key,
+      departmentName:  dept?.name,
+      categoryKey:     cat?.key,
+      categoryName:    cat?.name,
+      subCategoryKey:  sub?.key,
+      subCategoryName: sub?.name,
+    };
+    this.form.criteria = [...this.form.criteria, criterion];
+    this.criterionDraft = this.emptyCriterionDraft();
+  }
+
+  removeCriterion(index: number): void {
+    this.form.criteria = this.form.criteria.filter((_, i) => i !== index);
+  }
+
+  criterionLabel(c: CampaignTargetCriteria): string {
+    return [c.departmentName, c.categoryName, c.subCategoryName].filter(Boolean).join(' › ');
+  }
+
   saveCampaign(): void {
+    if (!this.canSaveCampaign) {
+      this.toast.warning('Incomplete', 'Campaign name is required. If dates are set, the To Date must be on or after Effective From.');
+      return;
+    }
     const mode = this.modalMode();
     const payload = {
       name:        this.form.name.trim(),
       description: this.form.description.trim(),
-      startDate:   new Date(this.form.startDate),
-      endDate:     new Date(this.form.endDate),
+      startDate:   this.form.effectiveFrom ? new Date(this.form.effectiveFrom) : new Date(),
+      endDate:     this.form.toDate        ? new Date(this.form.toDate)        : new Date('2099-12-31'),
       channel:     this.form.channel,
       status:      mode === 'add' ? CampaignStatus.Draft : this.selectedCampaign()!.status,
-      targetCriteria: mode === 'edit' ? this.selectedCampaign()!.targetCriteria : [],
+      targetCriteria: this.form.criteria,
       notificationHistory: mode === 'edit' ? this.selectedCampaign()!.notificationHistory : [],
       createdByStaffId: this.svc.session.staffId,
     };
@@ -188,7 +247,10 @@ export class CampaignsComponent {
   }
 
   private emptyForm(): CampaignForm {
-    const today = new Date().toISOString().split('T')[0];
-    return { name: '', description: '', startDate: today, endDate: today, channel: NotificationChannel.Email };
+    return { name: '', description: '', effectiveFrom: '', toDate: '', channel: NotificationChannel.Email, criteria: [] };
+  }
+
+  private emptyCriterionDraft(): CriterionDraft {
+    return { departmentKey: '', categoryKey: '', subCategoryKey: '' };
   }
 }

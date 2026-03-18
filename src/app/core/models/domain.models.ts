@@ -155,6 +155,8 @@ export interface RewardTransaction {
 
 /** A single targeting criterion for a campaign (Req 6) */
 export interface CampaignTargetCriteria {
+  departmentKey?: string;
+  departmentName?: string;
   categoryKey?: string;
   categoryName?: string;
   subCategoryKey?: string;

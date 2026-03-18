@@ -49,9 +49,9 @@ export class StaffPortalComponent {
       title: 'Admin',
       items: [
         { label: 'Containers', icon: 'layers', route: '/staff/containers' },
-        { label: 'Donor Management', icon: 'users', route: '/staff/donors' },
+        { label: 'Donors', icon: 'users', route: '/staff/donors' },
         { label: 'Campaigns', icon: 'send', route: '/staff/campaigns' },
-        { label: 'System Settings', icon: 'settings', route: '/staff/settings' }
+        { label: 'Settings', icon: 'settings', route: '/staff/settings' }
       ]
     }
   ];

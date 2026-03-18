@@ -3,9 +3,15 @@
     <div class="topbar-title">Campaigns</div>
     <div class="topbar-subtitle">Donor notification campaigns by category interest</div>
   </div>
-  <button class="btn btn-primary" (click)="openAdd()">
-    <app-icon name="plus" size="15" /> New Campaign
-  </button>
+  <div class="topbar-actions">
+    <div class="search-bar" style="width: 280px">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search campaigns…" />
+    </div>
+    <button class="btn btn-primary" (click)="openAdd()">
+      <app-icon name="plus" size="15" /> New Campaign
+    </button>
+  </div>
 </div>
 
 <div class="page-content">
@@ -30,13 +36,6 @@
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filters-row">
-    <div class="search-bar" style="flex: 1; max-width: 380px">
-      <span class="search-icon"><app-icon name="search" size="14" /></span>
-      <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search campaign name or description…" />
-    </div>
-  </div>
 
   <!-- Table -->
   <div class="card">
@@ -46,7 +45,7 @@
           <tr>
             <th>Campaign</th>
             <th>Channel</th>
-            <th>Date Range</th>
+            <th>Effective Dates</th>
             <th>Status</th>
             <th>Sent</th>
             <th>Actions</th>
@@ -58,6 +57,13 @@
               <td>
                 <div style="font-weight: 700; font-size: 13px">{{ c.name }}</div>
                 <div style="font-size: 11px; color: var(--gray-500)">{{ c.description }}</div>
+                @if (c.targetCriteria.length) {
+                  <div class="table-criteria">
+                    @for (tc of c.targetCriteria; track $index) {
+                      <span class="badge badge-info" style="font-size: 10px">{{ criterionLabel(tc) }}</span>
+                    }
+                  </div>
+                }
               </td>
               <td><span class="badge badge-info" style="font-size: 11px">{{ channelLabel(c.channel) }}</span></td>
               <td style="font-size: 12px">
@@ -118,6 +124,7 @@
   [confirmLabel]="confirmLabel"
   cancelLabel="Cancel"
   [showCancel]="true"
+  [confirmDisabled]="!canSaveCampaign"
   (closed)="closeModal()"
   (confirmed)="onModalConfirm()"
 >
@@ -131,12 +138,16 @@
       <input class="form-input" [(ngModel)]="form.description" placeholder="Brief campaign summary…" />
     </div>
     <div class="form-group">
-      <label class="form-label">Start Date *</label>
-      <input type="date" class="form-input" [(ngModel)]="form.startDate" />
+      <label class="form-label">Effective From <span class="form-label-opt">(optional)</span></label>
+      <input type="date" class="form-input" [(ngModel)]="form.effectiveFrom" />
     </div>
     <div class="form-group">
-      <label class="form-label">End Date *</label>
-      <input type="date" class="form-input" [(ngModel)]="form.endDate" />
+      <label class="form-label">To Date <span class="form-label-opt">(optional)</span></label>
+      <input type="date" class="form-input" [(ngModel)]="form.toDate"
+             [class.input-error]="form.toDate && form.effectiveFrom && form.toDate < form.effectiveFrom" />
+      @if (form.toDate && form.effectiveFrom && form.toDate < form.effectiveFrom) {
+        <div class="form-hint-error">To Date must be on or after Effective From</div>
+      }
     </div>
     <div class="form-group" style="grid-column: span 2">
       <label class="form-label">Notification Channel</label>
@@ -145,6 +156,55 @@
         <option [ngValue]="NC.SMS">{{ NCLabel[NC.SMS] }}</option>
         <option [ngValue]="NC.Both">{{ NCLabel[NC.Both] }}</option>
       </select>
+    </div>
+
+    <!-- ── Target Criteria ── -->
+    <div class="form-group" style="grid-column: span 2">
+      <label class="form-label">Target Criteria <span class="form-label-opt">(optional — leave empty to target all donors)</span></label>
+
+      <!-- Added criteria chips -->
+      @if (form.criteria.length > 0) {
+        <div class="criteria-list">
+          @for (c of form.criteria; track $index) {
+            <div class="criterion-chip">
+              <app-icon name="layers" [size]="12"></app-icon>
+              <span>{{ criterionLabel(c) }}</span>
+              <button class="criterion-remove" (click)="removeCriterion($index)" title="Remove">×</button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Builder row -->
+      <div class="criterion-builder">
+        <select class="form-select crit-select" [(ngModel)]="criterionDraft.departmentKey"
+                (ngModelChange)="criterionDraft.categoryKey = ''; criterionDraft.subCategoryKey = ''">
+          <option value="">— Department —</option>
+          @for (dept of svc.departments; track dept.key) {
+            <option [value]="dept.key">{{ dept.name }}</option>
+          }
+        </select>
+        <select class="form-select crit-select" [(ngModel)]="criterionDraft.categoryKey"
+                [disabled]="!criterionDraft.departmentKey || draftCategories.length === 0"
+                (ngModelChange)="criterionDraft.subCategoryKey = ''">
+          <option value="">— Category —</option>
+          @for (cat of draftCategories; track cat.key) {
+            <option [value]="cat.key">{{ cat.name }}</option>
+          }
+        </select>
+        <select class="form-select crit-select" [(ngModel)]="criterionDraft.subCategoryKey"
+                [disabled]="!criterionDraft.categoryKey || draftSubCategories.length === 0">
+          <option value="">— Subcategory —</option>
+          @for (sub of draftSubCategories; track sub.key) {
+            <option [value]="sub.key">{{ sub.name }}</option>
+          }
+        </select>
+        <button class="btn btn-secondary crit-add-btn"
+                [disabled]="!criterionDraft.departmentKey"
+                (click)="addCriterion()">
+          <app-icon name="plus" [size]="13"></app-icon> Add
+        </button>
+      </div>
     </div>
   </div>
 </app-modal>

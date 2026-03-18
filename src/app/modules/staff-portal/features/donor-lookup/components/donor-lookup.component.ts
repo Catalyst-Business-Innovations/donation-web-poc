@@ -11,7 +11,7 @@ import { DonorTier, Donor } from '../../../../../core/models/domain.models';
 import { NewDonationStateService } from '../../new-donation/services/new-donation-state.service';
 import { NewDonationMapper } from '../../new-donation/models/new-donation.mapper';
 
-type ModalMode = 'add' | 'edit' | 'history' | null;
+type ModalMode = 'edit' | 'history' | null;
 
 interface EnrollForm {
   firstName: string;
@@ -78,11 +78,6 @@ export class DonorLookupComponent {
   }
 
   // Modal actions
-  openAddModal(): void {
-    this.enrollForm = { firstName: '', lastName: '', phone: '', email: '', address: '' };
-    this.modalMode.set('add');
-  }
-
   openEditModal(d: DonorLookupItem): void {
     const donor = this.mockData.donors.find(donor => donor.id === d.id);
     if (donor) {
@@ -115,9 +110,7 @@ export class DonorLookupComponent {
     }
 
     const mode = this.modalMode();
-    if (mode === 'add') {
-      this.toast.success('Success!', `${firstName} ${lastName} has been enrolled.`);
-    } else if (mode === 'edit') {
+    if (mode === 'edit') {
       this.toast.success('Saved!', `${firstName} ${lastName}'s information has been updated.`);
     }
     this.closeModal();
@@ -125,16 +118,13 @@ export class DonorLookupComponent {
 
   get modalTitle(): string {
     const mode = this.modalMode();
-    if (mode === 'add') return '➕ Enroll New Donor';
     if (mode === 'edit') return '✏️ Edit Donor Information';
     if (mode === 'history') return '📜 Donation History';
     return '';
   }
 
   get confirmLabel(): string {
-    const mode = this.modalMode();
-    if (mode === 'add') return 'Enroll Donor';
-    if (mode === 'edit') return 'Save Changes';
+    if (this.modalMode() === 'edit') return 'Save Changes';
     return 'Close';
   }
 

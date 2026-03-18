@@ -1039,6 +1039,24 @@
   .terminal-sub  { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
 }
 
+.card-approved {
+  margin-top: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 10px;
+  background: #dcfce7;
+  border: 2px solid #16a34a;
+  color: #15803d;
+
+  app-icon { flex-shrink: 0; }
+  .ca-body { flex: 1; }
+  .ca-title { font-size: 15px; font-weight: 700; }
+  .ca-sub   { font-size: 12px; opacity: 0.75; margin-top: 2px; }
+  .ca-retry { font-size: 12px; padding: 4px 10px; color: var(--gray-400); }
+}
+
 // ── Review step: payment summary (read-only) ─────────────────────────────
 .money-summary {
   display: flex;
