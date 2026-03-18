@@ -2,7 +2,7 @@ import { Injectable, computed, signal } from '@angular/core';
 import { MockDataService } from '../../../../../core/services/mock-data.service';
 import { NewDonationState, SelectedDonor, WizardStep } from '../models/new-donation.state';
 import { NewDonationMapper } from '../models/new-donation.mapper';
-import { DonationType, ReceiptDelivery } from '../../../../../core/models/domain.models';
+import { DonationScope, ReceiptDelivery } from '../../../../../core/models/domain.models';
 
 @Injectable({ providedIn: 'root' })
 export class NewDonationStateService {
@@ -32,17 +32,17 @@ export class NewDonationStateService {
   setDonor(d: SelectedDonor | null | undefined): void {
     this._state.update(s => ({ ...s, donor: d }));
   }
-  setDonationType(t: DonationType): void {
+  setDonationType(t: DonationScope): void {
     this._state.update(s => ({
       ...s,
       donationType: t,
       // Clear items when switching to monetary-only so review is clean
-      selectedItems: t === DonationType.Monetary ? {} : s.selectedItems
+      selectedItems: t === DonationScope.Monetary ? {} : s.selectedItems
     }));
   }
   nextStep(): void {
     this._state.update(s => {
-      const maxStep = s.donationType === DonationType.Both ? 5 : 4;
+      const maxStep = s.donationType === DonationScope.Both ? 5 : 4;
       const next = Math.min(maxStep, (s.step as number) + 1) as WizardStep;
       return { ...s, step: next };
     });

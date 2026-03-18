@@ -12,7 +12,7 @@ export enum LocationStatus  { Open = 1, Closed, Busy }
 export enum StaffRole       { Attendant = 1, PresortWorker, Manager, Admin }
 export enum DonationStatus { Scheduled = 1, CheckedIn, Completed, Cancelled, NoShow }
 export enum ScheduledDonationType   { WalkIn = 1, Scheduled, Pickup }
-export enum DonationType      { Items = 1, Monetary, Both }
+export enum DonationScope      { Items = 1, Monetary, Both }
 
 // ── Phase 1 enums ────────────────────────────────────────────────────────────
 export enum PointsCalcMethod   { PerItem = 1, PerWeight }   // PerWeight disabled by default
@@ -81,10 +81,10 @@ export const ScheduledDonationTypeLabel: Record<ScheduledDonationType, string> =
   [ScheduledDonationType.Scheduled]: 'Scheduled',
   [ScheduledDonationType.Pickup]:    'Pickup',
 };
-export const DonationTypeLabel: Record<DonationType, string> = {
-  [DonationType.Items]:    'Donate Items',
-  [DonationType.Monetary]: 'Monetary Donation',
-  [DonationType.Both]:     'Items & Monetary',
+export const DonationScopeLabel: Record<DonationScope, string> = {
+  [DonationScope.Items]:    'Donate Items',
+  [DonationScope.Monetary]: 'Monetary Donation',
+  [DonationScope.Both]:     'Items & Monetary',
 };
 export const RewardStatusLabel: Record<RewardStatus, string> = {
   [RewardStatus.Active]:   'Active',

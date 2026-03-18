@@ -1,4 +1,4 @@
-import { DonorTier, DonationType, ReceiptDelivery } from '../../../../../core/models/domain.models';
+import { DonorTier, DonationScope, ReceiptDelivery } from '../../../../../core/models/domain.models';
 
 export type WizardStep = 1 | 2 | 3 | 4 | 5;
 
@@ -21,7 +21,7 @@ export type SelectedItemsMap = Record<string, SelectedItemEntry>;
 
 export interface NewDonationState {
   step: WizardStep;
-  donationType: DonationType | null;
+  donationType: DonationScope | null;
   donor: SelectedDonor | null | undefined;
   selectedItems: SelectedItemsMap;
   monetaryAmount: number | null;

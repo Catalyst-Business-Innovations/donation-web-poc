@@ -6,7 +6,7 @@ import { MockDataService } from '../../../../../core/services/mock-data.service'
 import { ToastService } from '../../../../../core/services/toast.service';
 import { NewDonationMapper } from '../models/new-donation.mapper';
 import { SelectedDonor, EnrollForm } from '../models/new-donation.state';
-import { DonorTier, ScheduledDonation, DonationStatus, DonationStatusLabel, Container, ContainerStatus, ContainerStatusLabel, ContainerType, ContainerTypeLabel, DonationType, ReceiptDelivery, Donor } from '../../../../../core/models/domain.models';
+import { DonorTier, ScheduledDonation, DonationStatus, DonationStatusLabel, Container, ContainerStatus, ContainerStatusLabel, ContainerType, ContainerTypeLabel, DonationScope, ReceiptDelivery, Donor } from '../../../../../core/models/domain.models';
 
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { IconComponent, IconName } from '../../../../../shared/components/icon/icon.component';
@@ -42,7 +42,7 @@ export class NewDonationComponent {
   protected readonly AS = DonationStatus;
   protected readonly RD = ReceiptDelivery;
   protected readonly CS = ContainerStatus;
-  protected readonly DT = DonationType;
+  protected readonly DT = DonationScope;
   protected receiptNum = this.mockData.newReceipt();
   protected showConfirmation = signal(false);
   protected donationId = signal<string>('');
@@ -71,8 +71,8 @@ export class NewDonationComponent {
       { n: 1, label: 'Identify Donor' },
       { n: 2, label: 'Donation Type' },
     ];
-    if (t === DonationType.Monetary) return [...base, { n: 3, label: 'Add Money' }, { n: 4, label: 'Review' }];
-    if (t === DonationType.Both)     return [...base, { n: 3, label: 'Add Items' }, { n: 4, label: 'Add Money' }, { n: 5, label: 'Review' }];
+    if (t === DonationScope.Monetary) return [...base, { n: 3, label: 'Add Money' }, { n: 4, label: 'Review' }];
+    if (t === DonationScope.Both)     return [...base, { n: 3, label: 'Add Items' }, { n: 4, label: 'Add Money' }, { n: 5, label: 'Review' }];
     return [...base, { n: 3, label: 'Add Items' }, { n: 4, label: 'Review' }];
   });
 
@@ -80,8 +80,8 @@ export class NewDonationComponent {
     const s = this.st.step(), dt = this.st.donationType();
     if (s === 1) return 'Identify Donor';
     if (s === 2) return 'Select Donation Type';
-    if (s === 3) return dt === DonationType.Monetary ? 'Add Money' : 'Add Items';
-    if (s === 4) return dt === DonationType.Both ? 'Add Money' : 'Review & Complete';
+    if (s === 3) return dt === DonationScope.Monetary ? 'Add Money' : 'Add Items';
+    if (s === 4) return dt === DonationScope.Both ? 'Add Money' : 'Review & Complete';
     return 'Review & Complete';
   });
 
@@ -95,17 +95,17 @@ export class NewDonationComponent {
   });
 
   readonly isAddItemsStep = computed(() =>
-    this.st.step() === 3 && this.st.donationType() !== DonationType.Monetary
+    this.st.step() === 3 && this.st.donationType() !== DonationScope.Monetary
   );
 
   readonly isAddMoneyStep = computed(() => {
     const s = this.st.step(), dt = this.st.donationType();
-    return (s === 3 && dt === DonationType.Monetary) || (s === 4 && dt === DonationType.Both);
+    return (s === 3 && dt === DonationScope.Monetary) || (s === 4 && dt === DonationScope.Both);
   });
 
   readonly isReviewStep = computed(() => {
     const s = this.st.step(), dt = this.st.donationType();
-    return (s === 4 && dt !== DonationType.Both) || s === 5;
+    return (s === 4 && dt !== DonationScope.Both) || s === 5;
   });
 
   readonly canProceedFromMoney = computed(() => {
@@ -119,8 +119,8 @@ export class NewDonationComponent {
   protected readonly canComplete = computed(() => {
     const type = this.st.donationType();
     if (!type) return false;
-    if (type === DonationType.Items)    return this.st.totalItems() > 0;
-    if (type === DonationType.Monetary) return this.canProceedFromMoney();
+    if (type === DonationScope.Items)    return this.st.totalItems() > 0;
+    if (type === DonationScope.Monetary) return this.canProceedFromMoney();
     return this.st.totalItems() > 0 && this.canProceedFromMoney();
   });
 
@@ -171,7 +171,7 @@ export class NewDonationComponent {
     return this.mockData.getTier(t);
   }
 
-  selectType(t: DonationType): void {
+  selectType(t: DonationScope): void {
     this.st.setDonationType(t);
     this.st.nextStep();
   }
@@ -219,7 +219,7 @@ export class NewDonationComponent {
     this.sdResults.set([]);
     this.sdQ = '';
     this.sdNotFound.set(false);
-    this.st.setDonationType(DonationType.Items);
+    this.st.setDonationType(DonationScope.Items);
     this.st.goToStep(3);
   }
 
@@ -273,7 +273,7 @@ export class NewDonationComponent {
     this.toast.success('Card Approved', 'Payment authorised successfully.');
   }
 
-  quickDonate(type: DonationType): void {
+  quickDonate(type: DonationScope): void {
     this.st.setDonor(null);
     this.st.setDonationType(type);
     this.st.goToStep(3);
