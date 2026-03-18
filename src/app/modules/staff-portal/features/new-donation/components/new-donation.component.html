@@ -74,8 +74,7 @@
           <div class="id-divider">or search</div>
           <div class="search-bar" style="margin-bottom: 8px">
             <span class="search-icon"><app-icon name="search" size="14" /></span>
-            <input [(ngModel)]="searchQ" placeholder="Name or phone number..." />
-            <button class="btn btn-ghost demo-search-btn" (click)="demoSearch()" title="Fill demo search">Demo</button>
+            <input [ngModel]="searchQ()" (ngModelChange)="searchQ.set($event)" placeholder="Name or phone number..." />
           </div>
           @for (d of searchResults(); track d.id) {
             <div class="donor-result" (click)="selectDonor(d)">
@@ -86,11 +85,14 @@
                   <app-icon [name]="tierCfg(d.tier).icon" [size]="12"></app-icon>
                   {{ tierCfg(d.tier).label }} · {{ d.points | number }} pts
                 </div>
+                @if (d.phone) {
+                  <div class="dr-meta">{{ d.phone }}</div>
+                }
               </div>
               <span class="badge badge-gray">{{ d.totalDonations }} visits</span>
             </div>
           }
-          @if (searchQ.length > 1 && searchResults().length === 0) {
+          @if (searchQ().length > 1 && searchResults().length === 0) {
             <div class="no-results">
               <div>No donors found</div>
               <button class="btn btn-primary" style="margin-top: 10px; width: 100%" (click)="showEnroll.set(true)">
@@ -129,7 +131,7 @@
             </div>
           </div>
           <div class="appt-lookup-row">
-            <input class="form-input" [(ngModel)]="apptQ" placeholder="APT-20260320-001"
+            <input class="form-input" [(ngModel)]="apptQ" placeholder="Reference #, donor name or phone..."
               (keyup.enter)="lookupAppointment()" />
             <button class="btn btn-primary" (click)="lookupAppointment()">Search</button>
             <button class="btn btn-secondary" (click)="demoScanApptQR()">
@@ -137,36 +139,36 @@
             </button>
           </div>
 
-          @if (apptResult()) {
+          @for (appt of apptResults(); track appt.id) {
             <div class="appt-result">
               <div class="appt-res-body">
-                <div class="appt-res-id">{{ apptResult()!.id }}</div>
-                <div class="appt-res-name">{{ apptResult()!.donorName }}</div>
+                <div class="appt-res-id">{{ appt.id }}</div>
+                <div class="appt-res-name">{{ appt.donorName }}</div>
                 <div class="appt-res-meta">
-                  <app-icon name="map-pin" [size]="11"></app-icon> {{ apptResult()!.locationName }}
+                  <app-icon name="map-pin" [size]="11"></app-icon> {{ appt.locationName }}
                   &nbsp;·&nbsp;
-                  <app-icon name="calendar" [size]="11"></app-icon> {{ apptResult()!.date | date:'MMM d' }} @ {{ apptResult()!.timeSlot }}
-                  &nbsp;·&nbsp; {{ apptResult()!.itemCount }} items
+                  <app-icon name="calendar" [size]="11"></app-icon> {{ appt.date | date:'MMM d' }} @ {{ appt.timeSlot }}
+                  &nbsp;·&nbsp; {{ appt.itemCount }} items
                 </div>
                 <div class="appt-res-cats">
-                  @for (c of apptResult()!.categories; track c) {
+                  @for (c of appt.categories ?? []; track c) {
                     <span class="badge badge-gray">{{ c }}</span>
                   }
                 </div>
               </div>
               <div class="appt-res-actions">
-                <span class="badge {{ apptStatusBadge(apptResult()!.status) }}">{{ apptStatusLabel(apptResult()!.status) }}</span>
-                @if (apptResult()!.status === AS.Scheduled) {
-                  <button class="btn btn-success" (click)="loadAppointment(apptResult()!)">Load &amp; Continue →</button>
+                <span class="badge {{ apptStatusBadge(appt.status) }}">{{ apptStatusLabel(appt.status) }}</span>
+                @if (appt.status === AS.Scheduled) {
+                  <button class="btn btn-success" (click)="loadAppointment(appt)">Load &amp; Continue</button>
                 } @else {
-                  <span class="appt-res-warn">Cannot load — appointment is {{ apptStatusLabel(apptResult()!.status) }}</span>
+                  <span class="appt-res-warn">Cannot load — appointment is {{ apptStatusLabel(appt.status) }}</span>
                 }
               </div>
             </div>
           }
 
           @if (apptNotFound()) {
-            <div class="appt-not-found">⚠ No appointment found for "{{ apptQ }}"</div>
+            <div class="appt-not-found">⚠ No appointments found for "{{ apptQ }}"</div>
           }
         </div>
       </div>

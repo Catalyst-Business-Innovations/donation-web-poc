@@ -9,7 +9,8 @@ export class NewDonationMapper {
       initials: `${d.firstName[0]}${d.lastName[0]}`.toUpperCase(),
       tier: d.loyaltyTier,
       points: d.loyaltyPoints,
-      totalDonations: d.totalDonations
+      totalDonations: d.totalDonations,
+      phone: d.phone
     };
   }
 

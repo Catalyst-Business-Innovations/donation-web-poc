@@ -9,6 +9,7 @@ export interface SelectedDonor {
   tier: DonorTier;
   points: number;
   totalDonations: number;
+  phone?: string;
 }
 
 export interface SelectedItemEntry {

@@ -24,10 +24,10 @@ export class NewDonationComponent {
   protected mockData = inject(MockDataService);
   protected toast = inject(ToastService);
 
-  protected searchQ = '';
+  protected searchQ = signal<string>('');
   protected showEnroll = signal(false);
   protected apptQ = '';
-  protected apptResult = signal<ScheduledAppointment | null>(null);
+  protected apptResults = signal<ScheduledAppointment[]>([]);
   protected apptNotFound = signal(false);
   protected activeDept = signal('clothes');
   protected selectedContainer = signal<Container | null>(null);
@@ -78,11 +78,11 @@ export class NewDonationComponent {
 
   readonly topTitle = computed(() => {
     const s = this.st.step(), dt = this.st.donationType();
-    if (s === 1) return 'Step 1 — Identify Donor';
-    if (s === 2) return 'Step 2 — Donation Type';
-    if (s === 3) return dt === DonationType.Monetary ? 'Step 3 — Add Money' : 'Step 3 — Add Items';
-    if (s === 4) return dt === DonationType.Both ? 'Step 4 — Add Money' : 'Step 4 — Review & Complete';
-    return 'Step 5 — Review & Complete';
+    if (s === 1) return 'Identify Donor';
+    if (s === 2) return 'Select Donation Type';
+    if (s === 3) return dt === DonationType.Monetary ? 'Add Money' : 'Add Items';
+    if (s === 4) return dt === DonationType.Both ? 'Add Money' : 'Review & Complete';
+    return 'Review & Complete';
   });
 
   readonly topSubtitle = computed(() => {
@@ -132,7 +132,7 @@ export class NewDonationComponent {
   ];
 
   readonly searchResults = computed<SelectedDonor[]>(() => {
-    const q = this.searchQ.toLowerCase();
+    const q = this.searchQ().toLowerCase();
     if (q.length < 2) return [];
     return this.mockData.donors
       .filter(d => `${d.firstName} ${d.lastName} ${d.phone}`.toLowerCase().includes(q))
@@ -177,18 +177,17 @@ export class NewDonationComponent {
   }
 
   lookupAppointment(): void {
-    const q = this.apptQ.trim();
-    if (!q) return;
-    const found = this.mockData.getAppointments().find(
-      a => a.id.toLowerCase() === q.toLowerCase()
+    const raw = this.apptQ.trim();
+    if (!raw) return;
+    const q = raw.toLowerCase();
+    const qDigits = q.replace(/\D/g, '');
+    const results = this.mockData.getAppointments().filter(a =>
+      a.id.toLowerCase().includes(q) ||
+      a.donorName.toLowerCase().includes(q) ||
+      (qDigits.length >= 3 && (a.donorPhone ?? '').replace(/\D/g, '').includes(qDigits))
     );
-    if (found) {
-      this.apptResult.set(found);
-      this.apptNotFound.set(false);
-    } else {
-      this.apptResult.set(null);
-      this.apptNotFound.set(true);
-    }
+    this.apptResults.set(results);
+    this.apptNotFound.set(results.length === 0);
   }
 
   demoScanApptQR(): void {
@@ -217,7 +216,7 @@ export class NewDonationComponent {
     }
 
     this.toast.success('Appointment Loaded', `${appt.id} — ${appt.donorName}`);
-    this.apptResult.set(null);
+    this.apptResults.set([]);
     this.apptQ = '';
     this.apptNotFound.set(false);
     this.st.setDonationType(DonationType.Items);
@@ -258,8 +257,9 @@ export class NewDonationComponent {
     if (!donors.length) return;
     const random = donors[Math.floor(Math.random() * donors.length)];
     // Use first 3 chars of first name so multiple results may appear
-    this.searchQ = random.firstName.slice(0, 3);
-    this.toast.info('Demo Search', `Searching for "${this.searchQ}"`);
+    const q = random.firstName.slice(0, 3);
+    this.searchQ.set(q);
+    this.toast.info('Demo Search', `Searching for "${q}"`);
   }
 
   selectPaymentMethod(m: 'cash' | 'card'): void {
@@ -280,7 +280,7 @@ export class NewDonationComponent {
   }
   clearDonor(): void {
     this.st.setDonor(undefined);
-    this.searchQ = '';
+    this.searchQ.set('');
   }
 
   enrollDonor(): void {
@@ -361,9 +361,9 @@ export class NewDonationComponent {
     this.cardApproved.set(false);
     this.delivery.set(ReceiptDelivery.Email);
     this.showEnroll.set(false);
-    this.searchQ = '';
+    this.searchQ.set('');
     this.apptQ = '';
-    this.apptResult.set(null);
+    this.apptResults.set([]);
     this.apptNotFound.set(false);
     this.showAssociateModal.set(false);
     this.associatedDonor.set(null);
@@ -389,9 +389,9 @@ export class NewDonationComponent {
     this.cardApproved.set(false);
     this.delivery.set(ReceiptDelivery.Email);
     this.showEnroll.set(false);
-    this.searchQ = '';
+    this.searchQ.set('');
     this.apptQ = '';
-    this.apptResult.set(null);
+    this.apptResults.set([]);
     this.apptNotFound.set(false);
   }
 }

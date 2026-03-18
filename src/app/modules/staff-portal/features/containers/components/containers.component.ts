@@ -48,10 +48,10 @@ export class ContainersComponent {
     const cnts = this.mockData.containers;
     const n = (s: ContainerStatus) => cnts.filter(c => c.status === s).length;
     return [
-      { status: ContainerStatus.Available,       icon: 'download'  as IconName, label: 'Available',        count: n(ContainerStatus.Available) },
-      { status: ContainerStatus.ReadyForSorting, icon: 'clock'     as IconName, label: 'Ready for Sorting', count: n(ContainerStatus.ReadyForSorting) },
-      { status: ContainerStatus.Sorting,         icon: 'list'      as IconName, label: 'Sorting',           count: n(ContainerStatus.Sorting) },
+      { status: ContainerStatus.Available,       icon: 'download'  as IconName, label: 'Available',         count: n(ContainerStatus.Available) },
       { status: ContainerStatus.InUse,           icon: 'settings'  as IconName, label: 'In Use',            count: n(ContainerStatus.InUse) },
+      { status: ContainerStatus.ReadyForSorting, icon: 'clock'     as IconName, label: 'Ready for Sorting',  count: n(ContainerStatus.ReadyForSorting) },
+      { status: ContainerStatus.Sorting,         icon: 'list'      as IconName, label: 'Sorting',           count: n(ContainerStatus.Sorting) },
     ];
   });
 
@@ -117,18 +117,20 @@ export class ContainersComponent {
   // ── Status advance ─────────────────────────────────────────────────────────
   nextStatus(c: Container): ContainerStatus | null {
     const map: Partial<Record<ContainerStatus, ContainerStatus>> = {
-      [ContainerStatus.Available]:       ContainerStatus.ReadyForSorting,
+      [ContainerStatus.Available]:       ContainerStatus.InUse,
+      [ContainerStatus.InUse]:           ContainerStatus.ReadyForSorting,
       [ContainerStatus.ReadyForSorting]: ContainerStatus.Sorting,
-      [ContainerStatus.Sorting]:         ContainerStatus.InUse,
+      [ContainerStatus.Sorting]:         ContainerStatus.Available,
     };
     return map[c.status] ?? null;
   }
 
   nextStatusLabel(c: Container): string {
     const labels: Partial<Record<ContainerStatus, string>> = {
-      [ContainerStatus.Available]:       'Queue for Sorting',
+      [ContainerStatus.Available]:       'Mark In Use',
+      [ContainerStatus.InUse]:           'Queue for Sorting',
       [ContainerStatus.ReadyForSorting]: 'Start Sorting',
-      [ContainerStatus.Sorting]:         'Mark In Use',
+      [ContainerStatus.Sorting]:         'Mark Available',
     };
     return labels[c.status] ?? '';
   }
@@ -143,6 +145,7 @@ export class ContainersComponent {
     }
     const updates: Partial<Container> = { status: ns };
     if (ns === ContainerStatus.Sorting) updates.presortedAt = new Date();
+    if (ns === ContainerStatus.Available) updates.closedAt = new Date();
     this.mockData.updateContainer(c.id, updates);
     if (this.viewing()?.id === c.id) {
       this.viewing.set(this.mockData.containers.find(x => x.id === c.id) ?? null);
@@ -162,10 +165,10 @@ export class ContainersComponent {
 
   detailTimeline(c: Container): { label: string; time: Date | undefined; done: boolean; icon: IconName }[] {
     return [
-      { label: 'Available',        time: c.createdAt,   done: true,                                                                         icon: 'download' },
-      { label: 'Ready for Sorting',time: undefined,     done: c.status !== ContainerStatus.Available,                                       icon: 'clock'    },
-      { label: 'Sorting',          time: c.presortedAt, done: [ContainerStatus.Sorting, ContainerStatus.InUse].includes(c.status),          icon: 'list'     },
-      { label: 'In Use',           time: undefined,     done: c.status === ContainerStatus.InUse,                                           icon: 'settings' },
+      { label: 'Available',        time: c.createdAt,   done: true,                                                                                                              icon: 'download' },
+      { label: 'In Use',           time: undefined,     done: [ContainerStatus.InUse, ContainerStatus.ReadyForSorting, ContainerStatus.Sorting].includes(c.status),             icon: 'settings' },
+      { label: 'Ready for Sorting',time: undefined,     done: [ContainerStatus.ReadyForSorting, ContainerStatus.Sorting].includes(c.status),                                    icon: 'clock'    },
+      { label: 'Sorting',          time: c.presortedAt, done: c.status === ContainerStatus.Sorting,                                                                              icon: 'list'     },
     ];
   }
 
@@ -322,7 +325,7 @@ export class ContainersComponent {
 
   openBulkStatus(): void {
     if (this.selectedIds().size === 0) return;
-    this.bulkStatus = ContainerStatus.ReadyForSorting;
+    this.bulkStatus = ContainerStatus.InUse;
     this.bulkUpdating.set(true);
   }
 

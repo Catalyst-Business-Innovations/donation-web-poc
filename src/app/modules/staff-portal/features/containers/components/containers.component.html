@@ -33,9 +33,9 @@
     <select class="form-select f-sel" [(ngModel)]="statusFilter">
       <option [value]="''">All Statuses</option>
       <option [value]="CS.Available">Available</option>
+      <option [value]="CS.InUse">In Use</option>
       <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
       <option [value]="CS.Sorting">Sorting</option>
-      <option [value]="CS.InUse">In Use</option>
     </select>
     <select class="form-select f-sel" [(ngModel)]="destFilter">
       <option [value]="''">All Destinations</option>
@@ -281,7 +281,7 @@
           {{ nextStatusLabel(viewing()!) }}
         </button>
       }
-      @if (viewing()!.status === CS.Available) {
+      @if (viewing()!.status !== CS.Available) {
         <button class="btn btn-sm btn-danger-outline" (click)="disposeContainer(viewing()!)">
           Reset to Available
         </button>
@@ -317,9 +317,9 @@
       <label class="form-label">Status</label>
       <select class="form-select" [(ngModel)]="cStatus">
         <option [value]="CS.Available">Available</option>
+        <option [value]="CS.InUse">In Use</option>
         <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
         <option [value]="CS.Sorting">Sorting</option>
-        <option [value]="CS.InUse">In Use</option>
       </select>
     </div>
   </div>
@@ -446,9 +446,9 @@
         <label class="form-label">Status</label>
         <select class="form-select" [(ngModel)]="eStatus">
           <option [value]="CS.Available">Available</option>
+          <option [value]="CS.InUse">In Use</option>
           <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
           <option [value]="CS.Sorting">Sorting</option>
-          <option [value]="CS.InUse">In Use</option>
         </select>
       </div>
       <div class="form-group">
@@ -589,9 +589,9 @@
     <label class="form-label">New Status</label>
     <select class="form-select" [(ngModel)]="bulkStatus">
       <option [value]="CS.Available">Available</option>
+      <option [value]="CS.InUse">In Use</option>
       <option [value]="CS.ReadyForSorting">Ready for Sorting</option>
       <option [value]="CS.Sorting">Sorting</option>
-      <option [value]="CS.InUse">In Use</option>
     </select>
   </div>
 </app-modal>
