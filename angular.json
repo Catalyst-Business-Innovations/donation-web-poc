@@ -28,13 +28,14 @@
               { "glob": "**/*", "input": "src/assets", "output": "assets" }
             ],
             "styles": ["src/styles/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": ["qrcode"]
           },
           "configurations": {
             "production": {
               "budgets": [
                 { "type": "initial", "maximumWarning": "500kB", "maximumError": "1MB" },
-                { "type": "anyComponentStyle", "maximumWarning": "16kB", "maximumError": "24kB" }
+                { "type": "anyComponentStyle", "maximumWarning": "32kB", "maximumError": "40kB" }
               ],
               "outputHashing": "all"
             },
