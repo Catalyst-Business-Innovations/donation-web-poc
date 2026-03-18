@@ -1,19 +1,22 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { MockDataService } from '../../../../../core/services/mock-data.service';
 import { ToastService } from '../../../../../core/services/toast.service';
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { QrCodeComponent } from '../../../../../shared/components/qr-code/qr-code.component';
-import { ScheduledAppointment, AppointmentStatus, AppointmentType,
-  AppointmentStatusLabel, AppointmentTypeLabel } from '../../../../../core/models/domain.models';
+import {
+  ScheduledAppointment, AppointmentStatus, AppointmentType,
+  AppointmentStatusLabel, AppointmentTypeLabel,
+  Donation, DonationStatus, Donor, DonorTier
+} from '../../../../../core/models/domain.models';
 
 @Component({
   selector: 'app-donations',
   standalone: true,
-  imports: [FormsModule, DatePipe, ModalComponent, IconComponent, QrCodeComponent],
+  imports: [FormsModule, DatePipe, DecimalPipe, ModalComponent, IconComponent, QrCodeComponent],
   templateUrl: './donations.component.html',
   styleUrl: './donations.component.scss'
 })
@@ -25,10 +28,40 @@ export class DonationsComponent {
   // expose for template
   protected readonly AS = AppointmentStatus;
   protected readonly AT = AppointmentType;
+  protected readonly DS = DonationStatus;
+
+  protected activeTab = signal<'appointments' | 'completions'>('appointments');
 
   protected query = '';
   protected statusFilter: AppointmentStatus | '' = '';
   protected dateFilter = '';
+
+  // ── Completed-Donations tab ──────────────────────────────────────────────
+  protected donQuery = '';
+  protected _localDonations = signal<Donation[]>([...this.mockData.donations]);
+
+  readonly filteredDonations = computed(() => {
+    const q = this.donQuery.toLowerCase();
+    return this._localDonations().filter(d => {
+      return !q
+        || (d.donorName ?? '').toLowerCase().includes(q)
+        || d.id.toLowerCase().includes(q)
+        || (d.associatedDonorName ?? '').toLowerCase().includes(q);
+    });
+  });
+
+  // ── Link-Donor modal ─────────────────────────────────────────────────────
+  protected linkingDonation = signal<Donation | null>(null);
+  protected linkSearchQ = signal('');
+  protected linkSelectedDonor = signal<Donor | null>(null);
+
+  readonly linkResults = computed<Donor[]>(() => {
+    const q = this.linkSearchQ().toLowerCase();
+    if (q.length < 2) return [];
+    return this.mockData.donors.filter(d =>
+      `${d.firstName} ${d.lastName} ${d.phone}`.toLowerCase().includes(q)
+    );
+  });
 
   protected selected = signal<ScheduledAppointment | null>(null);
 
@@ -109,6 +142,46 @@ export class DonationsComponent {
   markCancelled(a: ScheduledAppointment, event: Event): void {
     event.stopPropagation();
     this.toast.info('Cancelled', `Appointment ${a.id} cancelled.`);
+  }
+
+  // ── Link-Donor modal actions ──────────────────────────────────────────────
+  openLinkModal(d: Donation, event: Event): void {
+    event.stopPropagation();
+    this.linkingDonation.set(d);
+    this.linkSearchQ.set('');
+    this.linkSelectedDonor.set(null);
+  }
+
+  closeLinkModal(): void {
+    this.linkingDonation.set(null);
+    this.linkSearchQ.set('');
+    this.linkSelectedDonor.set(null);
+  }
+
+  confirmLink(): void {
+    const donation = this.linkingDonation();
+    const donor = this.linkSelectedDonor();
+    if (!donation || !donor) return;
+    const updated = this.mockData.associateDonorToDonation(donation.id, donor.id);
+    if (updated) {
+      this._localDonations.update(list =>
+        list.map(d => d.id === updated.id ? updated : d)
+      );
+      this.toast.success('Linked!', `Donation ${donation.id} linked to ${donor.firstName} ${donor.lastName}.`);
+    } else {
+      this.toast.error('Failed', 'Could not link donor — the association window may have expired.');
+    }
+    this.closeLinkModal();
+  }
+
+  donationStatusBadge(s: DonationStatus): string {
+    const m: Record<DonationStatus, string> = {
+      [DonationStatus.Pending]:    'badge-info',
+      [DonationStatus.Processing]: 'badge-warning',
+      [DonationStatus.Completed]:  'badge-success',
+      [DonationStatus.Cancelled]:  'badge-danger',
+    };
+    return m[s] ?? 'badge-gray';
   }
 
 }

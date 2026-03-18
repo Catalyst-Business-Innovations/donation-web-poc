@@ -416,10 +416,12 @@
           <div class="card">
             <div class="card-header"><div class="card-title">Payment Method</div></div>
             <div class="pay-method-grid">
-              <button class="pay-method-btn" [class.active]="paymentMethod() === 'cash'" (click)="paymentMethod.set('cash')">
-                <span class="pm-icon">&#128181;</span>
-                <span class="pm-label">Cash</span>
-              </button>
+              @if (isCashAccepted()) {
+                <button class="pay-method-btn" [class.active]="paymentMethod() === 'cash'" (click)="paymentMethod.set('cash')">
+                  <span class="pm-icon">&#128181;</span>
+                  <span class="pm-label">Cash</span>
+                </button>
+              }
               <button class="pay-method-btn" [class.active]="paymentMethod() === 'card'" (click)="paymentMethod.set('card')">
                 <span class="pm-icon">&#128179;</span>
                 <span class="pm-label">Card / Tap</span>
@@ -657,5 +659,68 @@
     <div style="font-size: 12px; color: var(--gray-500)">
       {{ today | date: 'MMM d, yyyy' }}
     </div>
+
+    <!-- Req 1: Link anonymous donation to a donor (shown when donation is anonymous) -->
+    @if (st.donor() === null && donationId()) {
+      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-200)">
+        <button class="btn btn-secondary" style="width: 100%" (click)="showAssociateModal.set(true)">
+          &#128279; Link to Donor Account
+        </button>
+        <div style="font-size: 11px; color: var(--gray-500); margin-top: 6px; text-align: center">
+          Associate this donation with an existing donor to award loyalty points
+        </div>
+      </div>
+    }
+    @if (associatedDonor()) {
+      <div style="margin-top: 12px; padding: 10px 14px; background: var(--success-light); border: 1px solid var(--success); border-radius: 8px; font-size: 13px; color: var(--gray-800); display: flex; align-items: center; gap: 8px">
+        <span>&#10003;</span>
+        <span>Linked to <strong>{{ associatedDonor()!.displayName }}</strong></span>
+      </div>
+    }
+  </div>
+</app-modal>
+
+<!-- Req 1: Associate donor modal -->
+<app-modal
+  [open]="showAssociateModal()"
+  title="Link to Donor Account"
+  confirmLabel="Confirm Association"
+  [showCancel]="true"
+  cancelLabel="Cancel"
+  [confirmDisabled]="!associatedDonor()"
+  (closed)="showAssociateModal.set(false); associatedDonor.set(null); associateSearchQ.set('')"
+  (confirmed)="confirmAssociation()"
+>
+  <div style="padding: 4px 0">
+    <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px">
+      Search for the donor to associate with this anonymous donation.
+      Loyalty points will be recalculated and awarded upon confirmation.
+    </p>
+    <div class="search-bar" style="margin-bottom: 10px">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="associateSearchQ()" (ngModelChange)="associateSearchQ.set($event)" placeholder="Name or phone number..." />
+    </div>
+    @for (d of associateResults(); track d.id) {
+      <div class="donor-result"
+           [class.selected]="associatedDonor()?.id === d.id"
+           (click)="associatedDonor.set(d)">
+        <div class="d-av">{{ d.initials }}</div>
+        <div class="dr-info">
+          <div class="dr-name">{{ d.displayName }}</div>
+          <div class="dr-meta">
+            <app-icon [name]="tierCfg(d.tier).icon" [size]="12"></app-icon>
+            {{ tierCfg(d.tier).label }} · {{ d.points | number }} pts
+          </div>
+        </div>
+        @if (associatedDonor()?.id === d.id) {
+          <span class="badge badge-success">Selected</span>
+        }
+      </div>
+    }
+    @if (associateSearchQ().length > 1 && associateResults().length === 0) {
+      <div style="text-align: center; padding: 20px; color: var(--gray-500); font-size: 13px">
+        No donors found for "{{ associateSearchQ() }}"
+      </div>
+    }
   </div>
 </app-modal>

@@ -15,6 +15,12 @@ export enum AppointmentStatus { Scheduled = 1, CheckedIn, Completed, Cancelled, 
 export enum AppointmentType   { WalkIn = 1, Scheduled, Pickup }
 export enum DonationType      { Items = 1, Monetary, Both }
 
+// ── Phase 1 enums ────────────────────────────────────────────────────────────
+export enum PointsCalcMethod   { PerItem = 1, PerWeight }   // PerWeight disabled by default
+export enum RewardStatus        { Active = 1, Redeemed, Gifted, Expired }
+export enum CampaignStatus      { Draft = 1, Active, Paused, Completed }
+export enum NotificationChannel { Email = 1, SMS, Both }
+
 // ── Display label maps (used by components and templates) ────────────────────
 export const DonorTierLabel: Record<DonorTier, string> = {
   [DonorTier.Bronze]:   'Bronze',
@@ -87,6 +93,100 @@ export const DonationTypeLabel: Record<DonationType, string> = {
   [DonationType.Monetary]: 'Monetary Donation',
   [DonationType.Both]:     'Items & Monetary',
 };
+export const RewardStatusLabel: Record<RewardStatus, string> = {
+  [RewardStatus.Active]:   'Active',
+  [RewardStatus.Redeemed]: 'Redeemed',
+  [RewardStatus.Gifted]:   'Gifted',
+  [RewardStatus.Expired]:  'Expired',
+};
+export const CampaignStatusLabel: Record<CampaignStatus, string> = {
+  [CampaignStatus.Draft]:     'Draft',
+  [CampaignStatus.Active]:    'Active',
+  [CampaignStatus.Paused]:    'Paused',
+  [CampaignStatus.Completed]: 'Completed',
+};
+export const NotificationChannelLabel: Record<NotificationChannel, string> = {
+  [NotificationChannel.Email]: 'Email',
+  [NotificationChannel.SMS]:   'SMS',
+  [NotificationChannel.Both]:  'Email & SMS',
+};
+
+// ── Phase 1 interfaces ────────────────────────────────────────────────────────
+
+/** System-wide configuration flags (Req 2, 3, 4) */
+export interface AppConfig {
+  isCashAccepted: boolean;
+  associationWindowHours: number;   // Req 1 — how long staff can link an anon donation
+  pointsPerItem: number;            // Req 4
+  pointsCalcMethod: PointsCalcMethod;
+  emailReqs: {
+    forReceipt: boolean;
+    forLogin: boolean;
+    forCampaigns: boolean;
+  };
+}
+
+/** Defines a redeemable reward tier (Req 5) */
+export interface RewardDefinition {
+  id: string;
+  name: string;
+  description: string;
+  pointsRequired: number;
+  discountValue: number;   // dollar discount at POS
+  icon: string;
+  active: boolean;
+  sortOrder: number;
+}
+
+/** Records a single reward redemption or gift (Req 5, 7) */
+export interface RewardTransaction {
+  id: string;
+  donorId: string;
+  donorName: string;
+  definitionId: string;
+  definitionName: string;
+  pointsDeducted: number;
+  status: RewardStatus;
+  createdAt: Date;
+  redeemedAt?: Date;
+  giftedToName?: string;       // Req 7
+  giftedToContact?: string;    // phone or email of recipient
+}
+
+/** A single targeting criterion for a campaign (Req 6) */
+export interface CampaignTargetCriteria {
+  categoryKey?: string;
+  categoryName?: string;
+  subCategoryKey?: string;
+  subCategoryName?: string;
+  attributeKey?: string;    // future: e.g. "color"
+  attributeValue?: string;  // future: e.g. "Red"
+}
+
+/** A log entry from a campaign notification run (Req 6) */
+export interface CampaignNotification {
+  donorId: string;
+  donorName: string;
+  channel: NotificationChannel;
+  sentAt: Date;
+  success: boolean;
+  failureReason?: string;
+}
+
+/** A donor-targeting campaign (Req 6) */
+export interface Campaign {
+  id: string;
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  status: CampaignStatus;
+  channel: NotificationChannel;
+  targetCriteria: CampaignTargetCriteria[];
+  notificationHistory: CampaignNotification[];
+  createdAt: Date;
+  createdByStaffId: string;
+}
 
 export interface Donor {
   id: string;
@@ -172,6 +272,10 @@ export interface Donation {
   presortCompleted?: boolean;
   isPreSorted?: boolean;
   notes?: string;
+  /** Req 1 — populated when an anonymous donation is linked to a donor post-payment */
+  associatedDonorId?: string;
+  associatedDonorName?: string;
+  associatedAt?: Date;
 }
 
 export interface ContainerContent {

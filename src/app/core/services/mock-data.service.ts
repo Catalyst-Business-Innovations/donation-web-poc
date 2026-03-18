@@ -1,4 +1,4 @@
-﻿import { Injectable, inject } from '@angular/core';
+﻿import { Injectable, inject, signal } from '@angular/core';
 import {
   Donor,
   Location,
@@ -20,7 +20,16 @@ import {
   LocationStatus,
   StaffRole,
   AppointmentStatus,
-  AppointmentType
+  AppointmentType,
+  AppConfig,
+  PointsCalcMethod,
+  RewardDefinition,
+  RewardTransaction,
+  RewardStatus,
+  Campaign,
+  CampaignStatus,
+  CampaignNotification,
+  NotificationChannel,
 } from '../models/domain.models';
 import { StorageService } from './storage.service';
 import { PresortQueueItem } from '../../modules/staff-portal/features/presort/models/presort.models';
@@ -36,6 +45,83 @@ export class MockDataService {
     locationId: 'loc-001',
     locationName: 'Downtown Store'
   };
+
+  // ── Phase 1: System config (Req 2, 3, 4) ──────────────────────────────────
+  readonly appConfig = signal<AppConfig>({
+    isCashAccepted: true,
+    associationWindowHours: 24,
+    pointsPerItem: 10,
+    pointsCalcMethod: PointsCalcMethod.PerItem,
+    emailReqs: {
+      forReceipt: false,
+      forLogin: false,
+      forCampaigns: true,
+    },
+  });
+
+  updateAppConfig(patch: Partial<AppConfig>): void {
+    this.appConfig.update(c => ({ ...c, ...patch }));
+  }
+
+  // ── Phase 1: Reward definitions seed data (Req 5) ─────────────────────────
+  private _rewardDefs = signal<RewardDefinition[]>([
+    { id: 'rd-001', name: '$5 Discount',   description: 'Redeemable at POS',  pointsRequired: 100,  discountValue: 5,   icon: '🏷️', active: true,  sortOrder: 1 },
+    { id: 'rd-002', name: '$10 Discount',  description: 'Redeemable at POS',  pointsRequired: 200,  discountValue: 10,  icon: '🏷️', active: true,  sortOrder: 2 },
+    { id: 'rd-003', name: '$25 Discount',  description: 'Redeemable at POS',  pointsRequired: 450,  discountValue: 25,  icon: '🎟️', active: true,  sortOrder: 3 },
+    { id: 'rd-004', name: 'Free Pickup',   description: 'One free pickup',     pointsRequired: 300,  discountValue: 0,   icon: '🚚', active: true,  sortOrder: 4 },
+    { id: 'rd-005', name: '$50 Gift Card', description: 'Partner gift card',   pointsRequired: 900,  discountValue: 50,  icon: '🎁', active: true,  sortOrder: 5 },
+  ]);
+  readonly rewardDefinitions = this._rewardDefs.asReadonly();
+
+  // ── Phase 1: Reward transactions seed data (Req 5, 7) ─────────────────────
+  private _rewardTxns = signal<RewardTransaction[]>([
+    {
+      id: 'rtx-001', donorId: 'd-001', donorName: 'Michael Johnson',
+      definitionId: 'rd-001', definitionName: '$5 Discount', pointsDeducted: 100,
+      status: RewardStatus.Redeemed, createdAt: new Date('2026-03-10'), redeemedAt: new Date('2026-03-10'),
+    },
+    {
+      id: 'rtx-002', donorId: 'd-002', donorName: 'Sarah Williams',
+      definitionId: 'rd-002', definitionName: '$10 Discount', pointsDeducted: 200,
+      status: RewardStatus.Gifted, createdAt: new Date('2026-03-12'),
+      giftedToName: 'Emma Williams', giftedToContact: 'emma.w@email.com',
+    },
+  ]);
+  readonly rewardTransactions = this._rewardTxns.asReadonly();
+
+  // ── Phase 1: Campaign seed data (Req 6) ───────────────────────────────────
+  private _campaigns = signal<Campaign[]>([
+    {
+      id: 'cmp-001',
+      name: 'Winter Jacket Drive',
+      description: 'Reach donors who have given winter clothing in the past',
+      startDate: new Date('2026-04-01'),
+      endDate: new Date('2026-04-30'),
+      status: CampaignStatus.Draft,
+      channel: NotificationChannel.Email,
+      targetCriteria: [{ categoryKey: 'clothing', categoryName: 'Clothing', subCategoryKey: 'womens', subCategoryName: "Women's" }],
+      notificationHistory: [],
+      createdAt: new Date('2026-03-18'),
+      createdByStaffId: 'staff-001',
+    },
+    {
+      id: 'cmp-002',
+      name: 'Electronics Recycling Push',
+      description: 'Encourage electronics donors to donate again',
+      startDate: new Date('2026-03-20'),
+      endDate: new Date('2026-03-31'),
+      status: CampaignStatus.Active,
+      channel: NotificationChannel.Both,
+      targetCriteria: [{ categoryKey: 'electronics', categoryName: 'Electronics' }],
+      notificationHistory: [
+        { donorId: 'd-005', donorName: 'David Chen',       channel: NotificationChannel.Email, sentAt: new Date('2026-03-20'), success: true },
+        { donorId: 'd-010', donorName: 'Lisa Anderson',    channel: NotificationChannel.SMS,   sentAt: new Date('2026-03-20'), success: true },
+      ],
+      createdAt: new Date('2026-03-15'),
+      createdByStaffId: 'staff-001',
+    },
+  ]);
+  readonly campaigns = this._campaigns.asReadonly();
 
   readonly loyaltyTiers: LoyaltyTierConfig[] = [
     {
@@ -1635,6 +1721,180 @@ export class MockDataService {
       status: AppointmentStatus.Scheduled,
       createdAt: new Date()
     };
+  }
+
+  // ── Phase 1: Loyalty point calculation (Req 4) ────────────────────────────
+
+  calculatePoints(itemCount: number): number {
+    return itemCount * this.appConfig().pointsPerItem;
+  }
+
+  // ── Phase 1: Donor association (Req 1) ────────────────────────────────────
+
+  /**
+   * Returns true if the donation is eligible for donor association:
+   * - status is Completed
+   * - has no existing donorId or associatedDonorId
+   * - within the configurable window
+   */
+  canAssociateDonor(donation: Donation): boolean {
+    if (donation.status !== DonationStatus.Completed) return false;
+    if (donation.donorId || donation.associatedDonorId)  return false;
+    const windowMs = this.appConfig().associationWindowHours * 60 * 60 * 1000;
+    return (Date.now() - donation.timestamp.getTime()) <= windowMs;
+  }
+
+  /**
+   * Associates an anonymous donation with a donor.
+   * Updates the donation record and recalculates loyalty points.
+   * Returns the updated donation, or null if ineligible.
+   */
+  associateDonorToDonation(donationId: string, donorId: string): Donation | null {
+    const donor = this.donors.find(d => d.id === donorId);
+    if (!donor) return null;
+
+    const allDonations = this.donations;
+    const target = allDonations.find((d: Donation) => d.id === donationId);
+    if (!target || !this.canAssociateDonor(target)) return null;
+
+    const recalcPoints = this.calculatePoints(target.totalItems);
+    const updated: Donation = {
+      ...target,
+      associatedDonorId:   donorId,
+      associatedDonorName: `${donor.firstName} ${donor.lastName}`,
+      associatedAt:        new Date(),
+      loyaltyPointsEarned: recalcPoints,
+    };
+    return updated;
+  }
+
+  // ── Phase 1: Reward definitions management (Req 5) ────────────────────────
+
+  addRewardDefinition(def: Omit<RewardDefinition, 'id'>): RewardDefinition {
+    const newDef: RewardDefinition = { ...def, id: `rd-${Date.now()}` };
+    this._rewardDefs.update(list => [...list, newDef]);
+    return newDef;
+  }
+
+  updateRewardDefinition(id: string, patch: Partial<RewardDefinition>): void {
+    this._rewardDefs.update(list =>
+      list.map(d => d.id === id ? { ...d, ...patch } : d)
+    );
+  }
+
+  removeRewardDefinition(id: string): void {
+    this._rewardDefs.update(list => list.filter(d => d.id !== id));
+  }
+
+  // ── Phase 1: Reward redemption (Req 5) ────────────────────────────────────
+
+  /**
+   * Redeems a reward for a donor.
+   * Deducts points and records a RewardTransaction.
+   * Returns the new transaction or null if donor has insufficient points.
+   */
+  redeemReward(donorId: string, definitionId: string): RewardTransaction | null {
+    const donor = this.donors.find(d => d.id === donorId);
+    const def   = this._rewardDefs().find(d => d.id === definitionId);
+    if (!donor || !def || !def.active)              return null;
+    if (donor.loyaltyPoints < def.pointsRequired)   return null;
+
+    // Deduct points (mock — mutate in-place since donors is readonly array)
+    (donor as any).loyaltyPoints -= def.pointsRequired;
+
+    const txn: RewardTransaction = {
+      id:             `rtx-${Date.now()}`,
+      donorId,
+      donorName:      `${donor.firstName} ${donor.lastName}`,
+      definitionId,
+      definitionName: def.name,
+      pointsDeducted: def.pointsRequired,
+      status:         RewardStatus.Redeemed,
+      createdAt:      new Date(),
+      redeemedAt:     new Date(),
+    };
+    this._rewardTxns.update(list => [txn, ...list]);
+    return txn;
+  }
+
+  // ── Phase 1: Reward gifting (Req 7) ───────────────────────────────────────
+
+  /**
+   * Gifts a reward to another recipient.
+   * The sender's balance is already deducted at redemption time.
+   * This updates the transaction status and records recipient details.
+   */
+  giftReward(transactionId: string, recipientName: string, recipientContact: string): boolean {
+    let found = false;
+    this._rewardTxns.update(list =>
+      list.map(t => {
+        if (t.id === transactionId && t.status === RewardStatus.Active) {
+          found = true;
+          return { ...t, status: RewardStatus.Gifted, giftedToName: recipientName, giftedToContact: recipientContact };
+        }
+        return t;
+      })
+    );
+    return found;
+  }
+
+  getRewardTransactionsForDonor(donorId: string): RewardTransaction[] {
+    return this._rewardTxns().filter(t => t.donorId === donorId);
+  }
+
+  // ── Phase 1: Campaign management (Req 6) ──────────────────────────────────
+
+  createCampaign(campaign: Omit<Campaign, 'id' | 'notificationHistory' | 'createdAt'>): Campaign {
+    const newCampaign: Campaign = {
+      ...campaign,
+      id:                  `cmp-${Date.now()}`,
+      notificationHistory: [],
+      createdAt:           new Date(),
+    };
+    this._campaigns.update(list => [newCampaign, ...list]);
+    return newCampaign;
+  }
+
+  updateCampaign(id: string, patch: Partial<Campaign>): void {
+    this._campaigns.update(list =>
+      list.map(c => c.id === id ? { ...c, ...patch } : c)
+    );
+  }
+
+  /**
+   * Executes a campaign: finds eligible donors by targetCriteria,
+   * simulates sending notifications, and appends to notificationHistory.
+   */
+  executeCampaign(campaignId: string): CampaignNotification[] {
+    const campaign = this._campaigns().find(c => c.id === campaignId);
+    if (!campaign || campaign.status !== CampaignStatus.Active) return [];
+
+    const cfg = this.appConfig();
+
+    // Find donors who have donated items matching any criterion
+    const eligibleDonors = this.donors.filter(donor => {
+      // Exclude donors missing email when required for campaigns
+      if (cfg.emailReqs.forCampaigns && !donor.email) return false;
+      // All known donors are eligible in this mock (real: query donation history)
+      return true;
+    });
+
+    const now = new Date();
+    const newNotifications: CampaignNotification[] = eligibleDonors.map(donor => ({
+      donorId:   donor.id,
+      donorName: `${donor.firstName} ${donor.lastName}`,
+      channel:   campaign.channel,
+      sentAt:    now,
+      success:   Math.random() > 0.05, // 95% success rate simulation
+    }));
+
+    this._campaigns.update(list =>
+      list.map(c => c.id === campaignId
+        ? { ...c, status: CampaignStatus.Active, notificationHistory: [...c.notificationHistory, ...newNotifications] }
+        : c
+      )
+    );
+    return newNotifications;
   }
 }
 

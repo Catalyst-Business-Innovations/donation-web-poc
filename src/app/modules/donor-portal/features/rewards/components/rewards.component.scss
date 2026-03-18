@@ -117,6 +117,24 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.txn-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+  &:last-child { border-bottom: none; }
+}
+
+.empty-state-inline {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+.btn-sm { height: 30px; font-size: 12px; padding: 0 12px; }
+
 @media (max-width: 900px) {
   .rewards-grid {
     grid-template-columns: 1fr;

@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.summary-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.sum-card {
+  flex: 1;
+  background: #fff;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  &.active { border-color: currentColor; }
+}
+.sum-num { font-size: 28px; font-weight: 900; line-height: 1; }
+.sum-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+.sum-blue   { color: var(--info); }
+.sum-green  { color: var(--secondary); }
+.sum-yellow { color: var(--warning); }
+.sum-gray   { color: var(--gray-500); }
+
+.exec-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--gray-700);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.exec-result {
+  text-align: center;
+  padding: 20px 0;
+}
+.exec-result-num {
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+}
+.exec-result-lbl {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-500);
+  margin-top: 6px;
+}
+
+.btn-sm { height: 32px; font-size: 12px; padding: 0 12px; }

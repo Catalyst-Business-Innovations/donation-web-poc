@@ -15,7 +15,7 @@
           @if (showCancel) {
             <button class="btn btn-secondary" (click)="closed.emit()">{{ effectiveCancelLabel }}</button>
           }
-          <button class="btn btn-{{ confirmVariant }}" (click)="confirmed.emit()">{{ effectiveConfirmLabel }}</button>
+          <button class="btn btn-{{ confirmVariant }}" [disabled]="confirmDisabled" (click)="confirmed.emit()">{{ effectiveConfirmLabel }}</button>
         </div>
       }
     </div>

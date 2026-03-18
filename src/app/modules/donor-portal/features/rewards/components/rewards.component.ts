@@ -1,16 +1,17 @@
-import { Component, inject, signal } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
+import { Component, inject, signal, computed } from '@angular/core';
+import { DecimalPipe, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MockDataService } from '../../../../../core/services/mock-data.service';
 import { ToastService } from '../../../../../core/services/toast.service';
-import { RewardsMapper, RewardItem, PointsEntry, CommunityGift } from '../models/rewards.models';
-import { DonorTier } from '../../../../../core/models/domain.models';
+import { RewardsMapper } from '../models/rewards.models';
+import { DonorTier, RewardDefinition, RewardTransaction, RewardStatus } from '../../../../../core/models/domain.models';
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-rewards',
   standalone: true,
-  imports: [DecimalPipe, ModalComponent, IconComponent],
+  imports: [DecimalPipe, DatePipe, FormsModule, ModalComponent, IconComponent],
   templateUrl: './rewards.component.html',
   styleUrl: './rewards.component.scss'
 })
@@ -19,8 +20,32 @@ export class RewardsComponent {
   protected toast = inject(ToastService);
   protected donor = this.svc.donors[0];
   protected tier = this.svc.getTier(this.donor.loyaltyTier);
+  protected readonly RS = RewardStatus;
+
+  // Redeem modal
   protected showRedeemModal = signal(false);
-  protected selectedReward = signal<RewardItem | null>(null);
+  protected selectedDef = signal<RewardDefinition | null>(null);
+
+  // Gift modal
+  protected showGiftModal = signal(false);
+  protected giftingTxn = signal<RewardTransaction | null>(null);
+  protected giftName = signal('');
+  protected giftContact = signal('');
+
+  // Active reward definitions from service
+  readonly catalogue = computed(() =>
+    this.svc.rewardDefinitions().filter(r => r.active).sort((a, b) => a.sortOrder - b.sortOrder)
+  );
+
+  // Real transaction history for this donor
+  readonly txnHistory = computed(() =>
+    this.svc.getRewardTransactionsForDonor(this.donor.id)
+  );
+
+  // Redeemed (but not yet gifted) transactions
+  readonly redeemableTxns = computed(() =>
+    this.txnHistory().filter(t => t.status === RewardStatus.Redeemed)
+  );
 
   get nextTier() {
     const idx = this.svc.loyaltyTiers.findIndex(t => t.tier === this.donor.loyaltyTier);
@@ -31,44 +56,71 @@ export class RewardsComponent {
     return RewardsMapper.isAchieved(this.donor.loyaltyTier, t);
   }
 
-  readonly catalogue: RewardItem[] = [
-    { icon: 'star', title: 'Store Discount Voucher', desc: '10% off next in-store purchase', cost: 200 },
-    { icon: 'file-text', title: 'Impact Certificate', desc: 'Personalized digital certificate', cost: 50 },
-    { icon: 'gift', title: 'VIP Shopping Day', desc: 'Early access to new arrivals', cost: 500 },
-    { icon: 'trending-up', title: 'Community Recognition', desc: 'Featured on donor wall of fame', cost: 1000 },
-    { icon: 'gift', title: 'Surprise Gift Box', desc: 'Curated items from our team', cost: 750 }
-  ];
-
-  readonly pointsLog: PointsEntry[] = [
-    { icon: 'package', label: 'Donation — Downtown Store', date: 'Mar 1, 2026', delta: 53 },
-    { icon: 'package', label: 'Donation — Downtown Store', date: 'Feb 15, 2026', delta: 28 },
-    { icon: 'gift', label: 'Redeemed: VIP Shopping Day', date: 'Feb 1, 2026', delta: -500 },
-    { icon: 'package', label: 'Donation — Northside Store', date: 'Jan 22, 2026', delta: 116 },
-    { icon: 'star', label: 'Gold Tier Bonus', date: 'Jan 1, 2026', delta: 200 }
-  ];
-
-  readonly causes: CommunityGift[] = [
-    { icon: 'building', name: 'Local Schools Fund', desc: 'Support community education programs' },
-    { icon: 'home', name: 'Food Bank Alliance', desc: 'Fight hunger in our neighborhood' },
-    { icon: 'refresh', name: 'Green Planet Initiative', desc: 'Environmental sustainability programs' }
-  ];
-
-  openRedeemModal(r: RewardItem): void {
-    this.selectedReward.set(r);
+  openRedeemModal(def: RewardDefinition): void {
+    this.selectedDef.set(def);
     this.showRedeemModal.set(true);
   }
 
   confirmRedeem(): void {
-    const r = this.selectedReward();
-    if (!r) return;
+    const def = this.selectedDef();
+    if (!def) return;
+    const txn = this.svc.redeemReward(this.donor.id, def.id);
+    if (txn) {
+      this.toast.success('Redeemed!', `${def.name} redeemed for ${def.pointsRequired.toLocaleString()} pts.`);
+    } else {
+      this.toast.error('Failed', 'Not enough points or reward unavailable.');
+    }
     this.showRedeemModal.set(false);
-    this.toast.success('Redeemed!', `${r.title} redeemed for ${r.cost.toLocaleString()} points.`);
-    // Update donor points (in real app, this would be an API call)
-    this.donor.loyaltyPoints -= r.cost;
+    this.selectedDef.set(null);
   }
 
   closeRedeemModal(): void {
     this.showRedeemModal.set(false);
-    this.selectedReward.set(null);
+    this.selectedDef.set(null);
+  }
+
+  openGiftModal(txn: RewardTransaction): void {
+    this.giftingTxn.set(txn);
+    this.giftName.set('');
+    this.giftContact.set('');
+    this.showGiftModal.set(true);
+  }
+
+  confirmGift(): void {
+    const txn = this.giftingTxn();
+    if (!txn || !this.giftName().trim() || !this.giftContact().trim()) return;
+    const ok = this.svc.giftReward(txn.id, this.giftName().trim(), this.giftContact().trim());
+    if (ok) {
+      this.toast.success('Gifted!', `Reward gifted to ${this.giftName()}.`);
+    } else {
+      this.toast.error('Failed', 'Could not gift this reward.');
+    }
+    this.showGiftModal.set(false);
+    this.giftingTxn.set(null);
+  }
+
+  closeGiftModal(): void {
+    this.showGiftModal.set(false);
+    this.giftingTxn.set(null);
+  }
+
+  txnStatusBadge(s: RewardStatus): string {
+    const m: Record<RewardStatus, string> = {
+      [RewardStatus.Active]:   'badge-info',
+      [RewardStatus.Redeemed]: 'badge-success',
+      [RewardStatus.Gifted]:   'badge-purple',
+      [RewardStatus.Expired]:  'badge-gray',
+    };
+    return m[s] ?? 'badge-gray';
+  }
+
+  txnStatusLabel(s: RewardStatus): string {
+    const m: Record<RewardStatus, string> = {
+      [RewardStatus.Active]:   'Active',
+      [RewardStatus.Redeemed]: 'Redeemed',
+      [RewardStatus.Gifted]:   'Gifted',
+      [RewardStatus.Expired]:  'Expired',
+    };
+    return m[s] ?? String(s);
   }
 }

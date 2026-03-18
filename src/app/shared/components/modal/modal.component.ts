@@ -19,6 +19,7 @@ export class ModalComponent {
   @Input() confirmVariant = 'primary';
   @Input() showFooter = true;
   @Input() showCancel = true;
+  @Input() confirmDisabled = false;
   @Input() size: 'sm' | 'md' | 'lg' = 'md';
   @Output() closed = new EventEmitter<void>();
   @Output() confirmed = new EventEmitter<void>();

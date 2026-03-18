@@ -61,5 +61,10 @@ export const staffRoutes: Routes = [
     path: 'settings',
     data: { breadcrumb: 'System Settings' },
     loadComponent: () => import('./features/settings/components/settings.component').then(m => m.SettingsComponent)
+  },
+  {
+    path: 'campaigns',
+    data: { breadcrumb: 'Campaigns' },
+    loadComponent: () => import('./features/campaigns/components/campaigns.component').then(m => m.CampaignsComponent)
   }
 ];

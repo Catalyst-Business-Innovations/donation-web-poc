@@ -4,16 +4,26 @@ import { ToastService } from '../../../../../core/services/toast.service';
 import { MockDataService } from '../../../../../core/services/mock-data.service';
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
-import { NotifSetting, Integration, OrgSettings } from '../models/settings.models';
-import { DonationCategory } from '../../../../../core/models/domain.models';
+import { NotifSetting, Integration, OrgSettings, SystemRulesSettings } from '../models/settings.models';
+import { DonationCategory, RewardDefinition } from '../../../../../core/models/domain.models';
 
-type ModalMode = 'add-category' | 'edit-category' | 'configure-integration' | null;
+type ModalMode = 'add-category' | 'edit-category' | 'configure-integration' | 'add-reward' | 'edit-reward' | null;
 
 interface CategoryForm {
   key: string;
   name: string;
   icon: string;
   estimatedValue: number;
+}
+
+interface RewardForm {
+  name: string;
+  description: string;
+  pointsRequired: number;
+  discountValue: number;
+  icon: string;
+  active: boolean;
+  sortOrder: number;
 }
 
 @Component({
@@ -30,7 +40,21 @@ export class SettingsComponent {
   protected modalMode = signal<ModalMode>(null);
   protected selectedCategory = signal<DonationCategory | null>(null);
   protected selectedIntegration = signal<Integration | null>(null);
+  protected selectedReward = signal<RewardDefinition | null>(null);
   protected categoryForm: CategoryForm = { key: '', name: '', icon: '', estimatedValue: 0 };
+  protected rewardForm: RewardForm = { name: '', description: '', pointsRequired: 0, discountValue: 0, icon: '🏷️', active: true, sortOrder: 0 };
+
+  // Phase 2 — System Rules (Req 2, 3, 4)
+  readonly cfg = this.svc.appConfig;
+
+  systemRules: SystemRulesSettings = {
+    isCashAccepted:     this.svc.appConfig().isCashAccepted,
+    associationWindowHours: this.svc.appConfig().associationWindowHours,
+    pointsPerItem:      this.svc.appConfig().pointsPerItem,
+    emailForReceipt:    this.svc.appConfig().emailReqs.forReceipt,
+    emailForLogin:      this.svc.appConfig().emailReqs.forLogin,
+    emailForCampaigns:  this.svc.appConfig().emailReqs.forCampaigns,
+  };
 
   tierCopies = this.svc.loyaltyTiers.map(t => ({ ...t }));
 
@@ -59,6 +83,55 @@ export class SettingsComponent {
 
   save(section: string): void {
     this.toast.success('Saved!', `${section} updated.`);
+  }
+
+  saveSystemRules(): void {
+    this.svc.updateAppConfig({
+      isCashAccepted:         this.systemRules.isCashAccepted,
+      associationWindowHours: this.systemRules.associationWindowHours,
+      pointsPerItem:          this.systemRules.pointsPerItem,
+      emailReqs: {
+        forReceipt:   this.systemRules.emailForReceipt,
+        forLogin:     this.systemRules.emailForLogin,
+        forCampaigns: this.systemRules.emailForCampaigns,
+      },
+    });
+    this.toast.success('Saved!', 'System rules updated.');
+  }
+
+  // Reward definition modal actions
+  openAddRewardModal(): void {
+    this.rewardForm = { name: '', description: 'Redeemable at POS', pointsRequired: 100, discountValue: 5, icon: '🏷️', active: true, sortOrder: this.svc.rewardDefinitions().length + 1 };
+    this.modalMode.set('add-reward');
+  }
+
+  openEditRewardModal(reward: RewardDefinition): void {
+    this.rewardForm = { name: reward.name, description: reward.description, pointsRequired: reward.pointsRequired, discountValue: reward.discountValue, icon: reward.icon, active: reward.active, sortOrder: reward.sortOrder };
+    this.selectedReward.set(reward);
+    this.modalMode.set('edit-reward');
+  }
+
+  saveRewardForm(): void {
+    const { name, pointsRequired } = this.rewardForm;
+    if (!name || pointsRequired <= 0) {
+      this.toast.warning('Missing Info', 'Name and points required are needed.');
+      return;
+    }
+    const mode = this.modalMode();
+    if (mode === 'add-reward') {
+      this.svc.addRewardDefinition(this.rewardForm);
+      this.toast.success('Added!', `Reward "${name}" created.`);
+    } else if (mode === 'edit-reward') {
+      const r = this.selectedReward();
+      if (r) { this.svc.updateRewardDefinition(r.id, this.rewardForm); }
+      this.toast.success('Saved!', `Reward "${name}" updated.`);
+    }
+    this.closeModal();
+  }
+
+  deleteReward(id: string): void {
+    this.svc.removeRewardDefinition(id);
+    this.toast.info('Removed', 'Reward definition deleted.');
   }
 
   // Category modal actions
@@ -117,12 +190,15 @@ export class SettingsComponent {
     this.modalMode.set(null);
     this.selectedCategory.set(null);
     this.selectedIntegration.set(null);
+    this.selectedReward.set(null);
   }
 
   get modalTitle(): string {
     const mode = this.modalMode();
     if (mode === 'add-category') return '➕ Add Category';
     if (mode === 'edit-category') return '✏️ Edit Category';
+    if (mode === 'add-reward') return '➕ Add Reward Tier';
+    if (mode === 'edit-reward') return '✏️ Edit Reward Tier';
     if (mode === 'configure-integration') return `Configure: ${this.selectedIntegration()?.name ?? 'Integration'}`;
     return '';
   }
@@ -131,6 +207,8 @@ export class SettingsComponent {
     const mode = this.modalMode();
     if (mode === 'add-category') return 'Add Category';
     if (mode === 'edit-category') return 'Save Changes';
+    if (mode === 'add-reward') return 'Add Reward';
+    if (mode === 'edit-reward') return 'Save Changes';
     if (mode === 'configure-integration') {
       const int = this.selectedIntegration();
       return int?.connected ? 'Disconnect' : 'Connect';

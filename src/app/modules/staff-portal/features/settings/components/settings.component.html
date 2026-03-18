@@ -30,90 +30,165 @@
       <button class="btn btn-success" style="margin-top: 12px" (click)="save('Loyalty configuration')">Save</button>
     </div>
 
-    <!-- Organisation Settings -->
-    <div class="card">
-      <div class="card-header"><div class="card-title">Organisation</div></div>
-      <div class="form-group" style="margin-bottom: 10px">
-        <label class="form-label">Org Name</label>
-        <input class="form-input" [(ngModel)]="org.orgName" />
-      </div>
-      <div class="form-group" style="margin-bottom: 10px">
-        <label class="form-label">Tax ID (EIN)</label>
-        <input class="form-input" [(ngModel)]="org.taxId" />
-      </div>
-      <div class="form-group" style="margin-bottom: 10px">
-        <label class="form-label">Donor Receipt Message</label>
-        <textarea class="form-input" rows="3" [(ngModel)]="org.receiptMessage" style="resize: vertical"></textarea>
-      </div>
-      <div class="form-group" style="margin-bottom: 10px">
-        <label class="form-label">IRS Disclaimer</label>
-        <textarea class="form-input" rows="2" [(ngModel)]="org.irsDisclaimer" style="resize: vertical"></textarea>
-      </div>
-      <button class="btn btn-success" style="margin-top: 4px" (click)="save('Organisation settings')">Save</button>
-    </div>
+    
 
-    <!-- Donation Categories -->
+    <!-- System Rules (Req 2, 3, 4) -->
     <div class="card">
       <div class="card-header">
-        <div class="card-title">Donation Categories</div>
-        <button class="btn btn-primary btn-sm" (click)="openAddCategoryModal()">+ Add Category</button>
+        <div class="card-title">System Rules</div>
+        <div class="card-subtitle">Cash, association window, points, email requirements</div>
       </div>
-      <div class="cat-list">
-        @for (cat of svc.categories; track cat.key) {
-          <div class="cat-row" [class.inactive]="!cat.active">
-            <span style="font-size: 20px">{{ cat.icon }}</span>
-            <span class="cat-row-name">{{ cat.name }}</span>
-            <span style="font-size: 11px; color: var(--gray-500)">${{ cat.estimatedValue }} est.</span>
-            <span class="badge" [class.badge-success]="cat.active" [class.badge-warning]="!cat.active">
-              {{ cat.active ? 'Active' : 'Inactive' }}
-            </span>
-            <button class="btn-icon" title="Edit" (click)="openEditCategoryModal(cat)">
-              <app-icon name="edit" size="14" />
-            </button>
-          </div>
-        }
-      </div>
-    </div>
 
-    <!-- Notifications -->
-    <div class="card">
-      <div class="card-header"><div class="card-title">Notifications</div></div>
-      @for (n of notifications; track n.key) {
-        <div class="notif-row" (click)="n.enabled = !n.enabled">
-          <div>
-            <div style="font-weight: 600; font-size: 13px">{{ n.label }}</div>
-            <div style="font-size: 11px; color: var(--gray-500); margin-top: 2px">{{ n.desc }}</div>
-          </div>
-          <label class="toggle-label" (click)="$event.stopPropagation()">
-            <input type="checkbox" [(ngModel)]="n.enabled" style="accent-color: var(--primary)" />
-            {{ n.enabled ? 'On' : 'Off' }}
-          </label>
+      <div class="rules-section-label">Payment</div>
+      <div class="rule-row">
+        <div>
+          <div class="rule-label">Accept Cash Donations</div>
+          <div class="rule-desc">Show cash as a payment option at the donation terminal</div>
         </div>
-      }
+        <label class="toggle-label">
+          <input type="checkbox" [(ngModel)]="systemRules.isCashAccepted" style="accent-color: var(--primary)" />
+          {{ systemRules.isCashAccepted ? 'On' : 'Off' }}
+        </label>
+      </div>
+
+      <div class="rules-section-label">Donor Association</div>
+      <div class="rule-row">
+        <div>
+          <div class="rule-label">Association Window</div>
+          <div class="rule-desc">Hours staff can link an anonymous donation to a donor</div>
+        </div>
+        <div class="mini-field">
+          <input type="number" class="form-input mini-in" [(ngModel)]="systemRules.associationWindowHours" min="1" max="168" />
+          <label>hrs</label>
+        </div>
+      </div>
+
+      <div class="rules-section-label">Loyalty Points (Req 4)</div>
+      <div class="rule-row">
+        <div>
+          <div class="rule-label">Points per Item</div>
+          <div class="rule-desc">Loyalty points awarded per donated item</div>
+        </div>
+        <div class="mini-field">
+          <input type="number" class="form-input mini-in" [(ngModel)]="systemRules.pointsPerItem" min="1" />
+          <label>pts</label>
+        </div>
+      </div>
+
+      <div class="rules-section-label">Email Requirements (Req 3)</div>
+      <div class="rule-row" (click)="systemRules.emailForReceipt = !systemRules.emailForReceipt">
+        <div>
+          <div class="rule-label">Required for Receipt</div>
+          <div class="rule-desc">Donor must have email to receive e-receipts</div>
+        </div>
+        <label class="toggle-label" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="systemRules.emailForReceipt" style="accent-color: var(--primary)" />
+          {{ systemRules.emailForReceipt ? 'On' : 'Off' }}
+        </label>
+      </div>
+      <div class="rule-row" (click)="systemRules.emailForLogin = !systemRules.emailForLogin">
+        <div>
+          <div class="rule-label">Required for Portal Login</div>
+          <div class="rule-desc">Donor must have email to access the donor portal</div>
+        </div>
+        <label class="toggle-label" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="systemRules.emailForLogin" style="accent-color: var(--primary)" />
+          {{ systemRules.emailForLogin ? 'On' : 'Off' }}
+        </label>
+      </div>
+      <div class="rule-row" (click)="systemRules.emailForCampaigns = !systemRules.emailForCampaigns">
+        <div>
+          <div class="rule-label">Required for Campaigns</div>
+          <div class="rule-desc">Exclude donors without email from campaign notifications</div>
+        </div>
+        <label class="toggle-label" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="systemRules.emailForCampaigns" style="accent-color: var(--primary)" />
+          {{ systemRules.emailForCampaigns ? 'On' : 'Off' }}
+        </label>
+      </div>
+
+      <button class="btn btn-success" style="margin-top: 14px" (click)="saveSystemRules()">Save System Rules</button>
     </div>
 
-    <!-- Integrations -->
-    <div class="card span-2">
-      <div class="card-header"><div class="card-title">Integrations</div></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px">
-        @for (int of integrations; track int.name) {
-          <div class="int-row">
-            <app-icon [name]="int.icon" [size]="24" style="flex-shrink: 0; color: var(--primary)"></app-icon>
-            <div style="flex: 1; min-width: 0">
-              <div style="font-weight: 700; font-size: 13px">{{ int.name }}</div>
-              <div style="font-size: 11px; color: var(--gray-500)">{{ int.desc }}</div>
-            </div>
-            <span class="badge" [class.badge-success]="int.connected" [class.badge-danger]="!int.connected" style="flex-shrink: 0">
-              {{ int.connected ? 'Connected' : 'Disconnected' }}
-            </span>
-            <button class="btn btn-secondary btn-sm" style="flex-shrink: 0" (click)="openConfigureIntegrationModal(int)">Configure</button>
-          </div>
-        }
+    <!-- Reward Definitions (Req 5) -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Reward Tiers</div>
+        <button class="btn btn-primary btn-sm" (click)="openAddRewardModal()">+ Add Tier</button>
       </div>
+      <table class="reward-table">
+        <thead>
+          <tr>
+            <th>Reward</th>
+            <th style="text-align: right">Points</th>
+            <th style="text-align: right">Value</th>
+            <th style="text-align: center">Active</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of svc.rewardDefinitions(); track r.id) {
+            <tr [class.inactive-row]="!r.active">
+              <td>
+                <span style="margin-right: 6px">{{ r.icon }}</span>
+                <span style="font-weight: 600">{{ r.name }}</span>
+                <div style="font-size: 11px; color: var(--gray-500)">{{ r.description }}</div>
+              </td>
+              <td style="text-align: right; font-weight: 700; color: var(--primary)">{{ r.pointsRequired }}</td>
+              <td style="text-align: right">{{ r.discountValue > 0 ? '$' + r.discountValue : '—' }}</td>
+              <td style="text-align: center">
+                <span class="badge" [class.badge-success]="r.active" [class.badge-warning]="!r.active">
+                  {{ r.active ? 'Active' : 'Off' }}
+                </span>
+              </td>
+              <td style="text-align: right; white-space: nowrap">
+                <button class="btn-icon" title="Edit" (click)="openEditRewardModal(r)"><app-icon name="edit" size="14" /></button>
+                <button class="btn-icon" title="Delete" style="color: var(--danger)" (click)="deleteReward(r.id)"><app-icon name="delete" size="14" /></button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
 
   </div>
 </div>
+
+<!-- Add/Edit Reward Modal -->
+<app-modal
+  [open]="modalMode() === 'add-reward' || modalMode() === 'edit-reward'"
+  [title]="modalTitle"
+  [confirmLabel]="confirmLabel"
+  (closed)="closeModal()"
+  (confirmed)="saveRewardForm()"
+>
+  <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label">Reward Name *</label>
+      <input class="form-input" [(ngModel)]="rewardForm.name" placeholder="e.g., $5 Discount" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Icon (Emoji)</label>
+      <input class="form-input" [(ngModel)]="rewardForm.icon" placeholder="🏷️" maxlength="4" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Points Required *</label>
+      <input type="number" class="form-input" [(ngModel)]="rewardForm.pointsRequired" min="1" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Discount Value ($)</label>
+      <input type="number" class="form-input" [(ngModel)]="rewardForm.discountValue" min="0" step="0.5" />
+    </div>
+    <div class="form-group" style="grid-column: span 2">
+      <label class="form-label">Description</label>
+      <input class="form-input" [(ngModel)]="rewardForm.description" placeholder="Redeemable at POS" />
+    </div>
+    <div class="form-group" style="grid-column: span 2; display: flex; align-items: center; gap: 10px">
+      <input type="checkbox" [(ngModel)]="rewardForm.active" style="accent-color: var(--primary)" />
+      <label class="form-label" style="margin: 0">Active (visible to donors)</label>
+    </div>
+  </div>
+</app-modal>
 
 <!-- Add/Edit Category Modal -->
 <app-modal

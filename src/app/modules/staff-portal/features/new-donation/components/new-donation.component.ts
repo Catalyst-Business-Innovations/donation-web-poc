@@ -6,7 +6,7 @@ import { MockDataService } from '../../../../../core/services/mock-data.service'
 import { ToastService } from '../../../../../core/services/toast.service';
 import { NewDonationMapper } from '../models/new-donation.mapper';
 import { SelectedDonor, EnrollForm } from '../models/new-donation.state';
-import { DonorTier, ScheduledAppointment, AppointmentStatus, AppointmentStatusLabel, Container, ContainerStatus, ContainerStatusLabel, ContainerType, ContainerTypeLabel, DonationType, ReceiptDelivery } from '../../../../../core/models/domain.models';
+import { DonorTier, ScheduledAppointment, AppointmentStatus, AppointmentStatusLabel, Container, ContainerStatus, ContainerStatusLabel, ContainerType, ContainerTypeLabel, DonationType, ReceiptDelivery, Donor } from '../../../../../core/models/domain.models';
 
 import { ModalComponent } from '../../../../../shared/components/modal/modal.component';
 import { IconComponent, IconName } from '../../../../../shared/components/icon/icon.component';
@@ -46,6 +46,21 @@ export class NewDonationComponent {
   protected showConfirmation = signal(false);
   protected donationId = signal<string>('');
   protected readonly today = new Date();
+
+  // Phase 2 — Post-payment donor association (Req 1)
+  protected showAssociateModal = signal(false);
+  protected associateSearchQ = signal('');
+  protected associatedDonor = signal<SelectedDonor | null>(null);
+
+  readonly isCashAccepted = computed(() => this.mockData.appConfig().isCashAccepted);
+
+  readonly associateResults = computed<SelectedDonor[]>(() => {
+    const q = this.associateSearchQ().toLowerCase();
+    if (q.length < 2) return [];
+    return this.mockData.donors
+      .filter(d => `${d.firstName} ${d.lastName} ${d.phone}`.toLowerCase().includes(q))
+      .map(NewDonationMapper.donorToSelected);
+  });
 
   protected enrollForm: EnrollForm = { firstName: '', lastName: '', phone: '', email: '' };
 
@@ -312,6 +327,16 @@ export class NewDonationComponent {
     this.customMon.set(false);
     this.paymentMethod.set(null);
     this.cashTendered.set(null);
+  }
+
+  confirmAssociation(): void {
+    const donor = this.associatedDonor();
+    if (!donor) return;
+    this.mockData.associateDonorToDonation(this.donationId(), donor.id);
+    this.toast.success('Donor Linked!', `Donation associated with ${donor.displayName}.`);
+    this.showAssociateModal.set(false);
+    this.associatedDonor.set(null);
+    this.associateSearchQ.set('');
   }
 
   cancel(): void {

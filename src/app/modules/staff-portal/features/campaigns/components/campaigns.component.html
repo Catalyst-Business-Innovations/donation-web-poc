@@ -1,0 +1,191 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Campaigns</div>
+    <div class="topbar-subtitle">Donor notification campaigns by category interest</div>
+  </div>
+  <button class="btn btn-primary" (click)="openAdd()">
+    <app-icon name="plus" size="15" /> New Campaign
+  </button>
+</div>
+
+<div class="page-content">
+
+  <!-- Summary cards -->
+  <div class="summary-row">
+    <div class="sum-card sum-gray" [class.active]="statusFilter() === CS.Draft" (click)="statusFilter.set(statusFilter() === CS.Draft ? '' : CS.Draft)">
+      <div class="sum-num">{{ counts().draft }}</div>
+      <div class="sum-lbl">Draft</div>
+    </div>
+    <div class="sum-card sum-green" [class.active]="statusFilter() === CS.Active" (click)="statusFilter.set(statusFilter() === CS.Active ? '' : CS.Active)">
+      <div class="sum-num">{{ counts().active }}</div>
+      <div class="sum-lbl">Active</div>
+    </div>
+    <div class="sum-card sum-yellow" [class.active]="statusFilter() === CS.Paused" (click)="statusFilter.set(statusFilter() === CS.Paused ? '' : CS.Paused)">
+      <div class="sum-num">{{ counts().paused }}</div>
+      <div class="sum-lbl">Paused</div>
+    </div>
+    <div class="sum-card sum-blue" [class.active]="statusFilter() === CS.Completed" (click)="statusFilter.set(statusFilter() === CS.Completed ? '' : CS.Completed)">
+      <div class="sum-num">{{ counts().completed }}</div>
+      <div class="sum-lbl">Completed</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-bar" style="flex: 1; max-width: 380px">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search campaign name or description…" />
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Campaign</th>
+            <th>Channel</th>
+            <th>Date Range</th>
+            <th>Status</th>
+            <th>Sent</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of filtered(); track c.id) {
+            <tr>
+              <td>
+                <div style="font-weight: 700; font-size: 13px">{{ c.name }}</div>
+                <div style="font-size: 11px; color: var(--gray-500)">{{ c.description }}</div>
+              </td>
+              <td><span class="badge badge-info" style="font-size: 11px">{{ channelLabel(c.channel) }}</span></td>
+              <td style="font-size: 12px">
+                {{ c.startDate | date: 'MMM d' }} – {{ c.endDate | date: 'MMM d, yyyy' }}
+              </td>
+              <td><span class="badge {{ statusBadge(c.status) }}">{{ statusLabel(c.status) }}</span></td>
+              <td style="font-weight: 700">
+                @if (c.notificationHistory.length > 0) {
+                  {{ c.notificationHistory.length }}
+                } @else {
+                  —
+                }
+              </td>
+              <td>
+                <div class="table-actions" (click)="$event.stopPropagation()">
+                  @if (c.status === CS.Draft) {
+                    <button class="btn-icon" title="Activate" (click)="activateCampaign(c, $event)">
+                      <app-icon name="check-circle" size="14" />
+                    </button>
+                  }
+                  @if (c.status === CS.Active) {
+                    <button class="btn btn-success btn-sm" (click)="openExecute(c, $event)">
+                      <app-icon name="send" size="13" /> Run
+                    </button>
+                    <button class="btn-icon" title="Pause" (click)="pauseCampaign(c, $event)">
+                      <app-icon name="alert-circle" size="14" />
+                    </button>
+                  }
+                  @if (c.status === CS.Paused) {
+                    <button class="btn-icon" title="Activate" (click)="activateCampaign(c, $event)">
+                      <app-icon name="check-circle" size="14" />
+                    </button>
+                  }
+                  <button class="btn-icon" title="Edit" (click)="openEdit(c, $event)">
+                    <app-icon name="edit" size="14" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (filtered().length === 0) {
+        <div class="empty-state">
+          <div class="empty-state-icon"><app-icon name="send" [size]="40"></app-icon></div>
+          <div class="empty-state-title">No campaigns yet</div>
+          <div class="empty-state-text">Create a campaign to notify donors by category interest.</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Campaign Modal -->
+<app-modal
+  [open]="modalMode() === 'add' || modalMode() === 'edit'"
+  [title]="modalTitle"
+  [confirmLabel]="confirmLabel"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  (closed)="closeModal()"
+  (confirmed)="onModalConfirm()"
+>
+  <div class="form-grid">
+    <div class="form-group" style="grid-column: span 2">
+      <label class="form-label">Campaign Name *</label>
+      <input class="form-input" [(ngModel)]="form.name" placeholder="e.g., Spring Clothing Drive" />
+    </div>
+    <div class="form-group" style="grid-column: span 2">
+      <label class="form-label">Description</label>
+      <input class="form-input" [(ngModel)]="form.description" placeholder="Brief campaign summary…" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Start Date *</label>
+      <input type="date" class="form-input" [(ngModel)]="form.startDate" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">End Date *</label>
+      <input type="date" class="form-input" [(ngModel)]="form.endDate" />
+    </div>
+    <div class="form-group" style="grid-column: span 2">
+      <label class="form-label">Notification Channel</label>
+      <select class="form-select" [(ngModel)]="form.channel">
+        <option [ngValue]="NC.Email">{{ NCLabel[NC.Email] }}</option>
+        <option [ngValue]="NC.SMS">{{ NCLabel[NC.SMS] }}</option>
+        <option [ngValue]="NC.Both">{{ NCLabel[NC.Both] }}</option>
+      </select>
+    </div>
+  </div>
+</app-modal>
+
+<!-- Execute Campaign Modal -->
+<app-modal
+  [open]="modalMode() === 'execute'"
+  [title]="modalTitle"
+  [confirmLabel]="confirmLabel"
+  cancelLabel="Cancel"
+  [showCancel]="!executeResults()"
+  (closed)="closeModal()"
+  (confirmed)="onModalConfirm()"
+>
+  @if (selectedCampaign()) {
+    <div style="padding: 4px 0">
+      @if (!executeResults()) {
+        <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px">
+          This will send <strong>{{ channelLabel(selectedCampaign()!.channel) }}</strong> notifications
+          to all eligible donors for campaign <strong>"{{ selectedCampaign()!.name }}"</strong>.
+        </p>
+        <div class="exec-info-row">
+          <app-icon name="users" size="16" />
+          <span>All donors with email on file will be notified.</span>
+        </div>
+        <div class="exec-info-row" style="color: var(--warning)">
+          <app-icon name="alert-circle" size="16" />
+          <span>This action cannot be undone. Notifications will be sent immediately.</span>
+        </div>
+      } @else {
+        <div class="exec-result">
+          <div class="exec-result-num" style="color: var(--secondary)">{{ executeResults()!.sent }}</div>
+          <div class="exec-result-lbl">Delivered</div>
+        </div>
+        @if (executeResults()!.failed > 0) {
+          <div class="exec-result" style="margin-top: 10px">
+            <div class="exec-result-num" style="color: var(--danger)">{{ executeResults()!.failed }}</div>
+            <div class="exec-result-lbl">Failed</div>
+          </div>
+        }
+      }
+    </div>
+  }
+</app-modal>

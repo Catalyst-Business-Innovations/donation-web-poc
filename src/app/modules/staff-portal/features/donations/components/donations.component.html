@@ -1,12 +1,21 @@
 <div class="topbar">
   <div>
     <div class="topbar-title">Donations</div>
-    <div class="topbar-subtitle">All appointments and walk-ins across all stores</div>
+    <div class="topbar-subtitle">Appointments, walk-ins, and completed donations</div>
+  </div>
+  <div class="tab-switcher">
+    <button class="tab-btn" [class.active]="activeTab() === 'appointments'" (click)="activeTab.set('appointments')">
+      <app-icon name="calendar" size="14" /> Appointments
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'completions'" (click)="activeTab.set('completions')">
+      <app-icon name="check-circle" size="14" /> Completed Donations
+    </button>
   </div>
 </div>
 
 <div class="page-content">
 
+@if (activeTab() === 'appointments') {
   <!-- Summary cards -->
   <div class="summary-row">
     <div class="sum-card sum-blue" [class.active]="statusFilter === AS.Scheduled" (click)="statusFilter = statusFilter === AS.Scheduled ? '' : AS.Scheduled">
@@ -123,6 +132,79 @@
       }
     </div>
   </div>
+} @else {
+  <!-- ═══════════════════════════════════════════════════
+       COMPLETED DONATIONS TAB
+  ════════════════════════════════════════════════════ -->
+  <div class="filters-row" style="margin-bottom: 16px">
+    <div class="search-bar" style="flex: 1; max-width: 380px">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [(ngModel)]="donQuery" placeholder="Search ID, donor name…" />
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Donation ID</th>
+            <th>Donor</th>
+            <th>Date</th>
+            <th>Store</th>
+            <th>Items</th>
+            <th>Status</th>
+            <th>Linked Donor</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of filteredDonations(); track d.id) {
+            <tr>
+              <td><span class="apt-id-cell">{{ d.id }}</span></td>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-name">{{ d.donorName }}</div>
+                  @if (d.donorTier) {
+                    <div class="donor-sub">Tier {{ d.donorTier }}</div>
+                  }
+                </div>
+              </td>
+              <td style="font-size: 13px">{{ d.timestamp | date: 'MMM d, yyyy h:mm a' }}</td>
+              <td style="font-size: 13px">{{ d.locationName }}</td>
+              <td style="font-weight: 700">{{ d.totalItems }}</td>
+              <td><span class="badge {{ donationStatusBadge(d.status) }}">{{ d.status === DS.Completed ? 'Completed' : d.status === DS.Cancelled ? 'Cancelled' : d.status === DS.Processing ? 'Processing' : 'Pending' }}</span></td>
+              <td>
+                @if (d.associatedDonorName) {
+                  <span class="badge badge-success" style="font-size: 11px">{{ d.associatedDonorName }}</span>
+                } @else if (d.donorId) {
+                  <span class="badge badge-info" style="font-size: 11px">{{ d.donorName }}</span>
+                } @else {
+                  <span style="font-size: 12px; color: var(--gray-400)">Anonymous</span>
+                }
+              </td>
+              <td>
+                <div class="table-actions">
+                  @if (mockData.canAssociateDonor(d)) {
+                    <button class="btn btn-secondary btn-sm" title="Link to Donor" (click)="openLinkModal(d, $event)">
+                      <app-icon name="user" size="13" /> Link Donor
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (filteredDonations().length === 0) {
+        <div class="empty-state">
+          <div class="empty-state-icon"><app-icon name="check-circle" [size]="40"></app-icon></div>
+          <div class="empty-state-title">No completed donations found</div>
+          <div class="empty-state-text">Donations created via the New Donation flow will appear here.</div>
+        </div>
+      }
+    </div>
+  </div>
+}
 </div>
 
 <!-- ═══════════════════════════════════════════════════
@@ -240,4 +322,53 @@
       </div>
     </div>
   }
+</app-modal>
+
+<!-- ═══════════════════════════════════════════════════
+     LINK DONOR MODAL (Req 1 / 3C)
+════════════════════════════════════════════════════ -->
+<app-modal
+  [open]="!!linkingDonation()"
+  title="Link Donation to Donor Account"
+  confirmLabel="Confirm Link"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  [confirmDisabled]="!linkSelectedDonor()"
+  (closed)="closeLinkModal()"
+  (confirmed)="confirmLink()"
+>
+  <div style="padding: 4px 0">
+    @if (linkingDonation()) {
+      <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 4px">
+        Linking <strong>{{ linkingDonation()!.id }}</strong> — {{ linkingDonation()!.totalItems }} items
+        on {{ linkingDonation()!.timestamp | date: 'MMM d, yyyy' }}.
+      </p>
+      <p style="font-size: 12px; color: var(--gray-500); margin-bottom: 12px">
+        Loyalty points will be recalculated and awarded on confirmation.
+      </p>
+    }
+    <div class="search-bar" style="margin-bottom: 10px">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="linkSearchQ()" (ngModelChange)="linkSearchQ.set($event)" placeholder="Search donor name or phone…" />
+    </div>
+    @for (d of linkResults(); track d.id) {
+      <div class="donor-result"
+           [class.selected]="linkSelectedDonor()?.id === d.id"
+           (click)="linkSelectedDonor.set(d)">
+        <div class="d-av">{{ d.firstName[0] }}{{ d.lastName[0] }}</div>
+        <div class="dr-info">
+          <div class="dr-name">{{ d.firstName }} {{ d.lastName }}</div>
+          <div class="dr-meta">{{ d.phone }} · {{ d.loyaltyPoints | number }} pts</div>
+        </div>
+        @if (linkSelectedDonor()?.id === d.id) {
+          <span class="badge badge-success">Selected</span>
+        }
+      </div>
+    }
+    @if (linkSearchQ().length > 1 && linkResults().length === 0) {
+      <div style="text-align: center; padding: 20px; color: var(--gray-500); font-size: 13px">
+        No donors found for "{{ linkSearchQ() }}"
+      </div>
+    }
+  </div>
 </app-modal>
