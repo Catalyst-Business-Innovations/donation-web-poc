@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe, DatePipe } from '@angular/common';
 import { NewDonationStateService } from '../services/new-donation-state.service';
@@ -19,10 +19,13 @@ import { QrCodeComponent } from '../../../../../shared/components/qr-code/qr-cod
   templateUrl: './new-donation.component.html',
   styleUrl: './new-donation.component.scss'
 })
-export class NewDonationComponent {
+export class NewDonationComponent implements OnInit, OnDestroy {
   protected st = inject(NewDonationStateService);
   protected mockData = inject(MockDataService);
   protected toast = inject(ToastService);
+
+  private terminalChannel!: BroadcastChannel;
+  private terminalWindow: Window | null = null;
 
   protected searchQ = signal<string>('');
   protected showEnroll = signal(false);
@@ -38,6 +41,10 @@ export class NewDonationComponent {
   protected paymentMethod = signal<'cash' | 'card' | null>(null);
   protected cashTendered = signal<number | null>(null);
   protected cardApproved = signal(false);
+  protected cardDeclined = signal(false);
+  protected cardDeclineReason = signal<string>('');
+  protected cardTxnRef = signal<string>('');
+  protected terminalWaiting = signal(false);
   protected delivery = signal<ReceiptDelivery>(ReceiptDelivery.Print);
   protected readonly AS = DonationStatus;
   protected readonly RD = ReceiptDelivery;
@@ -55,6 +62,35 @@ export class NewDonationComponent {
   protected associatedDonor = signal<SelectedDonor | null>(null);
 
   readonly isCashAccepted = computed(() => this.mockData.appConfig().isCashAccepted);
+
+  ngOnInit(): void {
+    this.terminalChannel = new BroadcastChannel('card-terminal');
+    this.terminalChannel.onmessage = (event: MessageEvent) => {
+      const data = event.data;
+      if (data.type === 'approved') {
+        this.cardApproved.set(true);
+        this.cardDeclined.set(false);
+        this.cardDeclineReason.set('');
+        this.cardTxnRef.set(data.txnRef ?? '');
+        this.terminalWaiting.set(false);
+        this.toast.success('Card Approved', 'Payment authorised successfully.');
+      } else if (data.type === 'declined') {
+        this.cardDeclined.set(true);
+        this.cardApproved.set(false);
+        this.cardDeclineReason.set(data.reason ?? 'Unknown error');
+        this.cardTxnRef.set('');
+        this.terminalWaiting.set(false);
+        this.toast.warning('Card Declined', data.reason ?? 'Unknown error');
+      }
+    };
+  }
+
+  ngOnDestroy(): void {
+    this.terminalChannel?.close();
+    if (this.terminalWindow && !this.terminalWindow.closed) {
+      this.terminalWindow.close();
+    }
+  }
 
   readonly associateResults = computed<SelectedDonor[]>(() => {
     const q = this.associateSearchQ().toLowerCase();
@@ -236,6 +272,7 @@ export class NewDonationComponent {
 
   selectDonor(d: SelectedDonor): void {
     this.st.setDonor(d);
+    this.searchQ.set('');
     this.toast.success('Donor found', `Welcome back, ${d.displayName}!`);
   }
 
@@ -265,12 +302,53 @@ export class NewDonationComponent {
   selectPaymentMethod(m: 'cash' | 'card'): void {
     this.paymentMethod.set(m);
     this.cardApproved.set(false);
+    this.cardDeclined.set(false);
+    this.cardDeclineReason.set('');
     this.cashTendered.set(null);
+    if (m === 'card') {
+      this.openTerminalSimulator();
+    }
+  }
+
+  openTerminalSimulator(): void {
+    this.terminalWaiting.set(true);
+    // Open (or focus) the simulator window
+    if (!this.terminalWindow || this.terminalWindow.closed) {
+      this.terminalWindow = window.open(
+        '/terminal-simulator',
+        'terminal-simulator',
+        'width=420,height=640,menubar=no,toolbar=no,location=no,status=no'
+      );
+    } else {
+      this.terminalWindow.focus();
+    }
+    // Send the payment request
+    setTimeout(() => {
+      this.terminalChannel.postMessage({
+        type: 'request',
+        amount: this.monetary() ?? 0
+      });
+    }, 500);
   }
 
   simulateCardTap(): void {
     this.cardApproved.set(true);
+    this.cardDeclined.set(false);
+    this.cardDeclineReason.set('');
+    this.cardTxnRef.set('TXN-' + Math.random().toString(36).substring(2, 10).toUpperCase());
+    this.terminalWaiting.set(false);
     this.toast.success('Card Approved', 'Payment authorised successfully.');
+  }
+
+  simulateCardDecline(): void {
+    const reasons = ['Insufficient funds', 'Card expired', 'Transaction limit exceeded', 'Card blocked by issuer'];
+    const reason = reasons[Math.floor(Math.random() * reasons.length)];
+    this.cardDeclined.set(true);
+    this.cardApproved.set(false);
+    this.cardDeclineReason.set(reason);
+    this.cardTxnRef.set('');
+    this.terminalWaiting.set(false);
+    this.toast.warning('Card Declined', reason);
   }
 
   quickDonate(type: DonationScope): void {
@@ -377,7 +455,6 @@ export class NewDonationComponent {
     this.mockData.associateDonorToDonation(this.donationId(), donor.id);
     this.toast.success('Donor Linked!', `Donation associated with ${donor.displayName}.`);
     this.showAssociateModal.set(false);
-    this.associatedDonor.set(null);
     this.associateSearchQ.set('');
   }
 

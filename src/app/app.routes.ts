@@ -32,5 +32,10 @@ export const routes: Routes = [
     loadComponent: () => import('./modules/donor-portal/donor-portal.component').then(m => m.DonorPortalComponent),
     loadChildren: () => import('./modules/donor-portal/donor-portal.routes').then(m => m.donorRoutes)
   },
+  {
+    path: 'terminal-simulator',
+    loadComponent: () =>
+      import('./modules/staff-portal/features/new-donation/components/terminal-simulator.component').then(m => m.TerminalSimulatorComponent)
+  },
   { path: '**', redirectTo: '' }
 ];

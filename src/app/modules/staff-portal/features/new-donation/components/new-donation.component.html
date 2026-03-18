@@ -6,29 +6,6 @@
       <div class="topbar-subtitle">{{ topSubtitle() }}</div>
     </div>
     <div class="topbar-actions">
-      @if (st.step() > 1 && st.donor() !== undefined) {
-        <div class="tb-donor-chip">
-          @if (st.donor() === null) {
-            <div class="tb-dc-avatar tb-dc-anon">👤</div>
-            <div class="tb-dc-info">
-              <span class="tb-dc-name">Anonymous</span>
-            </div>
-          } @else {
-            <div class="tb-dc-avatar">{{ st.donor()!.initials }}</div>
-            <div class="tb-dc-info">
-              <span class="tb-dc-name">{{ st.donor()!.displayName }}</span>
-              <span class="tb-dc-sub">
-                <app-icon [name]="tierCfg(st.donor()!.tier).icon" [size]="10"></app-icon>
-                {{ tierCfg(st.donor()!.tier).label }} · {{ st.donor()!.points | number }} pts
-              </span>
-            </div>
-          }
-          <button class="tb-dc-change" (click)="st.goToStep(1)">Change</button>
-        </div>
-      }
-      @if (st.step() > 1) {
-        <button class="btn btn-secondary" (click)="st.prevStep()">Back</button>
-      }
       <button class="btn btn-ghost" (click)="cancel()">✕ Cancel</button>
     </div>
   </div>
@@ -45,6 +22,99 @@
       }
     }
   </div>
+
+  <!-- ─── Summary Bar (visible from step 1 once donor is selected, hidden on review) ─── -->
+  @if (st.donor() !== undefined && !isReviewStep()) {
+    <div class="summary-bar global-summary">
+      <!-- Donor chip -->
+      @if (st.donor() === null) {
+        <div class="sb-donor-chip sb-donor-anon">
+          <div class="sb-donor-avatar sb-donor-avatar-anon">👤</div>
+          <div class="sb-donor-info">
+            <span class="sb-donor-name">Anonymous</span>
+            <span class="sb-donor-meta">No loyalty points</span>
+          </div>
+        </div>
+      } @else {
+        <div class="sb-donor-chip">
+          <div class="sb-donor-avatar">{{ st.donor()!.initials }}</div>
+          <div class="sb-donor-info">
+            <span class="sb-donor-name">{{ st.donor()!.displayName }}</span>
+            <span class="sb-donor-meta">
+              <app-icon [name]="tierCfg(st.donor()!.tier).icon" [size]="11"></app-icon>
+              {{ tierCfg(st.donor()!.tier).label }} · {{ st.donor()!.points | number }} pts
+            </span>
+          </div>
+        </div>
+      }
+      <button class="sb-change-btn" (click)="clearDonor(); st.goToStep(1)">Change</button>
+
+      <!-- Donation type (step 2+) -->
+      @if (st.step() > 1 && st.donationType()) {
+        <div class="sb-divider"></div>
+        <div class="sb-stat">
+          <div class="sb-val sb-val-sm">
+            {{ st.donationType() === DT.Items ? '📦' : st.donationType() === DT.Monetary ? '💵' : '🎁' }}
+          </div>
+          <div class="sb-lbl">
+            {{
+              st.donationType() === DT.Items ? 'Items' : st.donationType() === DT.Monetary ? 'Money' : 'Items & Money'
+            }}
+          </div>
+        </div>
+      }
+
+      <!-- Item count (step 3+ when items apply) -->
+      @if (st.step() > 2 && st.totalItems() > 0) {
+        <div class="sb-divider"></div>
+        <div class="sb-stat">
+          <div class="sb-val">{{ st.totalItems() }}</div>
+          <div class="sb-lbl">Items</div>
+        </div>
+      }
+
+      <!-- Points (step 3+ when items apply) -->
+      @if (st.step() > 2 && st.donor() && st.estPoints() > 0) {
+        <div class="sb-divider"></div>
+        <div class="sb-stat">
+          <div class="sb-val">+{{ st.estPoints() }}</div>
+          <div class="sb-lbl">Points</div>
+        </div>
+      }
+
+      <!-- Monetary (only on/after add-money step) -->
+      @if (isAddMoneyStep() && (monetary() ?? 0) > 0) {
+        <div class="sb-divider"></div>
+        <div class="sb-stat">
+          <div class="sb-val">${{ (monetary() ?? 0).toFixed(0) }}</div>
+          <div class="sb-lbl">Money @if (paymentMethod()) { | {{ paymentMethod() === 'cash' ? '💵 Cash' : '💳 Card' }} }</div>
+        </div>
+      }
+
+      <!-- Navigation buttons -->
+      <div class="sb-actions">
+        @if (st.step() > 1) {
+          <button class="sb-back-btn" (click)="st.prevStep()">Back</button>
+        }
+        @if (st.step() === 1) {
+          <button class="btn btn-success btn-lg" (click)="st.nextStep()">Continue</button>
+        }
+        @if (st.step() === 2 && st.donationType()) {
+          <button class="btn btn-success btn-lg" (click)="st.nextStep()">Continue</button>
+        }
+        @if (isAddItemsStep()) {
+          <button class="btn btn-success btn-lg" [disabled]="st.totalItems() === 0" (click)="st.nextStep()">
+            {{ st.donationType() === DT.Both ? 'Continue' : 'Review' }}
+          </button>
+        }
+        @if (isAddMoneyStep()) {
+          <button class="btn btn-success btn-lg" [disabled]="!canProceedFromMoney()" (click)="st.nextStep()">
+            Review
+          </button>
+        }
+      </div>
+    </div>
+  }
 
   <!-- ─── STEP 1: Identify ─── -->
   @if (st.step() === 1) {
@@ -66,7 +136,10 @@
               <app-icon name="user" [size]="24"></app-icon>
               <span>Anonymous</span>
             </button>
-            <button class="quick-btn add-donor-btn" (click)="enrollForm = { firstName: '', lastName: '', phone: '', email: '' }; showEnroll.set(true)">
+            <button
+              class="quick-btn add-donor-btn"
+              (click)="enrollForm = { firstName: '', lastName: '', phone: '', email: '' }; showEnroll.set(true)"
+            >
               <app-icon name="plus" [size]="24"></app-icon>
               <span>Add Donor</span>
             </button>
@@ -131,11 +204,16 @@
             </div>
           </div>
           <div class="appt-lookup-row">
-            <input class="form-input" [(ngModel)]="sdQ" placeholder="Reference #, donor name or phone..."
-              (keyup.enter)="lookupScheduledDonation()" />
+            <input
+              class="form-input"
+              [(ngModel)]="sdQ"
+              placeholder="Reference #, donor name or phone..."
+              (keyup.enter)="lookupScheduledDonation()"
+            />
             <button class="btn btn-primary" (click)="lookupScheduledDonation()">Search</button>
             <button class="btn btn-secondary" (click)="demoScanSdQR()">
-              <app-icon name="search" [size]="14"></app-icon> Scan QR
+              <app-icon name="search" [size]="14"></app-icon>
+              Scan QR
             </button>
           </div>
 
@@ -145,10 +223,11 @@
                 <div class="appt-res-id">{{ appt.referenceNumber }}</div>
                 <div class="appt-res-name">{{ appt.donorName }}</div>
                 <div class="appt-res-meta">
-                  <app-icon name="map-pin" [size]="11"></app-icon> {{ appt.locationName }}
+                  <app-icon name="map-pin" [size]="11"></app-icon>
+                  {{ appt.locationName }}
                   &nbsp;·&nbsp;
-                  <app-icon name="calendar" [size]="11"></app-icon> {{ appt.date | date:'MMM d' }} @ {{ appt.timeSlot }}
-                  &nbsp;·&nbsp; {{ appt.itemCount }} items
+                  <app-icon name="calendar" [size]="11"></app-icon>
+                  {{ appt.date | date: 'MMM d' }} @ {{ appt.timeSlot }} &nbsp;·&nbsp; {{ appt.itemCount }} items
                 </div>
                 <div class="appt-res-cats">
                   @for (c of appt.categories ?? []; track c) {
@@ -161,7 +240,9 @@
                 @if (appt.status === AS.Scheduled) {
                   <button class="btn btn-success" (click)="loadScheduledDonation(appt)">Load &amp; Continue</button>
                 } @else {
-                  <span class="appt-res-warn">Cannot load — scheduled donation is {{ sdStatusLabel(appt.status) }}</span>
+                  <span class="appt-res-warn">
+                    Cannot load — scheduled donation is {{ sdStatusLabel(appt.status) }}
+                  </span>
                 }
               </div>
             </div>
@@ -172,35 +253,6 @@
           }
         </div>
       </div>
-
-      <!-- Selected donor banner -->
-      @if (st.donor() !== undefined) {
-        @if (st.donor() === null) {
-          <div class="anon-banner">
-            <app-icon name="user" [size]="32"></app-icon>
-            <div class="ab-info">
-              <div class="ab-title">Anonymous Donation</div>
-              <div class="ab-sub">No loyalty points awarded. You can still enroll this donor.</div>
-            </div>
-            <button class="btn btn-ghost" style="color: rgba(255, 255, 255, 0.6)" (click)="clearDonor()">Change</button>
-            <button class="btn btn-success btn-lg" (click)="st.nextStep()">Continue →</button>
-          </div>
-        } @else {
-          <div class="found-banner">
-            <div class="d-av-lg">{{ st.donor()!.initials }}</div>
-            <div class="fb-info">
-              <div class="fb-tier">
-                <app-icon [name]="tierCfg(st.donor()!.tier).icon" [size]="14"></app-icon>
-                {{ tierCfg(st.donor()!.tier).label }} Member
-              </div>
-              <div class="fb-name">{{ st.donor()!.displayName }}</div>
-              <div class="fb-meta">{{ st.donor()!.points | number }} pts · {{ st.donor()!.totalDonations }} visits</div>
-            </div>
-            <button class="btn btn-ghost" style="color: rgba(255, 255, 255, 0.6)" (click)="clearDonor()">Change</button>
-            <button class="btn btn-success btn-lg" (click)="st.nextStep()">Continue →</button>
-          </div>
-        }
-      }
 
       <!-- Enroll form -->
       @if (showEnroll()) {
@@ -229,7 +281,7 @@
           </div>
           <div class="enroll-actions">
             <button class="btn btn-secondary" (click)="showEnroll.set(false)">Cancel</button>
-            <button class="btn btn-primary" (click)="enrollDonor()">Enroll & Continue →</button>
+            <button class="btn btn-primary" (click)="enrollDonor()">Enroll & Continue</button>
           </div>
         </div>
       }
@@ -251,7 +303,11 @@
             <div class="dtype-title">Donate Items</div>
             <div class="dtype-desc">Clothing, electronics, furniture and more</div>
           </button>
-          <button class="dtype-card" [class.active]="st.donationType() === DT.Monetary" (click)="selectType(DT.Monetary)">
+          <button
+            class="dtype-card"
+            [class.active]="st.donationType() === DT.Monetary"
+            (click)="selectType(DT.Monetary)"
+          >
             <div class="dtype-icon">&#128181;</div>
             <div class="dtype-title">Monetary Donation</div>
             <div class="dtype-desc">Cash, credit card, or tap-to-pay</div>
@@ -262,11 +318,6 @@
             <div class="dtype-desc">Donate goods and make a payment together</div>
           </button>
         </div>
-        @if (st.donationType()) {
-          <button class="btn btn-success btn-lg dtype-continue" (click)="st.nextStep()">
-            Continue with {{ st.donationType() === DT.Items ? 'Items' : st.donationType() === DT.Monetary ? 'Monetary' : 'Items & Monetary' }} →
-          </button>
-        }
       </div>
     </div>
   }
@@ -274,52 +325,6 @@
   <!-- ─── STEP 3 / Add Items ─── -->
   @if (isAddItemsStep()) {
     <div class="step2-host anim-in">
-      <!-- Summary bar -->
-      <div class="summary-bar">
-        <div class="sb-stat">
-          <div class="sb-val">{{ st.totalItems() }}</div>
-          <div class="sb-lbl">Items</div>
-        </div>
-        @if (st.donor()) {
-          <div class="sb-divider"></div>
-          <div class="sb-stat">
-            <div class="sb-val">+{{ st.estPoints() }}</div>
-            <div class="sb-lbl">Points</div>
-          </div>
-        }
-        <label class="presort-toggle">
-          <input type="checkbox" [checked]="st.isPreSorted()" (change)="st.setPreSorted($any($event.target).checked)" />
-          Already Presorted
-        </label>
-
-        <!-- Container chip -->
-        <div class="sb-divider"></div>
-        @if (selectedContainer()) {
-          <div class="sb-container-chip" (click)="showContainerPicker.set(true)">
-            <app-icon name="package" [size]="14"></app-icon>
-            <div class="sbc-info">
-              <span class="sbc-id">{{ selectedContainer()!.barcode }}</span>
-              <span class="sbc-type">{{ containerTypeLabel(selectedContainer()!.containerType) }}</span>
-            </div>
-            <button class="sbc-clear" (click)="$event.stopPropagation(); selectedContainer.set(null)" title="Remove container">×</button>
-          </div>
-        } @else {
-          <button class="sb-container-btn" (click)="showContainerPicker.set(true)">
-            <app-icon name="package" [size]="14"></app-icon>
-            Assign Container
-          </button>
-        }
-
-        <button
-          class="btn btn-success btn-lg"
-          style="margin-left: auto"
-          [disabled]="st.totalItems() === 0"
-          (click)="st.nextStep()"
-        >
-          {{ st.donationType() === DT.Both ? 'Next' : 'Review' }}
-        </button>
-      </div>
-
       <!-- Dept tabs -->
       <div class="dept-tabs">
         @for (dept of mockData.departments; track dept.key) {
@@ -337,14 +342,18 @@
         @for (dept of mockData.departments; track dept.key) {
           @if (activeDept() === dept.key) {
             <div class="cat-grid anim-in">
-
               <!-- Dept-level any card (full-width banner) -->
-              <div class="cat-card cat-card-any"
-                   [class.has-items]="getQty(dept.key) > 0"
-                   (click)="adjust(key(dept.key), 1)">
+              <div
+                class="cat-card cat-card-any"
+                [class.has-items]="getQty(dept.key) > 0"
+                (click)="adjust(key(dept.key), 1)"
+              >
                 <div class="cat-card-any-text">
                   <span class="cat-type-chip cat-type-dept">Department</span>
-                  <div class="cat-name">{{ dept.name }} <span class="cat-any-tag">Any</span></div>
+                  <div class="cat-name">
+                    {{ dept.name }}
+                    <span class="cat-any-tag">Any</span>
+                  </div>
                 </div>
                 <div class="qty-ctrl" (click)="$event.stopPropagation()">
                   <button (click)="adjust(key(dept.key), -1)">&#8722;</button>
@@ -357,12 +366,17 @@
               <div class="cat-categories-tree">
                 @for (cat of dept.categories; track cat.key) {
                   <div class="cat-group">
-                    <div class="cat-card cat-card-any cat-card-cat"
-                         [class.has-items]="getQty(dept.key, cat.key) > 0"
-                         (click)="adjust(key(dept.key, cat.key), 1)">
+                    <div
+                      class="cat-card cat-card-any cat-card-cat"
+                      [class.has-items]="getQty(dept.key, cat.key) > 0"
+                      (click)="adjust(key(dept.key, cat.key), 1)"
+                    >
                       <div class="cat-card-any-text">
                         <span class="cat-type-chip cat-type-cat">Category</span>
-                        <div class="cat-name">{{ cat.name }} <span class="cat-any-tag">Any</span></div>
+                        <div class="cat-name">
+                          {{ cat.name }}
+                          <span class="cat-any-tag">Any</span>
+                        </div>
                       </div>
                       <div class="qty-ctrl" (click)="$event.stopPropagation()">
                         <button (click)="adjust(key(dept.key, cat.key), -1)">&#8722;</button>
@@ -372,10 +386,12 @@
                     </div>
                     @if ((cat.subCategories ?? []).length > 0) {
                       <div class="cat-sub-grid">
-                        @for (sub of (cat.subCategories ?? []); track sub.key) {
-                          <div class="cat-card cat-card-sub"
-                               [class.has-items]="getQty(dept.key, cat.key, sub.key) > 0"
-                               (click)="adjust(key(dept.key, cat.key, sub.key), 1)">
+                        @for (sub of cat.subCategories ?? []; track sub.key) {
+                          <div
+                            class="cat-card cat-card-sub"
+                            [class.has-items]="getQty(dept.key, cat.key, sub.key) > 0"
+                            (click)="adjust(key(dept.key, cat.key, sub.key), 1)"
+                          >
                             <span class="cat-type-chip cat-type-sub">Sub</span>
                             <div class="cat-name">{{ sub.name }}</div>
                             <div class="qty-ctrl" (click)="$event.stopPropagation()">
@@ -390,7 +406,6 @@
                   </div>
                 }
               </div>
-
             </div>
           }
         }
@@ -402,7 +417,6 @@
   @if (isAddMoneyStep()) {
     <div class="page-content anim-in">
       <div class="add-money-host">
-
         <!-- Amount -->
         <div class="card">
           <div class="card-header">
@@ -438,14 +452,22 @@
             <div class="card-header"><div class="card-title">Payment Method</div></div>
             <div class="pay-method-grid">
               @if (isCashAccepted()) {
-                <button class="pay-method-btn" [class.active]="paymentMethod() === 'cash'" (click)="selectPaymentMethod('cash')">
+                <button
+                  class="pay-method-btn"
+                  [class.active]="paymentMethod() === 'cash'"
+                  (click)="selectPaymentMethod('cash')"
+                >
                   <span class="pm-icon">&#128181;</span>
                   <span class="pm-label">Cash</span>
                 </button>
               }
-              <button class="pay-method-btn" [class.active]="paymentMethod() === 'card'" (click)="selectPaymentMethod('card')">
+              <button
+                class="pay-method-btn"
+                [class.active]="paymentMethod() === 'card'"
+                (click)="selectPaymentMethod('card')"
+              >
                 <span class="pm-icon">&#128179;</span>
-                <span class="pm-label">Card / Tap</span>
+                <span class="pm-label">Card</span>
               </button>
             </div>
 
@@ -462,9 +484,10 @@
                   />
                 </div>
                 @if ((cashTendered() ?? 0) > 0) {
-                  @if ((cashTendered()! >= monetary()!)) {
+                  @if (cashTendered()! >= monetary()!) {
                     <div class="change-display">
-                      Change Due: <strong>${{ (cashTendered()! - monetary()!).toFixed(2) }}</strong>
+                      Change Due:
+                      <strong>${{ (cashTendered()! - monetary()!).toFixed(2) }}</strong>
                     </div>
                   } @else {
                     <div class="change-insufficient">&#9888; Insufficient — need ${{ monetary()!.toFixed(2) }}</div>
@@ -474,40 +497,34 @@
             }
 
             @if (paymentMethod() === 'card') {
-              @if (!cardApproved()) {
+              @if (!cardApproved() && !cardDeclined()) {
                 <div class="card-terminal">
                   <div class="terminal-icon">&#128179;</div>
                   <div class="terminal-msg">Tap or insert card on the terminal</div>
                   <div class="terminal-sub">Waiting for customer to tap or swipe...</div>
-                  <button class="btn btn-secondary" style="margin-top: 14px; width: 100%"
-                          (click)="simulateCardTap()">
-                    <app-icon name="credit-card" [size]="14"></app-icon>
-                    Simulate Card Tap &#10003;
-                  </button>
+                  <div class="terminal-pulse"></div>
                 </div>
-              } @else {
+              } @else if (cardApproved()) {
                 <div class="card-approved">
                   <app-icon name="check-circle" [size]="32"></app-icon>
                   <div class="ca-body">
                     <div class="ca-title">Card Approved</div>
                     <div class="ca-sub">Payment authorised successfully</div>
                   </div>
-                  <button class="btn btn-ghost ca-retry" (click)="cardApproved.set(false)">Retry</button>
+                </div>
+              } @else if (cardDeclined()) {
+                <div class="card-declined">
+                  <app-icon name="x-circle" [size]="32"></app-icon>
+                  <div class="ca-body">
+                    <div class="ca-title">Card Declined</div>
+                    <div class="ca-sub">{{ cardDeclineReason() }}</div>
+                  </div>
+                  <button class="btn btn-secondary ca-retry" (click)="cardDeclined.set(false); cardDeclineReason.set(''); openTerminalSimulator()">Retry</button>
                 </div>
               }
             }
           </div>
         }
-
-        <button
-          class="btn btn-success btn-lg"
-          style="margin-top: 16px"
-          [disabled]="!canProceedFromMoney()"
-          (click)="st.nextStep()"
-        >
-          Review
-        </button>
-
       </div>
     </div>
   }
@@ -515,7 +532,6 @@
   <!-- ─── Review Step ─── -->
   @if (isReviewStep()) {
     <div class="page-content anim-in">
-
       <!-- Summary header -->
       <div class="rs-header">
         <div class="rs-header-icon"><app-icon name="check-circle" size="22" /></div>
@@ -523,27 +539,41 @@
           <div class="rs-header-title">Review Summary</div>
           <div class="rs-header-sub">Confirm all details before completing the donation</div>
         </div>
+        <button class="sb-back-btn" style="margin-left: auto" (click)="st.prevStep()">Back</button>
       </div>
 
-      <div class="review-grid" [class.single-col]="st.donationType() === DT.Monetary">
-
-        <!-- ── Left column: items ── -->
-        @if (st.donationType() !== DT.Monetary) {
-          <div class="card rs-items-card">
-
-            <!-- Donor chip -->
-            @if (st.donor(); as donor) {
-              <div class="rs-donor-chip">
-                <div class="rs-donor-avatar">{{ donor.initials }}</div>
-                <div class="rs-donor-info">
-                  <div class="rs-donor-name">{{ donor.displayName }}</div>
-                  <div class="rs-donor-meta">{{ tierCfg(donor.tier).label }} · {{ donor.points | number }} pts</div>
+      <div class="review-two-col">
+        <!-- ── Card 1: Summary ── -->
+        <div class="card">
+          <!-- Donor -->
+          <div class="rs-overview-bar" style="margin-bottom: 16px">
+            @if (st.donor() === null) {
+              <div class="sb-donor-chip sb-donor-anon">
+                <div class="sb-donor-avatar sb-donor-avatar-anon">👤</div>
+                <div class="sb-donor-info">
+                  <span class="sb-donor-name">Anonymous</span>
+                  <span class="sb-donor-meta">No loyalty points</span>
                 </div>
-                <div class="rs-points-badge">+{{ st.estPoints() }} pts</div>
+              </div>
+            } @else if (st.donor(); as donor) {
+              <div class="sb-donor-chip">
+                <div class="sb-donor-avatar">{{ donor.initials }}</div>
+                <div class="sb-donor-info">
+                  <span class="sb-donor-name">{{ donor.displayName }}</span>
+                  <span class="sb-donor-meta">
+                    <app-icon [name]="tierCfg(donor.tier).icon" [size]="11"></app-icon>
+                    {{ tierCfg(donor.tier).label }} · {{ donor.points | number }} pts
+                  </span>
+                </div>
               </div>
             }
+            @if (st.donor() && st.estPoints() > 0) {
+              <div class="rs-points-badge" style="margin-left: auto">+{{ st.estPoints() }} pts</div>
+            }
+          </div>
 
-            <!-- Items table -->
+          <!-- Items -->
+          @if (st.donationType() !== DT.Monetary) {
             <div class="rs-section-label">Items to Donate</div>
             <div class="rs-items-list">
               @for (item of reviewItems(); track item.key) {
@@ -555,59 +585,96 @@
                 </div>
               }
             </div>
-
-            <!-- Totals -->
             <div class="rs-totals">
               <div class="rs-total-row">
                 <span>Total Items</span>
                 <strong>{{ st.totalItems() }}</strong>
               </div>
             </div>
-          </div>
-        }
-
-        <!-- ── Right column: payment + delivery + CTA ── -->
-        <div class="review-right">
-
-          <!-- Payment block -->
-          @if (st.donationType() !== DT.Items) {
-            <div class="card rs-payment-card">
-              <div class="rs-section-label">Monetary Donation</div>
-              <div class="rs-pay-row">
-                <div class="rs-pay-amount">${{ (monetary() ?? 0).toFixed(2) }}</div>
-                <div class="rs-pay-method">
-                  @if (paymentMethod() === 'cash') {
-                    <span class="rs-method-badge">💵 Cash</span>
-                  }
-                  @if (paymentMethod() === 'card') {
-                    <span class="rs-method-badge">💳 Card / Tap</span>
-                  }
-                </div>
-              </div>
-            </div>
           }
 
-          <!-- Receipt delivery -->
-          <div class="card">
-            <div class="rs-section-label">Receipt Delivery</div>
-            <div class="rs-delivery-opts">
-              @for (opt of deliveryOpts; track opt.value) {
-                <label class="delivery-opt" [class.active]="delivery() === opt.value">
-                  <input
-                    type="radio"
-                    name="del"
-                    [value]="opt.value"
-                    [checked]="delivery() === opt.value"
-                    (change)="delivery.set(opt.value)"
-                  />
-                  <app-icon [name]="opt.icon" [size]="14"></app-icon>
-                  {{ opt.label }}
-                </label>
-              }
+          <!-- Monetary -->
+          @if (st.donationType() !== DT.Items) {
+            @if (st.donationType() !== DT.Monetary) {
+              <div class="rs-divider"></div>
+            }
+            <div class="rs-section-label">Monetary Donation</div>
+            <div class="rs-pay-row">
+              <div class="rs-pay-amount">${{ (monetary() ?? 0).toFixed(2) }}</div>
+              <div class="rs-pay-method">
+                @if (paymentMethod() === 'cash') {
+                  <span class="rs-method-badge">💵 Cash</span>
+                }
+                @if (paymentMethod() === 'card') {
+                  <span class="rs-method-badge">💳 Card</span>
+                }
+              </div>
             </div>
+            @if (paymentMethod() === 'cash' && (cashTendered() ?? 0) > 0) {
+              <div class="rs-pay-details">
+                <div class="rs-pay-detail-row">
+                  <span>Tendered</span>
+                  <strong>${{ cashTendered()!.toFixed(2) }}</strong>
+                </div>
+                <div class="rs-pay-detail-row">
+                  <span>Change Due</span>
+                  <strong>${{ (cashTendered()! - (monetary() ?? 0)).toFixed(2) }}</strong>
+                </div>
+              </div>
+            }
+            @if (paymentMethod() === 'card' && cardApproved()) {
+              <div class="rs-pay-details">
+                <div class="rs-pay-detail-row">
+                  <span>Transaction Ref #</span>
+                  <strong class="rs-txn-ref">{{ cardTxnRef() }}</strong>
+                </div>
+                <div class="rs-pay-detail-row">
+                  <span>Amount Charged</span>
+                  <strong>${{ (monetary() ?? 0).toFixed(2) }}</strong>
+                </div>
+              </div>
+            }
+            @if (paymentMethod() === 'card' && cardDeclined()) {
+              <div class="rs-card-failure">
+                <app-icon name="x-circle" [size]="24"></app-icon>
+                <div class="rs-card-success-info">
+                  <div class="rs-card-failure-title">Card Declined</div>
+                  <div class="rs-card-failure-sub">{{ cardDeclineReason() }}</div>
+                </div>
+              </div>
+              <div class="rs-pay-details">
+                <div class="rs-pay-detail-row">
+                  <span>Amount</span>
+                  <strong>${{ (monetary() ?? 0).toFixed(2) }}</strong>
+                </div>
+                <div class="rs-pay-detail-row">
+                  <span>Action Required</span>
+                  <button class="btn btn-secondary btn-sm" (click)="cardDeclined.set(false); cardDeclineReason.set(''); openTerminalSimulator()">Retry Payment</button>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- ── Card 2: Delivery + CTA ── -->
+        <div class="card">
+          <div class="rs-section-label">Receipt Delivery</div>
+          <div class="rs-delivery-opts">
+            @for (opt of deliveryOpts; track opt.value) {
+              <label class="delivery-opt" [class.active]="delivery() === opt.value">
+                <input
+                  type="radio"
+                  name="del"
+                  [value]="opt.value"
+                  [checked]="delivery() === opt.value"
+                  (change)="delivery.set(opt.value)"
+                />
+                <app-icon [name]="opt.icon" [size]="14"></app-icon>
+                {{ opt.label }}
+              </label>
+            }
           </div>
 
-          <!-- Complete CTA -->
           <div class="rs-cta-block">
             <button class="btn btn-success btn-lg complete-btn" (click)="complete()" [disabled]="!canComplete()">
               <app-icon name="check-circle" [size]="18"></app-icon>
@@ -634,15 +701,22 @@
   <div class="cpicker-body">
     <div class="search-bar" style="margin-bottom: 12px">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
-      <input [ngModel]="containerSearchQ()" (ngModelChange)="containerSearchQ.set($event)" placeholder="Search by barcode, type or donor..." />
+      <input
+        [ngModel]="containerSearchQ()"
+        (ngModelChange)="containerSearchQ.set($event)"
+        placeholder="Search by barcode, type or donor..."
+      />
     </div>
     @if (availableContainers().length === 0) {
       <div class="cpicker-empty">No open containers found.</div>
     } @else {
       <div class="cpicker-list">
         @for (c of availableContainers(); track c.id) {
-          <div class="cpicker-row" [class.selected]="selectedContainer()?.id === c.id"
-               (click)="selectedContainer.set(c); showContainerPicker.set(false)">
+          <div
+            class="cpicker-row"
+            [class.selected]="selectedContainer()?.id === c.id"
+            (click)="selectedContainer.set(c); showContainerPicker.set(false)"
+          >
             <div class="cpicker-icon">
               <app-icon name="package" [size]="18"></app-icon>
             </div>
@@ -650,11 +724,21 @@
               <div class="cpicker-barcode">{{ c.barcode }}</div>
               <div class="cpicker-meta">
                 {{ containerTypeLabel(c.containerType) }} · {{ c.locationName }}
-                @if (c.donorVisitLabel) { · {{ c.donorVisitLabel }} }
+                @if (c.donorVisitLabel) {
+                  · {{ c.donorVisitLabel }}
+                }
               </div>
             </div>
             <div class="cpicker-right">
-              <span class="badge" [class.badge-success]="c.status === CS.Available" [class.badge-info]="c.status === CS.ReadyForSorting" [class.badge-warning]="c.status === CS.Sorting" [class.badge-purple]="c.status === CS.InUse">{{ containerStatusLabel(c.status) }}</span>
+              <span
+                class="badge"
+                [class.badge-success]="c.status === CS.Available"
+                [class.badge-info]="c.status === CS.ReadyForSorting"
+                [class.badge-warning]="c.status === CS.Sorting"
+                [class.badge-purple]="c.status === CS.InUse"
+              >
+                {{ containerStatusLabel(c.status) }}
+              </span>
               <span class="cpicker-items">{{ c.totalItems }} items</span>
             </div>
           </div>
@@ -676,7 +760,6 @@
   (confirmed)="closeConfirmation()"
 >
   <div class="confirm-modal">
-
     <!-- Hero banner -->
     <div class="cm-hero">
       <div class="cm-hero-icon">
@@ -706,22 +789,34 @@
     <div class="cm-summary">
       @if (st.donationType() !== DT.Monetary) {
         <div class="cm-row">
-          <span class="cm-row-label"><app-icon name="package" size="14" /> Items Donated</span>
+          <span class="cm-row-label">
+            <app-icon name="package" size="14" />
+            Items Donated
+          </span>
           <strong>{{ st.totalItems() }} item{{ st.totalItems() === 1 ? '' : 's' }}</strong>
         </div>
       }
       @if (st.donationType() !== DT.Items) {
         <div class="cm-row">
-          <span class="cm-row-label"><app-icon name="dollar" size="14" /> Monetary</span>
+          <span class="cm-row-label">
+            <app-icon name="dollar" size="14" />
+            Monetary
+          </span>
           <strong>${{ (monetary() ?? 0).toFixed(2) }}</strong>
         </div>
         <div class="cm-row">
-          <span class="cm-row-label"><app-icon name="credit-card" size="14" /> Payment</span>
-          <strong>{{ paymentMethod() === 'cash' ? 'Cash' : 'Card / Tap' }}</strong>
+          <span class="cm-row-label">
+            <app-icon name="credit-card" size="14" />
+            Payment
+          </span>
+          <strong>{{ paymentMethod() === 'cash' ? 'Cash' : 'Card' }}</strong>
         </div>
       }
       <div class="cm-row">
-        <span class="cm-row-label"><app-icon name="calendar" size="14" /> Date</span>
+        <span class="cm-row-label">
+          <app-icon name="calendar" size="14" />
+          Date
+        </span>
         <strong>{{ today | date: 'MMM d, yyyy' }}</strong>
       </div>
     </div>
@@ -741,13 +836,36 @@
     @if (st.donor() === null && donationId()) {
       @if (!associatedDonor()) {
         <button class="btn btn-secondary" style="width: 100%; margin-top: 4px" (click)="showAssociateModal.set(true)">
-          <app-icon name="user" size="14" /> Link to Donor Account
+          <app-icon name="user" size="14" />
+          Link to Donor Account
         </button>
         <div class="cm-link-hint">Associate this donation with a donor to award loyalty points</div>
       } @else {
-        <div class="cm-linked-badge">
-          <app-icon name="check-circle" size="16" />
-          Linked to <strong>{{ associatedDonor()!.displayName }}</strong>
+        <div class="cm-linked-card">
+          <div class="cm-linked-header">
+            <app-icon name="check-circle" [size]="20"></app-icon>
+            <span>Donation Linked Successfully</span>
+          </div>
+          <div class="cm-linked-donor">
+            <div class="cm-linked-avatar">{{ associatedDonor()!.initials }}</div>
+            <div class="cm-linked-info">
+              <div class="cm-linked-name">{{ associatedDonor()!.displayName }}</div>
+              <div class="cm-linked-meta">
+                <app-icon [name]="tierCfg(associatedDonor()!.tier).icon" [size]="11"></app-icon>
+                {{ tierCfg(associatedDonor()!.tier).label }} · {{ associatedDonor()!.points | number }} pts
+              </div>
+            </div>
+          </div>
+          <div class="cm-linked-details">
+            <div class="cm-linked-detail-row">
+              <span>Donation Ref</span>
+              <strong>{{ donationRefNumber() }}</strong>
+            </div>
+            <div class="cm-linked-detail-row">
+              <span>Points Awarded</span>
+              <strong class="cm-linked-points">+{{ st.estPoints() }} pts</strong>
+            </div>
+          </div>
         </div>
       }
     }
@@ -767,17 +885,19 @@
 >
   <div style="padding: 4px 0">
     <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 12px">
-      Search for the donor to associate with this anonymous donation.
-      Loyalty points will be recalculated and awarded upon confirmation.
+      Search for the donor to associate with this anonymous donation. Loyalty points will be recalculated and awarded
+      upon confirmation.
     </p>
     <div class="search-bar" style="margin-bottom: 10px">
       <span class="search-icon"><app-icon name="search" size="14" /></span>
-      <input [ngModel]="associateSearchQ()" (ngModelChange)="associateSearchQ.set($event)" placeholder="Name or phone number..." />
+      <input
+        [ngModel]="associateSearchQ()"
+        (ngModelChange)="associateSearchQ.set($event)"
+        placeholder="Name or phone number..."
+      />
     </div>
     @for (d of associateResults(); track d.id) {
-      <div class="donor-result"
-           [class.selected]="associatedDonor()?.id === d.id"
-           (click)="associatedDonor.set(d)">
+      <div class="donor-result" [class.selected]="associatedDonor()?.id === d.id" (click)="associatedDonor.set(d)">
         <div class="d-av">{{ d.initials }}</div>
         <div class="dr-info">
           <div class="dr-name">{{ d.displayName }}</div>
@@ -798,3 +918,4 @@
     }
   </div>
 </app-modal>
+
