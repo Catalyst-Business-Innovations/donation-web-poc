@@ -6,7 +6,7 @@ export interface DonorLookupRequest {
 }
 
 export interface DonorLookupItem {
-  id: string;
+  id: number;
   firstName: string;
   lastName: string;
   initials: string;
@@ -22,7 +22,7 @@ export interface DonorLookupItem {
 export interface DonorLookupState {
   query: string;
   tierFilter: string;
-  selectedId: string | null;
+  selectedId: number | null;
 }
 
 export class DonorLookupMapper {

@@ -3,7 +3,7 @@ import { DonorTier, DonationScope, ReceiptDelivery } from '../../../../../core/m
 export type WizardStep = 1 | 2 | 3 | 4 | 5;
 
 export interface SelectedDonor {
-  id: string;
+  id: number;
   displayName: string;
   initials: string;
   tier: DonorTier;

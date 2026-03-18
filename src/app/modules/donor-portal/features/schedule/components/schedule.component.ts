@@ -22,7 +22,7 @@ export class ScheduleComponent {
   protected readonly LS = LocationStatus;
   protected readonly LSL = LocationStatusLabel;
 
-  protected selLocation = '';
+  protected selLocation: number | null = null;
   protected selDate = '';
   protected selTime = '';
   protected notes = '';
@@ -131,7 +131,7 @@ export class ScheduleComponent {
       '📅 Donation Scheduled!',
       `See you at ${data.location} on ${new Date(data.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`
     );
-    this.selLocation = '';
+    this.selLocation = null;
     this.selDate = '';
     this.selTime = '';
     this.notes = '';

@@ -129,7 +129,7 @@ export class SettingsComponent {
     this.closeModal();
   }
 
-  deleteReward(id: string): void {
+  deleteReward(id: number): void {
     this.svc.removeRewardDefinition(id);
     this.toast.info('Removed', 'Reward definition deleted.');
   }

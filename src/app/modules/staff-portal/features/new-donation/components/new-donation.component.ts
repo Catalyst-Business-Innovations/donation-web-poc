@@ -45,7 +45,7 @@ export class NewDonationComponent {
   protected readonly DT = DonationScope;
   protected receiptNum = this.mockData.newReceipt();
   protected showConfirmation = signal(false);
-  protected donationId = signal<string>('');
+  protected donationId = signal<number>(0);
   protected readonly today = new Date();
 
   // Phase 2 — Post-payment donor association (Req 1)
@@ -290,7 +290,7 @@ export class NewDonationComponent {
       return;
     }
     const d: SelectedDonor = {
-      id: `new-${Date.now()}`,
+      id: Date.now(),
       displayName: `${firstName} ${lastName}`,
       initials: `${firstName[0]}${lastName[0]}`.toUpperCase(),
       tier: DonorTier.Bronze,
@@ -340,7 +340,7 @@ export class NewDonationComponent {
   complete(): void {
     const d = this.st.donor();
     // Generate donation ID
-    const newDonationId = `DN${Date.now()}`;
+    const newDonationId = Date.now();
     this.donationId.set(newDonationId);
     this.showConfirmation.set(true);
   }

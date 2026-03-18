@@ -39,7 +39,7 @@ export class PresortComponent {
   protected showConfirm = signal(false);
   protected showSplitConfirm = signal(false);
   protected splitBarcodes = signal<string[]>([]);
-  protected quickCompleteId = signal<string | null>(null);
+  protected quickCompleteId = signal<number | null>(null);
 
   // Live queue from mock data
   protected get queue(): PresortQueueItem[] {

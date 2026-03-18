@@ -121,7 +121,8 @@ export interface AppConfig {
 
 /** Defines a redeemable reward tier (Req 5) */
 export interface RewardDefinition {
-  id: string;
+  id: number;
+  referenceNumber: string;
   name: string;
   description: string;
   pointsRequired: number;
@@ -133,10 +134,11 @@ export interface RewardDefinition {
 
 /** Records a single reward redemption or gift (Req 5, 7) */
 export interface RewardTransaction {
-  id: string;
-  donorId: string;
+  id: number;
+  referenceNumber: string;
+  donorId: number;
   donorName: string;
-  definitionId: string;
+  definitionId: number;
   definitionName: string;
   pointsDeducted: number;
   status: RewardStatus;
@@ -160,7 +162,7 @@ export interface CampaignTargetCriteria {
 
 /** A log entry from a campaign notification run (Req 6) */
 export interface CampaignNotification {
-  donorId: string;
+  donorId: number;
   donorName: string;
   channel: NotificationChannel;
   sentAt: Date;
@@ -170,7 +172,8 @@ export interface CampaignNotification {
 
 /** A donor-targeting campaign (Req 6) */
 export interface Campaign {
-  id: string;
+  id: number;
+  referenceNumber: string;
   name: string;
   description: string;
   startDate: Date;
@@ -180,11 +183,12 @@ export interface Campaign {
   targetCriteria: CampaignTargetCriteria[];
   notificationHistory: CampaignNotification[];
   createdAt: Date;
-  createdByStaffId: string;
+  createdByStaffId: number;
 }
 
 export interface Donor {
-  id: string;
+  id: number;
+  referenceNumber: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -196,7 +200,7 @@ export interface Donor {
   lifetimeValue: number;
   joinDate: Date;
   lastDonationDate?: Date;
-  preferredLocationId?: string;
+  preferredLocationId?: number;
 }
 
 export interface SubCategory {
@@ -237,8 +241,9 @@ export interface DonationDepartment {
 }
 
 export interface DonationItem {
-  id: string;
-  donationId: string;
+  id: number;
+  referenceNumber: string;
+  donationId: number;
   categoryKey: string;
   subCategoryKey?: string;
   categoryName: string;
@@ -249,15 +254,16 @@ export interface DonationItem {
 }
 
 export interface Donation {
-  id: string;
+  id: number;
+  referenceNumber: string;
   receiptNumber: string;
-  donorId?: string;
+  donorId?: number;
   donorName?: string;
   donorInitials?: string;
   donorTier?: DonorTier;
-  locationId: string;
+  locationId: number;
   locationName: string;
-  attendantId: string;
+  attendantId: number;
   timestamp: Date;
   status: DonationStatus;
   items: DonationItem[];
@@ -268,7 +274,7 @@ export interface Donation {
   isPreSorted?: boolean;
   notes?: string;
   /** Req 1 — populated when an anonymous donation is linked to a donor post-payment */
-  associatedDonorId?: string;
+  associatedDonorId?: number;
   associatedDonorName?: string;
   associatedAt?: Date;
 }
@@ -282,9 +288,10 @@ export interface ContainerContent {
 }
 
 export interface Container {
-  id: string;
+  id: number;
+  referenceNumber: string;
   barcode: string;
-  donationId?: string;
+  donationId?: number;
   donationReceiptNumber?: string;
   donorVisitLabel?: string;
   presortWorkerName?: string;
@@ -299,7 +306,7 @@ export interface Container {
   /** Optional sub-category within the department */
   catKey?: string;
   catName?: string;
-  locationId: string;
+  locationId: number;
   locationName: string;
   createdAt: Date;
   updatedAt: Date;
@@ -309,16 +316,17 @@ export interface Container {
   salvageWeightLbs?: number;
   isSeasonal?: boolean;
   seasonalTag?: string;
-  parentContainerId?: string;
+  parentContainerId?: number;
   notes?: string;
   closedAt?: Date;
-  transferToLocationId?: string;
+  transferToLocationId?: number;
   transferToLocationName?: string;
-  mergedContainerIds?: string[];
+  mergedContainerIds?: number[];
 }
 
 export interface Location {
-  id: string;
+  id: number;
+  referenceNumber: string;
   name: string;
   address: string;
   phone: string;
@@ -344,7 +352,7 @@ export interface CategoryBreak {
   percentage: number;
 }
 export interface LocationPerf {
-  locationId: string;
+  locationId: number;
   locationName: string;
   totalValue: number;
   percentage: number;
@@ -376,10 +384,10 @@ export interface LoyaltyTierConfig {
 }
 
 export interface StaffSession {
-  staffId: string;
+  staffId: number;
   staffName: string;
   role: StaffRole;
-  locationId: string;
+  locationId: number;
   locationName: string;
 }
 
@@ -394,12 +402,12 @@ export interface ToastModel {
 export interface ScheduledDonation {
   id: number;
   referenceNumber: string;
-  donorId?: string;
+  donorId?: number;
   donorName: string;
   donorPhone?: string;
   donorEmail?: string;
   address?: string;
-  locationId?: string;
+  locationId?: number;
   locationName?: string;
   method: DonationMethod;
   date: Date;

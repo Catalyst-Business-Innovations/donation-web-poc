@@ -1,7 +1,7 @@
 import { ContainerDest, ContainerType, ItemCondition, PresortMethod } from '../../../../../core/models/domain.models';
 
 export interface PresortQueueItem {
-  id: string;
+  id: number;
   barcode: string;
   /** Receipt number of linked donation visit */
   donationReceiptNumber?: string;
@@ -25,7 +25,7 @@ export interface PresortWorkItem {
 }
 
 export interface PresortState {
-  activeId: string | null;
+  activeId: number | null;
   containerType: ContainerType;
   presortMethod: PresortMethod;
   items: PresortWorkItem[];

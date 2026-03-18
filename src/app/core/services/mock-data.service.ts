@@ -1,4 +1,4 @@
-﻿import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import {
   Donor,
   Location,
@@ -38,10 +38,10 @@ export class MockDataService {
   private storage = inject(StorageService);
 
   readonly session: StaffSession = {
-    staffId: 'staff-001',
+    staffId: 1,
     staffName: 'Alex Morgan',
     role: StaffRole.Attendant,
-    locationId: 'loc-001',
+    locationId: 1,
     locationName: 'Downtown Store'
   };
 
@@ -64,24 +64,24 @@ export class MockDataService {
 
   // ── Phase 1: Reward definitions seed data (Req 5) ─────────────────────────
   private _rewardDefs = signal<RewardDefinition[]>([
-    { id: 'rd-001', name: '$5 Discount',   description: 'Redeemable at POS',  pointsRequired: 100,  discountValue: 5,   icon: '🏷️', active: true,  sortOrder: 1 },
-    { id: 'rd-002', name: '$10 Discount',  description: 'Redeemable at POS',  pointsRequired: 200,  discountValue: 10,  icon: '🏷️', active: true,  sortOrder: 2 },
-    { id: 'rd-003', name: '$25 Discount',  description: 'Redeemable at POS',  pointsRequired: 450,  discountValue: 25,  icon: '🎟️', active: true,  sortOrder: 3 },
-    { id: 'rd-004', name: 'Free Pickup',   description: 'One free pickup',     pointsRequired: 300,  discountValue: 0,   icon: '🚚', active: true,  sortOrder: 4 },
-    { id: 'rd-005', name: '$50 Gift Card', description: 'Partner gift card',   pointsRequired: 900,  discountValue: 50,  icon: '🎁', active: true,  sortOrder: 5 },
+    { id: 1, referenceNumber: 'RD-001', name: '$5 Discount',   description: 'Redeemable at POS',  pointsRequired: 100,  discountValue: 5,   icon: '🏷️', active: true,  sortOrder: 1 },
+    { id: 2, referenceNumber: 'RD-002', name: '$10 Discount',  description: 'Redeemable at POS',  pointsRequired: 200,  discountValue: 10,  icon: '🏷️', active: true,  sortOrder: 2 },
+    { id: 3, referenceNumber: 'RD-003', name: '$25 Discount',  description: 'Redeemable at POS',  pointsRequired: 450,  discountValue: 25,  icon: '🎟️', active: true,  sortOrder: 3 },
+    { id: 4, referenceNumber: 'RD-004', name: 'Free Pickup',   description: 'One free pickup',     pointsRequired: 300,  discountValue: 0,   icon: '🚚', active: true,  sortOrder: 4 },
+    { id: 5, referenceNumber: 'RD-005', name: '$50 Gift Card', description: 'Partner gift card',   pointsRequired: 900,  discountValue: 50,  icon: '🎁', active: true,  sortOrder: 5 },
   ]);
   readonly rewardDefinitions = this._rewardDefs.asReadonly();
 
   // ── Phase 1: Reward transactions seed data (Req 5, 7) ─────────────────────
   private _rewardTxns = signal<RewardTransaction[]>([
     {
-      id: 'rtx-001', donorId: 'd-001', donorName: 'Michael Johnson',
-      definitionId: 'rd-001', definitionName: '$5 Discount', pointsDeducted: 100,
+      id: 1, referenceNumber: 'RTX-001', donorId: 1, donorName: 'Michael Johnson',
+      definitionId: 1, definitionName: '$5 Discount', pointsDeducted: 100,
       status: RewardStatus.Redeemed, createdAt: new Date('2026-03-10'), redeemedAt: new Date('2026-03-10'),
     },
     {
-      id: 'rtx-002', donorId: 'd-002', donorName: 'Sarah Williams',
-      definitionId: 'rd-002', definitionName: '$10 Discount', pointsDeducted: 200,
+      id: 2, referenceNumber: 'RTX-002', donorId: 2, donorName: 'Sarah Williams',
+      definitionId: 2, definitionName: '$10 Discount', pointsDeducted: 200,
       status: RewardStatus.Gifted, createdAt: new Date('2026-03-12'),
       giftedToName: 'Emma Williams', giftedToContact: 'emma.w@email.com',
     },
@@ -91,7 +91,7 @@ export class MockDataService {
   // ── Phase 1: Campaign seed data (Req 6) ───────────────────────────────────
   private _campaigns = signal<Campaign[]>([
     {
-      id: 'cmp-001',
+      id: 1, referenceNumber: 'CMP-001',
       name: 'Winter Jacket Drive',
       description: 'Reach donors who have given winter clothing in the past',
       startDate: new Date('2026-04-01'),
@@ -101,10 +101,10 @@ export class MockDataService {
       targetCriteria: [{ categoryKey: 'clothing', categoryName: 'Clothing', subCategoryKey: 'womens', subCategoryName: "Women's" }],
       notificationHistory: [],
       createdAt: new Date('2026-03-18'),
-      createdByStaffId: 'staff-001',
+      createdByStaffId: 1,
     },
     {
-      id: 'cmp-002',
+      id: 2, referenceNumber: 'CMP-002',
       name: 'Electronics Recycling Push',
       description: 'Encourage electronics donors to donate again',
       startDate: new Date('2026-03-20'),
@@ -113,11 +113,11 @@ export class MockDataService {
       channel: NotificationChannel.Both,
       targetCriteria: [{ categoryKey: 'electronics', categoryName: 'Electronics' }],
       notificationHistory: [
-        { donorId: 'd-005', donorName: 'David Chen',       channel: NotificationChannel.Email, sentAt: new Date('2026-03-20'), success: true },
-        { donorId: 'd-010', donorName: 'Lisa Anderson',    channel: NotificationChannel.SMS,   sentAt: new Date('2026-03-20'), success: true },
+        { donorId: 5, donorName: 'David Chen',       channel: NotificationChannel.Email, sentAt: new Date('2026-03-20'), success: true },
+        { donorId: 10, donorName: 'Lisa Anderson',    channel: NotificationChannel.SMS,   sentAt: new Date('2026-03-20'), success: true },
       ],
       createdAt: new Date('2026-03-15'),
-      createdByStaffId: 'staff-001',
+      createdByStaffId: 1,
     },
   ]);
   readonly campaigns = this._campaigns.asReadonly();
@@ -388,7 +388,7 @@ export class MockDataService {
 
   readonly locations: Location[] = [
     {
-      id: 'loc-001',
+      id: 1, referenceNumber: 'LOC-001',
       name: 'Downtown Store',
       address: '123 Main Street',
       phone: '(555)100-2000',
@@ -401,7 +401,7 @@ export class MockDataService {
       revenueToday: 2840
     },
     {
-      id: 'loc-002',
+      id: 2, referenceNumber: 'LOC-002',
       name: 'Northside Store',
       address: '456 Oak Avenue',
       phone: '(555)200-3000',
@@ -414,7 +414,7 @@ export class MockDataService {
       revenueToday: 1960
     },
     {
-      id: 'loc-003',
+      id: 3, referenceNumber: 'LOC-003',
       name: 'Westside Store',
       address: '789 Pine Road',
       phone: '(555)300-4000',
@@ -427,7 +427,7 @@ export class MockDataService {
       revenueToday: 1280
     },
     {
-      id: 'loc-004',
+      id: 4, referenceNumber: 'LOC-004',
       name: 'Eastside Store',
       address: '321 Elm Boulevard',
       phone: '(555)400-5000',
@@ -443,7 +443,7 @@ export class MockDataService {
 
   readonly donors: Donor[] = [
     {
-      id: 'd-001',
+      id: 1, referenceNumber: 'D-001',
       firstName: 'Michael',
       lastName: 'Johnson',
       email: 'm.johnson@email.com',
@@ -457,7 +457,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-01')
     },
     {
-      id: 'd-002',
+      id: 2, referenceNumber: 'D-002',
       firstName: 'Sarah',
       lastName: 'Williams',
       email: 's.williams@email.com',
@@ -471,7 +471,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-02-28')
     },
     {
-      id: 'd-003',
+      id: 3, referenceNumber: 'D-003',
       firstName: 'Robert',
       lastName: 'Martinez',
       email: 'r.martinez@email.com',
@@ -485,7 +485,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-02')
     },
     {
-      id: 'd-004',
+      id: 4, referenceNumber: 'D-004',
       firstName: 'Lisa',
       lastName: 'Park',
       email: 'lisa.p@email.com',
@@ -499,7 +499,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-02-10')
     },
     {
-      id: 'd-005',
+      id: 5, referenceNumber: 'D-005',
       firstName: 'David',
       lastName: 'Chen',
       email: 'd.chen@email.com',
@@ -513,7 +513,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-10')
     },
     {
-      id: 'd-006',
+      id: 6, referenceNumber: 'D-006',
       firstName: 'Jennifer',
       lastName: 'Taylor',
       email: 'j.taylor@email.com',
@@ -527,7 +527,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-05')
     },
     {
-      id: 'd-007',
+      id: 7, referenceNumber: 'D-007',
       firstName: 'James',
       lastName: 'Anderson',
       email: 'j.anderson@email.com',
@@ -541,7 +541,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-08')
     },
     {
-      id: 'd-008',
+      id: 8, referenceNumber: 'D-008',
       firstName: 'Maria',
       lastName: 'Garcia',
       email: 'm.garcia@email.com',
@@ -555,7 +555,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-02-20')
     },
     {
-      id: 'd-009',
+      id: 9, referenceNumber: 'D-009',
       firstName: 'Thomas',
       lastName: 'Brown',
       email: 't.brown@email.com',
@@ -569,7 +569,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-12')
     },
     {
-      id: 'd-010',
+      id: 10, referenceNumber: 'D-010',
       firstName: 'Nancy',
       lastName: 'Wilson',
       email: 'n.wilson@email.com',
@@ -583,7 +583,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-04')
     },
     {
-      id: 'd-011',
+      id: 11, referenceNumber: 'D-011',
       firstName: 'Daniel',
       lastName: 'Moore',
       email: 'd.moore@email.com',
@@ -597,7 +597,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-02-25')
     },
     {
-      id: 'd-012',
+      id: 12, referenceNumber: 'D-012',
       firstName: 'Emily',
       lastName: 'Davis',
       email: 'e.davis@email.com',
@@ -611,7 +611,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-11')
     },
     {
-      id: 'd-013',
+      id: 13, referenceNumber: 'D-013',
       firstName: 'Kevin',
       lastName: 'Miller',
       email: 'k.miller@email.com',
@@ -625,7 +625,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-09')
     },
     {
-      id: 'd-014',
+      id: 14, referenceNumber: 'D-014',
       firstName: 'Rebecca',
       lastName: 'White',
       email: 'r.white@email.com',
@@ -639,7 +639,7 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-13')
     },
     {
-      id: 'd-015',
+      id: 15, referenceNumber: 'D-015',
       firstName: 'Chris',
       lastName: 'Thompson',
       email: 'c.thompson@email.com',
@@ -656,21 +656,21 @@ export class MockDataService {
 
   readonly donations: Donation[] = [
     {
-      id: 'don-001',
+      id: 1, referenceNumber: 'DON-001',
       receiptNumber: 'DN-001234',
-      donorId: 'd-001',
+      donorId: 1,
       donorName: 'Michael Johnson',
       donorInitials: 'MJ',
       donorTier: DonorTier.Gold,
-      locationId: 'loc-001',
+      locationId: 1,
       locationName: 'Downtown Store',
-      attendantId: 'staff-001',
+      attendantId: 1,
       timestamp: new Date('2026-03-15T14:45:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-001',
-          donationId: 'don-001',
+          id: 1, referenceNumber: 'ITEM-001',
+          donationId: 1,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
           quantity: 8,
@@ -678,8 +678,8 @@ export class MockDataService {
           totalEstimatedValue: 96
         },
         {
-          id: 'i-002',
-          donationId: 'don-001',
+          id: 2, referenceNumber: 'ITEM-002',
+          donationId: 1,
           categoryKey: 'books',
           categoryName: 'Books',
           quantity: 5,
@@ -687,8 +687,8 @@ export class MockDataService {
           totalEstimatedValue: 25
         },
         {
-          id: 'i-003',
-          donationId: 'don-001',
+          id: 3, referenceNumber: 'ITEM-003',
+          donationId: 1,
           categoryKey: 'housewares',
           categoryName: 'Housewares',
           quantity: 2,
@@ -702,21 +702,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-002',
+      id: 2, referenceNumber: 'DON-002',
       receiptNumber: 'DN-001233',
-      donorId: 'd-002',
+      donorId: 2,
       donorName: 'Sarah Williams',
       donorInitials: 'SW',
       donorTier: DonorTier.Gold,
-      locationId: 'loc-002',
+      locationId: 2,
       locationName: 'Northside Store',
-      attendantId: 'staff-002',
+      attendantId: 2,
       timestamp: new Date('2026-03-15T14:30:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-004',
-          donationId: 'don-002',
+          id: 4, referenceNumber: 'ITEM-004',
+          donationId: 2,
           categoryKey: 'shoes',
           categoryName: 'Shoes',
           quantity: 4,
@@ -724,8 +724,8 @@ export class MockDataService {
           totalEstimatedValue: 60
         },
         {
-          id: 'i-005',
-          donationId: 'don-002',
+          id: 5, referenceNumber: 'ITEM-005',
+          donationId: 2,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
           quantity: 4,
@@ -739,21 +739,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-003',
+      id: 3, referenceNumber: 'DON-003',
       receiptNumber: 'DN-001232',
-      donorId: 'd-003',
+      donorId: 3,
       donorName: 'Robert Martinez',
       donorInitials: 'RM',
       donorTier: DonorTier.Silver,
-      locationId: 'loc-001',
+      locationId: 1,
       locationName: 'Downtown Store',
-      attendantId: 'staff-001',
+      attendantId: 1,
       timestamp: new Date('2026-03-15T14:15:00'),
       status: DonationStatus.CheckedIn,
       items: [
         {
-          id: 'i-006',
-          donationId: 'don-003',
+          id: 6, referenceNumber: 'ITEM-006',
+          donationId: 3,
           categoryKey: 'furniture',
           categoryName: 'Furniture',
           quantity: 2,
@@ -761,8 +761,8 @@ export class MockDataService {
           totalEstimatedValue: 250
         },
         {
-          id: 'i-007',
-          donationId: 'don-003',
+          id: 7, referenceNumber: 'ITEM-007',
+          donationId: 3,
           categoryKey: 'home_decor',
           categoryName: 'Home Décor',
           quantity: 8,
@@ -776,21 +776,21 @@ export class MockDataService {
       presortCompleted: false
     },
     {
-      id: 'don-004',
+      id: 4, referenceNumber: 'DON-004',
       receiptNumber: 'DN-001231',
-      donorId: 'd-004',
+      donorId: 4,
       donorName: 'Lisa Park',
       donorInitials: 'LP',
       donorTier: DonorTier.Bronze,
-      locationId: 'loc-001',
+      locationId: 1,
       locationName: 'Downtown Store',
-      attendantId: 'staff-001',
+      attendantId: 1,
       timestamp: new Date('2026-03-14T10:20:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-008',
-          donationId: 'don-004',
+          id: 8, referenceNumber: 'ITEM-008',
+          donationId: 4,
           categoryKey: 'books',
           categoryName: 'Books & Media',
           quantity: 12,
@@ -804,21 +804,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-005',
+      id: 5, referenceNumber: 'DON-005',
       receiptNumber: 'DN-001230',
-      donorId: 'd-005',
+      donorId: 5,
       donorName: 'David Chen',
       donorInitials: 'DC',
       donorTier: DonorTier.Platinum,
-      locationId: 'loc-002',
+      locationId: 2,
       locationName: 'Northside Store',
-      attendantId: 'staff-002',
+      attendantId: 2,
       timestamp: new Date('2026-03-13T15:50:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-009',
-          donationId: 'don-005',
+          id: 9, referenceNumber: 'ITEM-009',
+          donationId: 5,
           categoryKey: 'electronics',
           categoryName: 'Electronics',
           quantity: 3,
@@ -826,8 +826,8 @@ export class MockDataService {
           totalEstimatedValue: 150
         },
         {
-          id: 'i-010',
-          donationId: 'don-005',
+          id: 10, referenceNumber: 'ITEM-010',
+          donationId: 5,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
           quantity: 10,
@@ -841,21 +841,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-006',
+      id: 6, referenceNumber: 'DON-006',
       receiptNumber: 'DN-001229',
-      donorId: 'd-006',
+      donorId: 6,
       donorName: 'Jennifer Taylor',
       donorInitials: 'JT',
       donorTier: DonorTier.Gold,
-      locationId: 'loc-001',
+      locationId: 1,
       locationName: 'Downtown Store',
-      attendantId: 'staff-001',
+      attendantId: 1,
       timestamp: new Date('2026-03-12T11:30:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-011',
-          donationId: 'don-006',
+          id: 11, referenceNumber: 'ITEM-011',
+          donationId: 6,
           categoryKey: 'toys',
           categoryName: 'Toys & Games',
           quantity: 8,
@@ -863,8 +863,8 @@ export class MockDataService {
           totalEstimatedValue: 80
         },
         {
-          id: 'i-012',
-          donationId: 'don-006',
+          id: 12, referenceNumber: 'ITEM-012',
+          donationId: 6,
           categoryKey: 'home_decor',
           categoryName: 'Home Décor',
           quantity: 5,
@@ -872,8 +872,8 @@ export class MockDataService {
           totalEstimatedValue: 75
         },
         {
-          id: 'i-013',
-          donationId: 'don-006',
+          id: 13, referenceNumber: 'ITEM-013',
+          donationId: 6,
           categoryKey: 'linens',
           categoryName: 'Linens & Textiles',
           quantity: 4,
@@ -887,21 +887,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-007',
+      id: 7, referenceNumber: 'DON-007',
       receiptNumber: 'DN-001228',
-      donorId: 'd-007',
+      donorId: 7,
       donorName: 'James Anderson',
       donorInitials: 'JA',
       donorTier: DonorTier.Silver,
-      locationId: 'loc-003',
+      locationId: 3,
       locationName: 'Westside Store',
-      attendantId: 'staff-003',
+      attendantId: 3,
       timestamp: new Date('2026-03-11T09:15:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-014',
-          donationId: 'don-007',
+          id: 14, referenceNumber: 'ITEM-014',
+          donationId: 7,
           categoryKey: 'sporting',
           categoryName: 'Sporting Goods',
           quantity: 6,
@@ -909,8 +909,8 @@ export class MockDataService {
           totalEstimatedValue: 150
         },
         {
-          id: 'i-015',
-          donationId: 'don-007',
+          id: 15, referenceNumber: 'ITEM-015',
+          donationId: 7,
           categoryKey: 'shoes',
           categoryName: 'Shoes',
           quantity: 3,
@@ -924,21 +924,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-008',
+      id: 8, referenceNumber: 'DON-008',
       receiptNumber: 'DN-001227',
-      donorId: 'd-009',
+      donorId: 9,
       donorName: 'Thomas Brown',
       donorInitials: 'TB',
       donorTier: DonorTier.Platinum,
-      locationId: 'loc-001',
+      locationId: 1,
       locationName: 'Downtown Store',
-      attendantId: 'staff-001',
+      attendantId: 1,
       timestamp: new Date('2026-03-10T13:40:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-016',
-          donationId: 'don-008',
+          id: 16, referenceNumber: 'ITEM-016',
+          donationId: 8,
           categoryKey: 'furniture',
           categoryName: 'Furniture',
           quantity: 1,
@@ -946,8 +946,8 @@ export class MockDataService {
           totalEstimatedValue: 125
         },
         {
-          id: 'i-017',
-          donationId: 'don-008',
+          id: 17, referenceNumber: 'ITEM-017',
+          donationId: 8,
           categoryKey: 'housewares',
           categoryName: 'Housewares',
           quantity: 15,
@@ -955,8 +955,8 @@ export class MockDataService {
           totalEstimatedValue: 120
         },
         {
-          id: 'i-018',
-          donationId: 'don-008',
+          id: 18, referenceNumber: 'ITEM-018',
+          donationId: 8,
           categoryKey: 'accessories',
           categoryName: 'Accessories',
           quantity: 10,
@@ -970,21 +970,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-009',
+      id: 9, referenceNumber: 'DON-009',
       receiptNumber: 'DN-001226',
-      donorId: 'd-010',
+      donorId: 10,
       donorName: 'Nancy Wilson',
       donorInitials: 'NW',
       donorTier: DonorTier.Silver,
-      locationId: 'loc-002',
+      locationId: 2,
       locationName: 'Northside Store',
-      attendantId: 'staff-002',
+      attendantId: 2,
       timestamp: new Date('2026-03-09T16:20:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-019',
-          donationId: 'don-009',
+          id: 19, referenceNumber: 'ITEM-019',
+          donationId: 9,
           categoryKey: 'books',
           categoryName: 'Books & Media',
           quantity: 20,
@@ -992,8 +992,8 @@ export class MockDataService {
           totalEstimatedValue: 100
         },
         {
-          id: 'i-020',
-          donationId: 'don-009',
+          id: 20, referenceNumber: 'ITEM-020',
+          donationId: 9,
           categoryKey: 'seasonal',
           categoryName: 'Seasonal',
           quantity: 8,
@@ -1007,21 +1007,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-010',
+      id: 10, referenceNumber: 'DON-010',
       receiptNumber: 'DN-001225',
-      donorId: 'd-011',
+      donorId: 11,
       donorName: 'Daniel Moore',
       donorInitials: 'DM',
       donorTier: DonorTier.Gold,
-      locationId: 'loc-001',
+      locationId: 1,
       locationName: 'Downtown Store',
-      attendantId: 'staff-001',
+      attendantId: 1,
       timestamp: new Date('2026-03-08T10:00:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-021',
-          donationId: 'don-010',
+          id: 21, referenceNumber: 'ITEM-021',
+          donationId: 10,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
           quantity: 15,
@@ -1029,8 +1029,8 @@ export class MockDataService {
           totalEstimatedValue: 180
         },
         {
-          id: 'i-022',
-          donationId: 'don-010',
+          id: 22, referenceNumber: 'ITEM-022',
+          donationId: 10,
           categoryKey: 'electronics',
           categoryName: 'Electronics',
           quantity: 2,
@@ -1044,21 +1044,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-011',
+      id: 11, referenceNumber: 'DON-011',
       receiptNumber: 'DN-001224',
-      donorId: 'd-001',
+      donorId: 1,
       donorName: 'Michael Johnson',
       donorInitials: 'MJ',
       donorTier: DonorTier.Gold,
-      locationId: 'loc-001',
+      locationId: 1,
       locationName: 'Downtown Store',
-      attendantId: 'staff-001',
+      attendantId: 1,
       timestamp: new Date('2026-03-01T14:25:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-023',
-          donationId: 'don-011',
+          id: 23, referenceNumber: 'ITEM-023',
+          donationId: 11,
           categoryKey: 'books',
           categoryName: 'Books & Media',
           quantity: 8,
@@ -1066,8 +1066,8 @@ export class MockDataService {
           totalEstimatedValue: 40
         },
         {
-          id: 'i-024',
-          donationId: 'don-011',
+          id: 24, referenceNumber: 'ITEM-024',
+          donationId: 11,
           categoryKey: 'housewares',
           categoryName: 'Housewares',
           quantity: 6,
@@ -1075,8 +1075,8 @@ export class MockDataService {
           totalEstimatedValue: 48
         },
         {
-          id: 'i-025',
-          donationId: 'don-011',
+          id: 25, referenceNumber: 'ITEM-025',
+          donationId: 11,
           categoryKey: 'linens',
           categoryName: 'Linens',
           quantity: 10,
@@ -1090,21 +1090,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-012',
+      id: 12, referenceNumber: 'DON-012',
       receiptNumber: 'DN-001223',
-      donorId: 'd-002',
+      donorId: 2,
       donorName: 'Sarah Williams',
       donorInitials: 'SW',
       donorTier: DonorTier.Gold,
-      locationId: 'loc-002',
+      locationId: 2,
       locationName: 'Northside Store',
-      attendantId: 'staff-002',
+      attendantId: 2,
       timestamp: new Date('2026-02-28T11:10:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-026',
-          donationId: 'don-012',
+          id: 26, referenceNumber: 'ITEM-026',
+          donationId: 12,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
           quantity: 12,
@@ -1118,21 +1118,21 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 'don-013',
+      id: 13, referenceNumber: 'DON-013',
       receiptNumber: 'DN-001222',
-      donorId: 'd-014',
+      donorId: 14,
       donorName: 'Rebecca White',
       donorInitials: 'RW',
       donorTier: DonorTier.Platinum,
-      locationId: 'loc-001',
+      locationId: 1,
       locationName: 'Downtown Store',
-      attendantId: 'staff-001',
+      attendantId: 1,
       timestamp: new Date('2026-02-25T15:30:00'),
       status: DonationStatus.Completed,
       items: [
         {
-          id: 'i-027',
-          donationId: 'don-013',
+          id: 27, referenceNumber: 'ITEM-027',
+          donationId: 13,
           categoryKey: 'furniture',
           categoryName: 'Furniture',
           quantity: 2,
@@ -1140,8 +1140,8 @@ export class MockDataService {
           totalEstimatedValue: 250
         },
         {
-          id: 'i-028',
-          donationId: 'don-013',
+          id: 28, referenceNumber: 'ITEM-028',
+          donationId: 13,
           categoryKey: 'electronics',
           categoryName: 'Electronics',
           quantity: 4,
@@ -1149,8 +1149,8 @@ export class MockDataService {
           totalEstimatedValue: 200
         },
         {
-          id: 'i-029',
-          donationId: 'don-013',
+          id: 29, referenceNumber: 'ITEM-029',
+          donationId: 13,
           categoryKey: 'home_decor',
           categoryName: 'Home Décor',
           quantity: 6,
@@ -1167,9 +1167,9 @@ export class MockDataService {
 
   readonly containers: Container[] = [
     {
-      id: 'c-001',
+      id: 1, referenceNumber: 'C-001',
       barcode: 'BRJ-2026-001234',
-      donationId: 'don-001',
+      donationId: 1,
       donationReceiptNumber: 'DN-001234',
       donorVisitLabel: 'Michael Johnson',
       containerType: ContainerType.Gaylord,
@@ -1183,16 +1183,16 @@ export class MockDataService {
       ],
       destination: ContainerDest.Production,
       status: ContainerStatus.Sorting,
-      locationId: 'loc-001', locationName: 'Downtown Store',
+      locationId: 1, locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T07:10:00'),
       updatedAt: new Date('2026-03-16T08:30:00'),
       presortedAt: new Date('2026-03-16T08:30:00'),
       totalItems: 40, totalEstimatedValue: 516
     },
     {
-      id: 'c-002',
+      id: 2, referenceNumber: 'C-002',
       barcode: 'BRJ-2026-001235',
-      donationId: 'don-002',
+      donationId: 2,
       donationReceiptNumber: 'DN-001233',
       donorVisitLabel: 'Sarah Williams',
       containerType: ContainerType.CartRack,
@@ -1205,16 +1205,16 @@ export class MockDataService {
       ],
       destination: ContainerDest.Production,
       status: ContainerStatus.InUse,
-      locationId: 'loc-001', locationName: 'Downtown Store',
+      locationId: 1, locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T06:00:00'),
       updatedAt: new Date('2026-03-16T10:00:00'),
       presortedAt: new Date('2026-03-16T09:00:00'),
       totalItems: 63, totalEstimatedValue: 405
     },
     {
-      id: 'c-003',
+      id: 3, referenceNumber: 'C-003',
       barcode: 'BRJ-2026-001236',
-      donationId: 'don-003',
+      donationId: 3,
       donationReceiptNumber: 'DN-001232',
       donorVisitLabel: 'Walk-in Drop',
       containerType: ContainerType.Gaylord,
@@ -1223,15 +1223,15 @@ export class MockDataService {
       contents: [{ categoryKey: 'clothing', categoryName: 'Clothing', quantity: 50, condition: ItemCondition.Sellable }],
       destination: ContainerDest.Warehouse,
       status: ContainerStatus.Available,
-      locationId: 'loc-001', locationName: 'Downtown Store',
+      locationId: 1, locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T11:00:00'),
       updatedAt: new Date('2026-03-16T11:00:00'),
       totalItems: 50, totalEstimatedValue: 600
     },
     {
-      id: 'c-004',
+      id: 4, referenceNumber: 'C-004',
       barcode: 'BRJ-2026-001237',
-      donationId: 'don-005',
+      donationId: 5,
       donationReceiptNumber: 'DN-001230',
       donorVisitLabel: 'David Chen',
       containerType: ContainerType.Tote,
@@ -1243,27 +1243,27 @@ export class MockDataService {
       ],
       destination: ContainerDest.Ecommerce,
       status: ContainerStatus.Sorting,
-      locationId: 'loc-002', locationName: 'Northside Store',
+      locationId: 2, locationName: 'Northside Store',
       createdAt: new Date('2026-03-15T16:00:00'),
       updatedAt: new Date('2026-03-15T17:00:00'),
       presortedAt: new Date('2026-03-15T17:00:00'),
       totalItems: 8, totalEstimatedValue: 400
     },
     {
-      id: 'c-005',
+      id: 5, referenceNumber: 'C-005',
       barcode: 'BRJ-2026-001238',
       containerType: ContainerType.Pallet,
       deptKey: 'home', deptName: 'Home & Living',
       catKey: 'furniture', catName: 'Furniture',
       contents: [],
       status: ContainerStatus.Available,
-      locationId: 'loc-001', locationName: 'Downtown Store',
+      locationId: 1, locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T13:30:00'),
       updatedAt: new Date('2026-03-16T13:30:00'),
       totalItems: 0, totalEstimatedValue: 0
     },
     {
-      id: 'c-006',
+      id: 6, referenceNumber: 'C-006',
       barcode: 'BRJ-2026-001239',
       containerType: ContainerType.Baler,
       deptKey: 'salvage', deptName: 'Salvage & Recycling',
@@ -1272,14 +1272,14 @@ export class MockDataService {
       destination: ContainerDest.Salvage,
       status: ContainerStatus.Available,
       salvageWeightLbs: 120,
-      locationId: 'loc-001', locationName: 'Downtown Store',
+      locationId: 1, locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T09:00:00'),
       updatedAt: new Date('2026-03-16T09:00:00'),
       totalItems: 0, totalEstimatedValue: 0,
       notes: 'Textile bale — scheduled for pickup'
     },
     {
-      id: 'c-007',
+      id: 7, referenceNumber: 'C-007',
       barcode: 'BRJ-2026-001240',
       donorVisitLabel: 'Walk-in Drop (Anonymous)',
       containerType: ContainerType.Gaylord,
@@ -1287,13 +1287,13 @@ export class MockDataService {
       deptKey: 'clothes', deptName: 'Clothing & Accessories',
       contents: [],
       status: ContainerStatus.Available,
-      locationId: 'loc-001', locationName: 'Downtown Store',
+      locationId: 1, locationName: 'Downtown Store',
       createdAt: new Date(Date.now() - 78 * 60 * 1000),
       updatedAt: new Date(Date.now() - 78 * 60 * 1000),
       totalItems: 65, totalEstimatedValue: 0
     },
     {
-      id: 'c-008',
+      id: 8, referenceNumber: 'C-008',
       barcode: 'BRJ-2026-001241',
       donationReceiptNumber: 'DN-001237',
       donorVisitLabel: 'Robert Martinez · DN-001237',
@@ -1302,7 +1302,7 @@ export class MockDataService {
       deptKey: 'home', deptName: 'Home & Living',
       contents: [],
       status: ContainerStatus.Available,
-      locationId: 'loc-001', locationName: 'Downtown Store',
+      locationId: 1, locationName: 'Downtown Store',
       createdAt: new Date(Date.now() - 95 * 60 * 1000),
       updatedAt: new Date(Date.now() - 95 * 60 * 1000),
       totalItems: 110, totalEstimatedValue: 0
@@ -1340,10 +1340,10 @@ export class MockDataService {
       { categoryKey: 'other', categoryName: 'Other', color: '#ef4444', count: 156, percentage: 25 }
     ],
     topLocations: [
-      { locationId: 'loc-001', locationName: 'Downtown Store', totalValue: 7420, percentage: 100 },
-      { locationId: 'loc-002', locationName: 'Northside Store', totalValue: 5890, percentage: 79 },
-      { locationId: 'loc-003', locationName: 'Westside Store', totalValue: 3240, percentage: 44 },
-      { locationId: 'loc-004', locationName: 'Eastside Store', totalValue: 1850, percentage: 25 }
+      { locationId: 1, locationName: 'Downtown Store', totalValue: 7420, percentage: 100 },
+      { locationId: 2, locationName: 'Northside Store', totalValue: 5890, percentage: 79 },
+      { locationId: 3, locationName: 'Westside Store', totalValue: 3240, percentage: 44 },
+      { locationId: 4, locationName: 'Eastside Store', totalValue: 1850, percentage: 25 }
     ]
   };
 
@@ -1449,25 +1449,25 @@ export class MockDataService {
 
   // ─── Helper Methods ───
 
-  getDonorById(id: string): Donor | undefined {
+  getDonorById(id: number): Donor | undefined {
     return this.donors.find(d => d.id === id);
   }
 
-  getDonationsByDonor(donorId: string): Donation[] {
+  getDonationsByDonor(donorId: number): Donation[] {
     return this.donations
       .filter(d => d.donorId === donorId)
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
-  getContainersByLocation(locationId: string): Container[] {
+  getContainersByLocation(locationId: number): Container[] {
     return this.containers.filter(c => c.locationId === locationId);
   }
 
-  getDonationById(id: string): Donation | undefined {
+  getDonationById(id: number): Donation | undefined {
     return this.donations.find(d => d.id === id);
   }
 
-  getLocationById(id: string): Location | undefined {
+  getLocationById(id: number): Location | undefined {
     return this.locations.find(l => l.id === id);
   }
 
@@ -1478,7 +1478,8 @@ export class MockDataService {
   // Simulated creation methods (would be API calls in production)
   createDonation(donation: Partial<Donation>): Donation {
     const newDonation: Donation = {
-      id: `don-${Date.now()}`,
+      id: Date.now(),
+      referenceNumber: `DON-${Date.now()}`,
       receiptNumber: this.newReceipt(),
       donorId: donation.donorId || undefined,
       donorName: donation.donorName || 'Anonymous',
@@ -1500,7 +1501,7 @@ export class MockDataService {
     return newDonation;
   }
 
-  updateDonation(id: string, updates: Partial<Donation>): Donation | undefined {
+  updateDonation(id: number, updates: Partial<Donation>): Donation | undefined {
     const index = this.donations.findIndex(d => d.id === id);
     if (index >= 0) {
       this.donations[index] = { ...this.donations[index], ...updates };
@@ -1512,7 +1513,8 @@ export class MockDataService {
 
   createContainer(container: Partial<Container>): Container {
     const newContainer: Container = {
-      id: `c-${Date.now()}`,
+      id: Date.now(),
+      referenceNumber: `C-${Date.now()}`,
       barcode: container.barcode ?? this.newBarcode(),
       donationId: container.donationId,
       donationReceiptNumber: container.donationReceiptNumber,
@@ -1549,7 +1551,7 @@ export class MockDataService {
     return newContainer;
   }
 
-  updateContainer(id: string, updates: Partial<Container>): Container | undefined {
+  updateContainer(id: number, updates: Partial<Container>): Container | undefined {
     const index = this.containers.findIndex(c => c.id === id);
     if (index >= 0) {
       this.containers[index] = { ...this.containers[index], ...updates, updatedAt: new Date() };
@@ -1559,17 +1561,18 @@ export class MockDataService {
     return undefined;
   }
 
-  updateDonor(id: string, patch: Partial<Donor>): void {
+  updateDonor(id: number, patch: Partial<Donor>): void {
     const index = this.donors.findIndex(d => d.id === id);
     if (index >= 0) {
       (this.donors as Donor[])[index] = { ...this.donors[index], ...patch };
     }
   }
 
-  addDonor(donor: Omit<Donor, 'id' | 'joinDate' | 'totalDonations' | 'lifetimeValue' | 'loyaltyPoints' | 'loyaltyTier'>): Donor {
+  addDonor(donor: Omit<Donor, 'id' | 'referenceNumber' | 'joinDate' | 'totalDonations' | 'lifetimeValue' | 'loyaltyPoints' | 'loyaltyTier'>): Donor {
     const newDonor: Donor = {
       ...donor,
-      id: `d-${Date.now()}`,
+      id: Date.now(),
+      referenceNumber: `D-${Date.now()}`,
       joinDate: new Date(),
       totalDonations: 0,
       lifetimeValue: 0,
@@ -1583,32 +1586,32 @@ export class MockDataService {
   // Simulated rewards/points
   getAvailableRewards() {
     return [
-      { id: 'r-001', name: '$5 Gift Card', pointsRequired: 500, icon: '💳', category: 'gift-card' },
-      { id: 'r-002', name: '$10 Gift Card', pointsRequired: 1000, icon: '💳', category: 'gift-card' },
-      { id: 'r-003', name: '$25 Gift Card', pointsRequired: 2500, icon: '💳', category: 'gift-card' },
-      { id: 'r-004', name: 'Free Pickup Service', pointsRequired: 300, icon: '🚚', category: 'service' },
-      { id: 'r-005', name: 'Priority Processing', pointsRequired: 150, icon: '⚡', category: 'service' },
-      { id: 'r-006', name: 'Thank You Mug', pointsRequired: 800, icon: '☕', category: 'merchandise' },
-      { id: 'r-007', name: 'Tote Bag', pointsRequired: 600, icon: '👜', category: 'merchandise' },
-      { id: 'r-008', name: 'Branded T-Shirt', pointsRequired: 1200, icon: '👕', category: 'merchandise' }
+      { id: 1, referenceNumber: 'R-001', name: '$5 Gift Card', pointsRequired: 500, icon: '💳', category: 'gift-card' },
+      { id: 2, referenceNumber: 'R-002', name: '$10 Gift Card', pointsRequired: 1000, icon: '💳', category: 'gift-card' },
+      { id: 3, referenceNumber: 'R-003', name: '$25 Gift Card', pointsRequired: 2500, icon: '💳', category: 'gift-card' },
+      { id: 4, referenceNumber: 'R-004', name: 'Free Pickup Service', pointsRequired: 300, icon: '🚚', category: 'service' },
+      { id: 5, referenceNumber: 'R-005', name: 'Priority Processing', pointsRequired: 150, icon: '⚡', category: 'service' },
+      { id: 6, referenceNumber: 'R-006', name: 'Thank You Mug', pointsRequired: 800, icon: '☕', category: 'merchandise' },
+      { id: 7, referenceNumber: 'R-007', name: 'Tote Bag', pointsRequired: 600, icon: '👜', category: 'merchandise' },
+      { id: 8, referenceNumber: 'R-008', name: 'Branded T-Shirt', pointsRequired: 1200, icon: '👕', category: 'merchandise' }
     ];
   }
 
-  getScheduledPickups(donorId?: string) {
+  getScheduledPickups(donorId?: number) {
     return this.getScheduledDonations(donorId);
   }
 
-  getScheduledDonations(donorId?: string): import('../models/domain.models').ScheduledDonation[] {
+  getScheduledDonations(donorId?: number): import('../models/domain.models').ScheduledDonation[] {
     const appts: import('../models/domain.models').ScheduledDonation[] = [
       {
         id: 1,
         referenceNumber: 'APT-20260320-001',
-        donorId: 'd-001',
+        donorId: 1,
         donorName: 'Michael Johnson',
         donorPhone: '(555) 101-2020',
         donorEmail: 'michael.j@email.com',
         address: '123 Main St, Springfield',
-        locationId: 'loc-001',
+        locationId: 1,
         locationName: 'Downtown Store',
         method: DonationMethod.Scheduled,
         date: new Date('2026-03-20'),
@@ -1623,12 +1626,12 @@ export class MockDataService {
       {
         id: 2,
         referenceNumber: 'APT-20260322-002',
-        donorId: 'd-002',
+        donorId: 2,
         donorName: 'Sarah Williams',
         donorPhone: '(555) 234-5678',
         donorEmail: 'sarah.w@email.com',
         address: '456 Oak Ave, Springfield',
-        locationId: 'loc-001',
+        locationId: 1,
         locationName: 'Downtown Store',
         method: DonationMethod.Scheduled,
         date: new Date('2026-03-22'),
@@ -1643,12 +1646,12 @@ export class MockDataService {
       {
         id: 3,
         referenceNumber: 'APT-20260318-003',
-        donorId: 'd-005',
+        donorId: 5,
         donorName: 'David Chen',
         donorPhone: '(555) 555-9900',
         donorEmail: 'david.c@email.com',
         address: '555 Maple Dr, Springfield',
-        locationId: 'loc-002',
+        locationId: 2,
         locationName: 'Westside Thrift',
         method: DonationMethod.Scheduled,
         date: new Date('2026-03-18'),
@@ -1663,12 +1666,12 @@ export class MockDataService {
       {
         id: 4,
         referenceNumber: 'APT-20260325-004',
-        donorId: 'd-006',
+        donorId: 6,
         donorName: 'Jennifer Taylor',
         donorPhone: '(555) 321-6543',
         donorEmail: 'jen.t@email.com',
         address: '111 Cedar Ln, Springfield',
-        locationId: 'loc-001',
+        locationId: 1,
         locationName: 'Downtown Store',
         method: DonationMethod.Scheduled,
         date: new Date('2026-03-25'),
@@ -1683,12 +1686,12 @@ export class MockDataService {
       {
         id: 5,
         referenceNumber: 'APT-20260319-005',
-        donorId: 'd-009',
+        donorId: 9,
         donorName: 'Thomas Brown',
         donorPhone: '(555) 777-1234',
         donorEmail: 'thomas.b@email.com',
         address: '444 Willow Ct, Springfield',
-        locationId: 'loc-003',
+        locationId: 3,
         locationName: 'Eastside Thrift',
         method: DonationMethod.Scheduled,
         date: new Date('2026-03-19'),
@@ -1704,7 +1707,7 @@ export class MockDataService {
         id: 6,
         referenceNumber: 'APT-20260328-006',
         donorName: 'Anonymous',
-        locationId: 'loc-002',
+        locationId: 2,
         locationName: 'Westside Thrift',
         method: DonationMethod.WalkIn,
         date: new Date('2026-03-28'),
@@ -1719,12 +1722,12 @@ export class MockDataService {
       {
         id: 7,
         referenceNumber: 'APT-20260401-007',
-        donorId: 'd-003',
+        donorId: 3,
         donorName: 'Robert Martinez',
         donorPhone: '(555) 456-7890',
         donorEmail: 'roberto.m@email.com',
         address: '789 Elm St, Springfield',
-        locationId: 'loc-001',
+        locationId: 1,
         locationName: 'Downtown Store',
         method: DonationMethod.Scheduled,
         date: new Date('2026-04-01'),
@@ -1743,7 +1746,7 @@ export class MockDataService {
   createPickup(pickup: any) {
     // Simulate creating a pickup
     return {
-      id: `p-${Date.now()}`,
+      id: Date.now(),
       ...pickup,
       status: DonationStatus.Scheduled,
       createdAt: new Date()
@@ -1776,7 +1779,7 @@ export class MockDataService {
    * Updates the donation record and recalculates loyalty points.
    * Returns the updated donation, or null if ineligible.
    */
-  associateDonorToDonation(donationId: string, donorId: string): Donation | null {
+  associateDonorToDonation(donationId: number, donorId: number): Donation | null {
     const donor = this.donors.find(d => d.id === donorId);
     if (!donor) return null;
 
@@ -1797,19 +1800,19 @@ export class MockDataService {
 
   // ── Phase 1: Reward definitions management (Req 5) ────────────────────────
 
-  addRewardDefinition(def: Omit<RewardDefinition, 'id'>): RewardDefinition {
-    const newDef: RewardDefinition = { ...def, id: `rd-${Date.now()}` };
+  addRewardDefinition(def: Omit<RewardDefinition, 'id' | 'referenceNumber'>): RewardDefinition {
+    const newDef: RewardDefinition = { ...def, id: Date.now(), referenceNumber: `RD-${Date.now()}` };
     this._rewardDefs.update(list => [...list, newDef]);
     return newDef;
   }
 
-  updateRewardDefinition(id: string, patch: Partial<RewardDefinition>): void {
+  updateRewardDefinition(id: number, patch: Partial<RewardDefinition>): void {
     this._rewardDefs.update(list =>
       list.map(d => d.id === id ? { ...d, ...patch } : d)
     );
   }
 
-  removeRewardDefinition(id: string): void {
+  removeRewardDefinition(id: number): void {
     this._rewardDefs.update(list => list.filter(d => d.id !== id));
   }
 
@@ -1820,7 +1823,7 @@ export class MockDataService {
    * Deducts points and records a RewardTransaction.
    * Returns the new transaction or null if donor has insufficient points.
    */
-  redeemReward(donorId: string, definitionId: string): RewardTransaction | null {
+  redeemReward(donorId: number, definitionId: number): RewardTransaction | null {
     const donor = this.donors.find(d => d.id === donorId);
     const def   = this._rewardDefs().find(d => d.id === definitionId);
     if (!donor || !def || !def.active)              return null;
@@ -1830,7 +1833,8 @@ export class MockDataService {
     (donor as any).loyaltyPoints -= def.pointsRequired;
 
     const txn: RewardTransaction = {
-      id:             `rtx-${Date.now()}`,
+      id:             Date.now(),
+      referenceNumber: `RTX-${Date.now()}`,
       donorId,
       donorName:      `${donor.firstName} ${donor.lastName}`,
       definitionId,
@@ -1851,7 +1855,7 @@ export class MockDataService {
    * The sender's balance is already deducted at redemption time.
    * This updates the transaction status and records recipient details.
    */
-  giftReward(transactionId: string, recipientName: string, recipientContact: string): boolean {
+  giftReward(transactionId: number, recipientName: string, recipientContact: string): boolean {
     let found = false;
     this._rewardTxns.update(list =>
       list.map(t => {
@@ -1865,16 +1869,17 @@ export class MockDataService {
     return found;
   }
 
-  getRewardTransactionsForDonor(donorId: string): RewardTransaction[] {
+  getRewardTransactionsForDonor(donorId: number): RewardTransaction[] {
     return this._rewardTxns().filter(t => t.donorId === donorId);
   }
 
   // ── Phase 1: Campaign management (Req 6) ──────────────────────────────────
 
-  createCampaign(campaign: Omit<Campaign, 'id' | 'notificationHistory' | 'createdAt'>): Campaign {
+  createCampaign(campaign: Omit<Campaign, 'id' | 'referenceNumber' | 'notificationHistory' | 'createdAt'>): Campaign {
     const newCampaign: Campaign = {
       ...campaign,
-      id:                  `cmp-${Date.now()}`,
+      id:                  Date.now(),
+      referenceNumber:     `CMP-${Date.now()}`,
       notificationHistory: [],
       createdAt:           new Date(),
     };
@@ -1882,7 +1887,7 @@ export class MockDataService {
     return newCampaign;
   }
 
-  updateCampaign(id: string, patch: Partial<Campaign>): void {
+  updateCampaign(id: number, patch: Partial<Campaign>): void {
     this._campaigns.update(list =>
       list.map(c => c.id === id ? { ...c, ...patch } : c)
     );
@@ -1892,7 +1897,7 @@ export class MockDataService {
    * Executes a campaign: finds eligible donors by targetCriteria,
    * simulates sending notifications, and appends to notificationHistory.
    */
-  executeCampaign(campaignId: string): CampaignNotification[] {
+  executeCampaign(campaignId: number): CampaignNotification[] {
     const campaign = this._campaigns().find(c => c.id === campaignId);
     if (!campaign || campaign.status !== CampaignStatus.Active) return [];
 

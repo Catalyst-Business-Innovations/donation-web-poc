@@ -45,7 +45,7 @@ export class DonationsComponent {
     return this._localDonations().filter(d => {
       return !q
         || (d.donorName ?? '').toLowerCase().includes(q)
-        || d.id.toLowerCase().includes(q)
+        || d.referenceNumber.toLowerCase().includes(q)
         || (d.associatedDonorName ?? '').toLowerCase().includes(q);
     });
   });
@@ -167,7 +167,7 @@ export class DonationsComponent {
       this._localDonations.update(list =>
         list.map(d => d.id === updated.id ? updated : d)
       );
-      this.toast.success('Linked!', `Donation ${donation.id} linked to ${donor.firstName} ${donor.lastName}.`);
+      this.toast.success('Linked!', `Donation ${donation.referenceNumber} linked to ${donor.firstName} ${donor.lastName}.`);
     } else {
       this.toast.error('Failed', 'Could not link donor — the association window may have expired.');
     }

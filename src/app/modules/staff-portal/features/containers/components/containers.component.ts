@@ -81,9 +81,9 @@ export class ContainersComponent {
   }
 
   // ── Selection ──────────────────────────────────────────────────────────────
-  protected selectedIds = signal<Set<string>>(new Set());
+  protected selectedIds = signal<Set<number>>(new Set());
 
-  isSelected(id: string): boolean { return this.selectedIds().has(id); }
+  isSelected(id: number): boolean { return this.selectedIds().has(id); }
 
   readonly allSelected = computed(() => {
     const f = this.filtered();
@@ -96,7 +96,7 @@ export class ContainersComponent {
     this.mockData.containers.filter(c => this.selectedIds().has(c.id))
   );
 
-  toggleSelect(id: string): void {
+  toggleSelect(id: number): void {
     this.selectedIds.update(s => {
       const n = new Set(s);
       n.has(id) ? n.delete(id) : n.add(id);
@@ -178,7 +178,7 @@ export class ContainersComponent {
   protected cDeptKey = '';
   protected cCatKey = '';
   protected cDest = null as ContainerDest | null;
-  protected cTransferTo = '';
+  protected cTransferTo: number | null = null;
   protected cStatus: ContainerStatus = ContainerStatus.Available;
   protected cSalvageWeight = '';
   protected cNotes = '';
@@ -191,7 +191,7 @@ export class ContainersComponent {
   openCreate(): void {
     this.cType = ContainerType.Gaylord;
     this.cDeptKey = ''; this.cCatKey = '';
-    this.cDest = null; this.cTransferTo = ''; this.cStatus = ContainerStatus.Available;
+    this.cDest = null; this.cTransferTo = null; this.cStatus = ContainerStatus.Available;
     this.cSalvageWeight = ''; this.cNotes = '';
     this.creating.set(true);
   }
@@ -223,13 +223,13 @@ export class ContainersComponent {
   protected editing = signal<Container | null>(null);
   protected eStatus: ContainerStatus = ContainerStatus.Available;
   protected eDest = null as ContainerDest | null;
-  protected eTransferTo = '';
+  protected eTransferTo: number | null = null;
   protected eNotes = '';
 
   openEdit(c: Container): void {
     this.eStatus = c.status;
     this.eDest = c.destination ?? null;
-    this.eTransferTo = c.transferToLocationId ?? '';
+    this.eTransferTo = c.transferToLocationId ?? null;
     this.eNotes = c.notes ?? '';
     this.editing.set(c);
   }
@@ -260,7 +260,7 @@ export class ContainersComponent {
   protected mDeptKey = '';
   protected mCatKey = '';
   protected mDest = null as ContainerDest | null;
-  protected mTransferTo = '';
+  protected mTransferTo: number | null = null;
   protected mNotes = '';
 
   readonly mDeptCats = computed(() => {
@@ -279,7 +279,7 @@ export class ContainersComponent {
     this.mDeptKey = sel[0].deptKey ?? '';
     this.mCatKey = sel[0].catKey ?? '';
     this.mDest = sel[0].destination ?? null;
-    this.mTransferTo = '';
+    this.mTransferTo = null;
     this.mNotes = '';
     this.merging.set(true);
   }

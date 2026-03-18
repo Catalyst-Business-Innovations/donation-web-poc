@@ -20,7 +20,7 @@ export class DonationHistoryComponent {
 
   readonly years = [2026, 2025, 2024];
   selectedYear = signal<number | null>(2026);
-  expandedId = signal<string | null>(null);
+  expandedId = signal<number | null>(null);
 
   readonly filteredDonations = computed(() => {
     const y = this.selectedYear();
@@ -29,7 +29,7 @@ export class DonationHistoryComponent {
 
   readonly summary = computed(() => HistoryMapper.summarise(this.svc.donations, this.selectedYear()));
 
-  toggle(id: string): void {
+  toggle(id: number): void {
     this.expandedId.update(cur => (cur === id ? null : id));
   }
   protected readonly DS = DonationStatus;
