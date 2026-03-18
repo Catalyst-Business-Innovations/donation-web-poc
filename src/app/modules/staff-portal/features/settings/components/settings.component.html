@@ -1,7 +1,7 @@
 <div class="topbar">
   <div>
     <div class="topbar-title">Settings</div>
-    <div class="topbar-subtitle">Configure system rules and loyalty tiers</div>
+    <div class="topbar-subtitle">Configure system rules, loyalty tiers, and rewards</div>
   </div>
 </div>
 
@@ -12,15 +12,16 @@
       <app-icon name="settings" [size]="16"></app-icon> General
     </button>
     <button class="tab-btn" [class.active]="activeTab() === 'loyalty'" (click)="activeTab.set('loyalty')">
-      <app-icon name="award" [size]="16"></app-icon> Loyalty & Rewards
+      <app-icon name="award" [size]="16"></app-icon> Loyalty Tiers
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'rewards'" (click)="activeTab.set('rewards')">
+      <app-icon name="gift" [size]="16"></app-icon> Rewards
     </button>
   </div>
 
   <!-- ═══════════ GENERAL TAB ═══════════ -->
   @if (activeTab() === 'general') {
     <div class="tab-panel">
-
-      <!-- System Rules -->
       <div class="settings-card">
         <div class="settings-card-header">
           <div class="settings-card-icon"><app-icon name="sliders" [size]="20"></app-icon></div>
@@ -66,6 +67,18 @@
             </div>
           </div>
 
+          <div class="rules-section-label">Reward Approval</div>
+          <div class="rule-row" (click)="systemRules.requireApproval = !systemRules.requireApproval">
+            <div>
+              <div class="rule-label">Manual Approval Required</div>
+              <div class="rule-desc">If enabled, reward redemptions require admin approval before fulfillment</div>
+            </div>
+            <label class="toggle" (click)="$event.stopPropagation()">
+              <input type="checkbox" [(ngModel)]="systemRules.requireApproval" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+
           <div class="rules-section-label">Email Requirements</div>
           <div class="rule-row" (click)="systemRules.emailForReceipt = !systemRules.emailForReceipt">
             <div>
@@ -102,15 +115,12 @@
           <button class="btn btn-success" (click)="saveSystemRules()">Save System Rules</button>
         </div>
       </div>
-
     </div>
   }
 
-  <!-- ═══════════ LOYALTY & REWARDS TAB ═══════════ -->
+  <!-- ═══════════ LOYALTY TIERS TAB ═══════════ -->
   @if (activeTab() === 'loyalty') {
     <div class="tab-panel">
-
-      <!-- Loyalty Tiers -->
       <div class="settings-card">
         <div class="settings-card-header">
           <div class="settings-card-icon"><app-icon name="award" [size]="20"></app-icon></div>
@@ -139,7 +149,7 @@
                     <label>Points Multiplier</label>
                     <div class="multiplier-input">
                       <input type="number" class="form-input" [(ngModel)]="tier.pointsMultiplier" step="0.5" min="1" />
-                      <span class="multiplier-x">×</span>
+                      <span class="multiplier-x">&times;</span>
                     </div>
                   </div>
                 </div>
@@ -162,50 +172,170 @@
           <button class="btn btn-success" (click)="save('Loyalty configuration')">Save Tiers</button>
         </div>
       </div>
+    </div>
+  }
+
+  <!-- ═══════════ REWARDS TAB ═══════════ -->
+  @if (activeTab() === 'rewards') {
+    <div class="tab-panel">
 
       <!-- Reward Definitions -->
       <div class="settings-card">
         <div class="settings-card-header">
           <div class="settings-card-icon"><app-icon name="gift" [size]="20"></app-icon></div>
-          <div>
+          <div style="flex: 1">
             <div class="settings-card-title">Reward Definitions</div>
-            <div class="settings-card-desc">Configure redeemable rewards for loyal donors</div>
+            <div class="settings-card-desc">Create and manage rewards that donors can redeem with their points</div>
           </div>
-          <button class="btn btn-primary btn-sm" style="margin-left: auto" (click)="openAddRewardModal()">+ Add Reward</button>
+          <button class="btn btn-primary btn-sm" (click)="openAddReward()">
+            <app-icon name="plus" [size]="14"></app-icon> Add Reward
+          </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="reward-filters">
+          <div class="filter-group">
+            <button class="filter-btn" [class.active]="rewardFilter() === 'all'" (click)="rewardFilter.set('all')">All</button>
+            <button class="filter-btn" [class.active]="rewardFilter() === 'active'" (click)="rewardFilter.set('active')">Active</button>
+            <button class="filter-btn" [class.active]="rewardFilter() === 'inactive'" (click)="rewardFilter.set('inactive')">Inactive</button>
+          </div>
+          <select class="form-input filter-select" [ngModel]="typeFilter()" (ngModelChange)="typeFilter.set(+$event)">
+            <option [value]="0">All Types</option>
+            @for (rt of rewardTypes; track rt.value) {
+              <option [value]="rt.value">{{ rt.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="settings-card-body no-padding">
+          <table class="reward-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Points</th>
+                <th>Limits</th>
+                <th>Redeemed</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of filteredRewards(); track r.id) {
+                <tr>
+                  <td>
+                    <div style="font-weight: 600">{{ r.name }}</div>
+                    <div style="font-size: 11px; color: var(--gray-500)">{{ r.description }}</div>
+                  </td>
+                  <td><span class="type-badge">{{ RTL[r.rewardType] }}</span></td>
+                  <td style="font-weight: 700">${{ r.value | number }}</td>
+                  <td style="font-weight: 700; color: var(--primary)">{{ r.pointsRequired | number }}</td>
+                  <td style="font-size: 12px; color: var(--gray-600)">
+                    @if (r.maxRedemptionsPerUser) {
+                      <div>{{ r.maxRedemptionsPerUser }}/user</div>
+                    }
+                    @if (r.totalRedemptionLimit) {
+                      <div>{{ r.totalRedemptions }}/{{ r.totalRedemptionLimit }} total</div>
+                    }
+                    @if (!r.maxRedemptionsPerUser && !r.totalRedemptionLimit) {
+                      <span style="color: var(--gray-400)">&mdash;</span>
+                    }
+                  </td>
+                  <td style="font-weight: 700">{{ r.totalRedemptions }}</td>
+                  <td>
+                    <span class="badge" [class.badge-success]="r.isActive" [class.badge-gray]="!r.isActive">
+                      {{ r.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn-icon" title="Edit" (click)="openEditReward(r)">
+                        <app-icon name="edit" [size]="15"></app-icon>
+                      </button>
+                      <button class="btn-icon" title="Toggle active" (click)="toggleRewardActive(r)">
+                        <app-icon [name]="r.isActive ? 'x-circle' : 'check-circle'" [size]="15"></app-icon>
+                      </button>
+                      <button class="btn-icon btn-icon-danger" title="Delete" (click)="deleteReward(r)">
+                        <app-icon name="delete" [size]="15"></app-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if (filteredRewards().length === 0) {
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 24px; color: var(--gray-400)">No rewards match the current filters.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Redemption Queue -->
+      <div class="settings-card">
+        <div class="settings-card-header">
+          <div class="settings-card-icon"><app-icon name="list" [size]="20"></app-icon></div>
+          <div>
+            <div class="settings-card-title">Redemption History</div>
+            <div class="settings-card-desc">View and manage all reward redemption requests</div>
+          </div>
         </div>
         <div class="settings-card-body no-padding">
           <table class="reward-table">
             <thead>
               <tr>
+                <th>Donor</th>
                 <th>Reward</th>
-                <th style="text-align: right">Points</th>
-                <th style="text-align: right">Value</th>
-                <th style="text-align: center">Status</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Points</th>
+                <th>Date</th>
+                <th>Status</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              @for (r of svc.rewardDefinitions(); track r.id) {
-                <tr [class.inactive-row]="!r.active">
+              @for (txn of allTransactions(); track txn.id) {
+                <tr>
+                  <td style="font-weight: 600">{{ txn.donorName }}</td>
                   <td>
-                    <div class="reward-name-cell">
-                      <span class="reward-icon">{{ r.icon }}</span>
-                      <div>
-                        <div class="reward-name">{{ r.name }}</div>
-                        <div class="reward-desc">{{ r.description }}</div>
-                      </div>
+                    <div>{{ txn.rewardName }}</div>
+                    @if (txn.voucherCode) {
+                      <div style="font-size: 11px; color: var(--gray-500)">Code: {{ txn.voucherCode }}</div>
+                    }
+                  </td>
+                  <td><span class="type-badge">{{ RTL[txn.rewardType] }}</span></td>
+                  <td style="font-weight: 700">${{ txn.rewardValue | number }}</td>
+                  <td style="font-weight: 700; color: var(--danger)">{{ txn.pointsUsed | number }}</td>
+                  <td style="font-size: 12px">{{ txn.createdAt | date: 'MMM d, yyyy' }}</td>
+                  <td>
+                    <span class="badge {{ txnStatusBadge(txn.status) }}">{{ RSL[txn.status] }}</span>
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      @if (txn.status === RS.Pending) {
+                        <button class="btn-icon" style="color: var(--success)" title="Approve" (click)="approveRedemption(txn.id)">
+                          <app-icon name="check-circle" [size]="15"></app-icon>
+                        </button>
+                        <button class="btn-icon" style="color: var(--danger)" title="Reject" (click)="rejectRedemption(txn.id)">
+                          <app-icon name="x-circle" [size]="15"></app-icon>
+                        </button>
+                      }
+                      @if (txn.status === RS.Approved) {
+                        <button class="btn btn-sm btn-success" (click)="fulfillRedemption(txn.id)">Fulfill</button>
+                        <button class="btn-icon" style="color: var(--gray-500)" title="Cancel" (click)="cancelRedemption(txn.id)">
+                          <app-icon name="close" [size]="15"></app-icon>
+                        </button>
+                      }
                     </div>
                   </td>
-                  <td style="text-align: right; font-weight: 700; color: var(--primary)">{{ r.pointsRequired }}</td>
-                  <td style="text-align: right">{{ r.discountValue > 0 ? '$' + r.discountValue : '—' }}</td>
-                  <td style="text-align: center">
-                    <span class="status-dot" [class.active]="r.active"></span>
-                    {{ r.active ? 'Active' : 'Off' }}
-                  </td>
-                  <td style="text-align: right; white-space: nowrap">
-                    <button class="btn-icon" title="Edit" (click)="openEditRewardModal(r)"><app-icon name="edit" [size]="14"></app-icon></button>
-                    <button class="btn-icon btn-icon-danger" title="Delete" (click)="deleteReward(r.id)"><app-icon name="delete" [size]="14"></app-icon></button>
-                  </td>
+                </tr>
+              }
+              @if (allTransactions().length === 0) {
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 24px; color: var(--gray-400)">No redemption records yet.</td>
                 </tr>
               }
             </tbody>
@@ -218,66 +348,62 @@
 
 </div>
 
-<!-- Add/Edit Reward Modal -->
+<!-- Add / Edit Reward Modal -->
 <app-modal
-  [open]="modalMode() === 'add-reward' || modalMode() === 'edit-reward'"
+  [open]="modalMode() !== null"
   [title]="modalTitle"
-  [confirmLabel]="confirmLabel"
-  [confirmDisabled]="!rewardForm.name.trim() || rewardForm.pointsRequired <= 0"
-  (closed)="closeModal()"
-  (confirmed)="saveRewardForm()"
+  [confirmLabel]="modalConfirmLabel"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  (closed)="modalMode.set(null)"
+  (confirmed)="confirmRewardModal()"
 >
-  <div class="form-grid">
-    <div class="form-group">
-      <label class="form-label">Reward Name *</label>
-      <input class="form-input" [(ngModel)]="rewardForm.name" placeholder="e.g., $5 Discount" />
+  <div style="padding: 4px 0">
+    <div class="form-group" style="margin-bottom: 12px">
+      <label class="form-label">Name *</label>
+      <input class="form-input" [(ngModel)]="rewardForm.name" placeholder="e.g. $5 Discount" />
     </div>
-    <div class="form-group">
-      <label class="form-label">Icon (Emoji)</label>
-      <input class="form-input" [(ngModel)]="rewardForm.icon" placeholder="🏷️" maxlength="4" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Points Required *</label>
-      <input type="number" class="form-input" [(ngModel)]="rewardForm.pointsRequired" min="1" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Discount Value ($)</label>
-      <input type="number" class="form-input" [(ngModel)]="rewardForm.discountValue" min="0" step="0.5" />
-    </div>
-    <div class="form-group" style="grid-column: span 2">
+    <div class="form-group" style="margin-bottom: 12px">
       <label class="form-label">Description</label>
-      <input class="form-input" [(ngModel)]="rewardForm.description" placeholder="Redeemable at POS" />
+      <input class="form-input" [(ngModel)]="rewardForm.description" placeholder="Short description" />
     </div>
-    <div class="form-group" style="grid-column: span 2; display: flex; align-items: center; gap: 10px">
-      <input type="checkbox" [(ngModel)]="rewardForm.active" style="accent-color: var(--primary)" />
-      <label class="form-label" style="margin: 0">Active (visible to donors)</label>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px">
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-input" [(ngModel)]="rewardForm.rewardType">
+          @for (rt of rewardTypes; track rt.value) {
+            <option [ngValue]="rt.value">{{ rt.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Value ($)</label>
+        <input class="form-input" type="number" [(ngModel)]="rewardForm.value" min="0" />
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom: 12px">
+      <label class="form-label">Points Required</label>
+      <input class="form-input" type="number" [(ngModel)]="rewardForm.pointsRequired" min="1" />
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px">
+      <div class="form-group">
+        <label class="form-label">Max per User (optional)</label>
+        <input class="form-input" type="number" [(ngModel)]="rewardForm.maxRedemptionsPerUser" min="1" placeholder="Unlimited" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Total Limit (optional)</label>
+        <input class="form-input" type="number" [(ngModel)]="rewardForm.totalRedemptionLimit" min="1" placeholder="Unlimited" />
+      </div>
+    </div>
+    <div class="rule-row" (click)="rewardForm.isActive = !rewardForm.isActive" style="border: none; padding-top: 4px">
+      <div>
+        <div class="rule-label">Active</div>
+        <div class="rule-desc">Visible and redeemable by donors</div>
+      </div>
+      <label class="toggle" (click)="$event.stopPropagation()">
+        <input type="checkbox" [(ngModel)]="rewardForm.isActive" />
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      </label>
     </div>
   </div>
 </app-modal>
-
-<!-- Add/Edit Category Modal -->
-<app-modal
-  [open]="modalMode() === 'add-category' || modalMode() === 'edit-category'"
-  [title]="modalTitle"
-  [confirmLabel]="confirmLabel"
-  [confirmDisabled]="!categoryForm.name.trim() || !categoryForm.icon.trim()"
-  (closed)="closeModal()"
-  (confirmed)="saveCategoryForm()"
->
-  <div class="form-grid">
-    <div class="form-group">
-      <label class="form-label">Category Name *</label>
-      <input class="form-input" [(ngModel)]="categoryForm.name" placeholder="e.g., Clothing" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Icon (Emoji) *</label>
-      <input class="form-input" [(ngModel)]="categoryForm.icon" placeholder="👔" maxlength="2" />
-    </div>
-    <div class="form-group" style="grid-column: span 2">
-      <label class="form-label">Estimated Value per Item ($)</label>
-      <input type="number" class="form-input" [(ngModel)]="categoryForm.estimatedValue" min="0" step="0.5" />
-    </div>
-  </div>
-</app-modal>
-
-

@@ -273,57 +273,170 @@
   app-icon { color: var(--tier-color); flex-shrink: 0; }
 }
 
+/* ── Conversion Card ── */
+.conversion-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+.conversion-visual {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 32px;
+  background: var(--gray-50);
+  border-radius: 12px;
+  border: 1px solid var(--gray-200);
+}
+.conversion-side {
+  text-align: center;
+}
+.conversion-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+.conversion-unit {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+.conversion-eq {
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--gray-400);
+}
+.conversion-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+  }
+}
+.conversion-preview {
+  text-align: center;
+  padding: 12px 20px;
+  background: var(--primary-50, #eff6ff);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+}
+.conversion-preview-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+.conversion-preview-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ── Reward Filters ── */
+.reward-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.filter-group {
+  display: flex;
+  gap: 4px;
+}
+.filter-btn {
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  &:hover { border-color: var(--primary); color: var(--primary); }
+  &.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+}
+.filter-select {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 10px;
+  min-width: 120px;
+}
+
 /* ── Reward Table ── */
 .reward-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
   th {
+    text-align: left;
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--gray-500);
-    padding: 10px 16px;
-    border-bottom: 2px solid var(--gray-200);
+    color: var(--gray-400);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--gray-50);
   }
   td {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--gray-100);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--gray-800);
+    border-bottom: 1px solid var(--gray-50);
     vertical-align: middle;
   }
-  tr:last-child td { border-bottom: none; }
-  tr.inactive-row { opacity: 0.5; }
+  tbody tr:hover { background: var(--gray-25, #fafafa); }
 }
-.reward-name-cell {
+.type-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.row-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
 }
-.reward-icon {
-  font-size: 20px;
-}
-.reward-name {
-  font-weight: 600;
-}
-.reward-desc {
-  font-size: 11px;
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: none;
   color: var(--gray-500);
-  margin-top: 1px;
-}
-
-/* ── Status Dot ── */
-.status-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--gray-300);
-  margin-right: 6px;
-  &.active { background: var(--success, #22c55e); }
+  cursor: pointer;
+  transition: all 0.12s ease;
+  &:hover { background: var(--gray-100); color: var(--gray-700); }
 }
 
 /* ── Button Danger ── */
 .btn-icon-danger {
   color: var(--danger) !important;
+  &:hover { background: var(--danger-light, #fef2f2); }
 }

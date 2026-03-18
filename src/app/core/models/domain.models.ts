@@ -16,7 +16,8 @@ export enum DonationScope      { Items = 1, Monetary, Both }
 
 // ── Phase 1 enums ────────────────────────────────────────────────────────────
 export enum PointsCalcMethod   { PerItem = 1, PerWeight }   // PerWeight disabled by default
-export enum RewardStatus        { Active = 1, Redeemed, Gifted, Expired }
+export enum RewardType          { Discount = 1, Cashback, Gift, Voucher }
+export enum RedemptionStatus    { Pending = 1, Approved, Rejected, Fulfilled, Cancelled }
 export enum CampaignStatus      { Draft = 1, Active, Paused, Completed }
 export enum NotificationChannel { Email = 1, SMS, Both }
 
@@ -86,11 +87,18 @@ export const DonationScopeLabel: Record<DonationScope, string> = {
   [DonationScope.Monetary]: 'Monetary Donation',
   [DonationScope.Both]:     'Items & Monetary',
 };
-export const RewardStatusLabel: Record<RewardStatus, string> = {
-  [RewardStatus.Active]:   'Active',
-  [RewardStatus.Redeemed]: 'Redeemed',
-  [RewardStatus.Gifted]:   'Gifted',
-  [RewardStatus.Expired]:  'Expired',
+export const RewardTypeLabel: Record<RewardType, string> = {
+  [RewardType.Discount]: 'Discount',
+  [RewardType.Cashback]: 'Cashback',
+  [RewardType.Gift]:     'Gift',
+  [RewardType.Voucher]:  'Voucher',
+};
+export const RedemptionStatusLabel: Record<RedemptionStatus, string> = {
+  [RedemptionStatus.Pending]:   'Pending',
+  [RedemptionStatus.Approved]:  'Approved',
+  [RedemptionStatus.Rejected]:  'Rejected',
+  [RedemptionStatus.Fulfilled]: 'Fulfilled',
+  [RedemptionStatus.Cancelled]: 'Cancelled',
 };
 export const CampaignStatusLabel: Record<CampaignStatus, string> = {
   [CampaignStatus.Draft]:     'Draft',
@@ -111,7 +119,9 @@ export interface AppConfig {
   isCashAccepted: boolean;
   associationWindowHours: number;   // Req 1 — how long staff can link an anon donation
   pointsPerItem: number;            // Req 4
+  pointsPerDollar: number;           // Reward conversion: how many points = $1
   pointsCalcMethod: PointsCalcMethod;
+  requireApproval: boolean;           // true = manual approval, false = auto-approve
   emailReqs: {
     forReceipt: boolean;
     forLogin: boolean;
@@ -119,33 +129,43 @@ export interface AppConfig {
   };
 }
 
-/** Defines a redeemable reward tier (Req 5) */
+/** Defines a redeemable reward (Req 5) */
 export interface RewardDefinition {
   id: number;
   referenceNumber: string;
   name: string;
   description: string;
   pointsRequired: number;
-  discountValue: number;   // dollar discount at POS
-  icon: string;
-  active: boolean;
-  sortOrder: number;
+  rewardType: RewardType;
+  value: number;                   // dollar value of the reward
+  validFrom?: Date;
+  validTo?: Date;
+  isActive: boolean;
+  maxRedemptionsPerUser?: number;
+  totalRedemptionLimit?: number;
+  totalRedemptions: number;
+  createdAt: Date;
 }
 
-/** Records a single reward redemption or gift (Req 5, 7) */
+/** Records a single reward redemption (Req 5, 7) */
 export interface RewardTransaction {
   id: number;
   referenceNumber: string;
   donorId: number;
   donorName: string;
-  definitionId: number;
-  definitionName: string;
-  pointsDeducted: number;
-  status: RewardStatus;
+  rewardId: number;
+  rewardName: string;
+  rewardType: RewardType;
+  rewardValue: number;
+  pointsUsed: number;
+  status: RedemptionStatus;
+  voucherCode?: string;
   createdAt: Date;
-  redeemedAt?: Date;
-  giftedToName?: string;       // Req 7
-  giftedToContact?: string;    // phone or email of recipient
+  approvedAt?: Date;
+  fulfilledAt?: Date;
+  rejectedAt?: Date;
+  cancelledAt?: Date;
+  rejectionReason?: string;
 }
 
 /** A single targeting criterion for a campaign (Req 6) */

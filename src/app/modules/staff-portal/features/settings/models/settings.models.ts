@@ -23,6 +23,8 @@ export interface SystemRulesSettings {
   isCashAccepted: boolean;
   associationWindowHours: number;
   pointsPerItem: number;
+  pointsPerDollar: number;
+  requireApproval: boolean;
   emailForReceipt: boolean;
   emailForLogin: boolean;
   emailForCampaigns: boolean;
