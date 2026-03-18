@@ -910,6 +910,7 @@
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
   text-align: center;
+  position: relative;
 
   &:hover {
     border-color: var(--primary);
@@ -919,6 +920,31 @@
 
   &:active {
     transform: translateY(0);
+  }
+
+  &.active {
+    border-color: var(--primary);
+    background: #f0f6ff;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
+
+    .dtype-title { color: var(--primary); }
+
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--primary);
+      background: rgba(0,102,255,0.1);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 }
 
@@ -944,6 +970,10 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--primary);
+}
+
+.dtype-continue {
+  min-width: 280px;
 }
 
 // ── Add Money step ────────────────────────────────────────────────────────

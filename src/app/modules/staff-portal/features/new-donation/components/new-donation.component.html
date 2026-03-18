@@ -244,22 +244,27 @@
           <div class="dtype-heading">How would you like to donate today?</div>
         }
         <div class="dtype-grid">
-          <button class="dtype-card" (click)="selectType(DT.Items)">
+          <button class="dtype-card" [class.active]="st.donationType() === DT.Items" (click)="selectType(DT.Items)">
             <div class="dtype-icon">&#128230;</div>
             <div class="dtype-title">Donate Items</div>
             <div class="dtype-desc">Clothing, electronics, furniture and more</div>
           </button>
-          <button class="dtype-card" (click)="selectType(DT.Monetary)">
+          <button class="dtype-card" [class.active]="st.donationType() === DT.Monetary" (click)="selectType(DT.Monetary)">
             <div class="dtype-icon">&#128181;</div>
             <div class="dtype-title">Monetary Donation</div>
             <div class="dtype-desc">Cash, credit card, or tap-to-pay</div>
           </button>
-          <button class="dtype-card" (click)="selectType(DT.Both)">
+          <button class="dtype-card" [class.active]="st.donationType() === DT.Both" (click)="selectType(DT.Both)">
             <div class="dtype-icon">&#127873;</div>
             <div class="dtype-title">Items &amp; Monetary</div>
             <div class="dtype-desc">Donate goods and make a payment together</div>
           </button>
         </div>
+        @if (st.donationType()) {
+          <button class="btn btn-success btn-lg dtype-continue" (click)="st.nextStep()">
+            Continue with {{ st.donationType() === DT.Items ? 'Items' : st.donationType() === DT.Monetary ? 'Monetary' : 'Items & Monetary' }} →
+          </button>
+        }
       </div>
     </div>
   }
