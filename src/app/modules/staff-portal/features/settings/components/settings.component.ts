@@ -49,6 +49,7 @@ export class SettingsComponent {
       rewardType: RewardType.Discount,
       value: 5,
       isActive: true,
+      isGiftable: false,
       maxRedemptionsPerUser: null as number | null,
       totalRedemptionLimit: null as number | null,
     };
@@ -124,6 +125,7 @@ export class SettingsComponent {
       rewardType: r.rewardType,
       value: r.value,
       isActive: r.isActive,
+      isGiftable: r.isGiftable ?? false,
       maxRedemptionsPerUser: r.maxRedemptionsPerUser ?? null,
       totalRedemptionLimit: r.totalRedemptionLimit ?? null,
     };
@@ -141,6 +143,7 @@ export class SettingsComponent {
         rewardType: f.rewardType,
         value: f.value,
         isActive: f.isActive,
+        isGiftable: f.isGiftable,
         maxRedemptionsPerUser: f.maxRedemptionsPerUser ?? undefined,
         totalRedemptionLimit: f.totalRedemptionLimit ?? undefined,
       });
@@ -153,6 +156,7 @@ export class SettingsComponent {
         rewardType: f.rewardType,
         value: f.value,
         isActive: f.isActive,
+        isGiftable: f.isGiftable,
         maxRedemptionsPerUser: f.maxRedemptionsPerUser ?? undefined,
         totalRedemptionLimit: f.totalRedemptionLimit ?? undefined,
       });

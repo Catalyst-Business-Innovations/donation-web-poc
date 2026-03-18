@@ -225,7 +225,12 @@
               @for (r of filteredRewards(); track r.id) {
                 <tr>
                   <td>
-                    <div style="font-weight: 600">{{ r.name }}</div>
+                    <div style="display: flex; align-items: center; gap: 6px; font-weight: 600">
+                      {{ r.name }}
+                      @if (r.isGiftable) {
+                        <span class="badge badge-info" style="font-size: 9px; padding: 1px 6px">Giftable</span>
+                      }
+                    </div>
                     <div style="font-size: 11px; color: var(--gray-500)">{{ r.description }}</div>
                   </td>
                   <td><span class="type-badge">{{ RTL[r.rewardType] }}</span></td>
@@ -402,6 +407,16 @@
       </div>
       <label class="toggle" (click)="$event.stopPropagation()">
         <input type="checkbox" [(ngModel)]="rewardForm.isActive" />
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      </label>
+    </div>
+    <div class="rule-row" (click)="rewardForm.isGiftable = !rewardForm.isGiftable" style="border: none; padding-top: 4px">
+      <div>
+        <div class="rule-label">Giftable</div>
+        <div class="rule-desc">Allow donors to gift this reward to others</div>
+      </div>
+      <label class="toggle" (click)="$event.stopPropagation()">
+        <input type="checkbox" [(ngModel)]="rewardForm.isGiftable" />
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
       </label>
     </div>

@@ -69,11 +69,11 @@ export class MockDataService {
 
   // ── Phase 1: Reward definitions seed data (Req 5) ─────────────────────────
   private _rewardDefs = signal<RewardDefinition[]>([
-    { id: 1, referenceNumber: 'RD-001', name: '$5 Discount',    description: 'Redeemable at POS',   pointsRequired: 100,  rewardType: RewardType.Discount,  value: 5,   isActive: true,  totalRedemptions: 12, createdAt: new Date('2026-01-15') },
-    { id: 2, referenceNumber: 'RD-002', name: '$10 Discount',   description: 'Redeemable at POS',   pointsRequired: 200,  rewardType: RewardType.Discount,  value: 10,  isActive: true,  totalRedemptions: 8,  createdAt: new Date('2026-01-15') },
-    { id: 3, referenceNumber: 'RD-003', name: '$25 Voucher',    description: 'Store credit voucher', pointsRequired: 450,  rewardType: RewardType.Voucher,   value: 25,  isActive: true,  totalRedemptions: 3,  totalRedemptionLimit: 50, createdAt: new Date('2026-02-01') },
-    { id: 4, referenceNumber: 'RD-004', name: '$10 Cashback',   description: 'Direct cashback',      pointsRequired: 250,  rewardType: RewardType.Cashback,  value: 10,  isActive: true,  totalRedemptions: 5,  maxRedemptionsPerUser: 3, createdAt: new Date('2026-02-10') },
-    { id: 5, referenceNumber: 'RD-005', name: 'Gift Basket',    description: 'Curated gift basket',  pointsRequired: 900,  rewardType: RewardType.Gift,      value: 50,  isActive: false, totalRedemptions: 1,  createdAt: new Date('2026-03-01') },
+    { id: 1, referenceNumber: 'RD-001', name: '$5 Discount',    description: 'Redeemable at POS',   pointsRequired: 100,  rewardType: RewardType.Discount,  value: 5,   isActive: true,  isGiftable: true,  totalRedemptions: 12, createdAt: new Date('2026-01-15') },
+    { id: 2, referenceNumber: 'RD-002', name: '$10 Discount',   description: 'Redeemable at POS',   pointsRequired: 200,  rewardType: RewardType.Discount,  value: 10,  isActive: true,  isGiftable: true,  totalRedemptions: 8,  createdAt: new Date('2026-01-15') },
+    { id: 3, referenceNumber: 'RD-003', name: '$25 Voucher',    description: 'Store credit voucher', pointsRequired: 450,  rewardType: RewardType.Voucher,   value: 25,  isActive: true,  isGiftable: true,  totalRedemptions: 3,  totalRedemptionLimit: 50, createdAt: new Date('2026-02-01') },
+    { id: 4, referenceNumber: 'RD-004', name: '$10 Cashback',   description: 'Direct cashback',      pointsRequired: 250,  rewardType: RewardType.Cashback,  value: 10,  isActive: true,  isGiftable: false, totalRedemptions: 5,  maxRedemptionsPerUser: 3, createdAt: new Date('2026-02-10') },
+    { id: 5, referenceNumber: 'RD-005', name: 'Gift Basket',    description: 'Curated gift basket',  pointsRequired: 900,  rewardType: RewardType.Gift,      value: 50,  isActive: true,  isGiftable: true,  totalRedemptions: 1,  createdAt: new Date('2026-03-01') },
   ]);
   readonly rewardDefinitions = this._rewardDefs.asReadonly();
 
@@ -1916,6 +1916,51 @@ export class MockDataService {
     };
     this._rewardTxns.update(list => [txn, ...list]);
     return txn;
+  }
+
+  /**
+   * Gifts a reward from one donor to another.
+   * Deducts points from the gifter; creates two transactions — one on each donor's history.
+   * Returns the gifter's transaction, or null if ineligible.
+   */
+  giftReward(fromDonorId: number, toDonorId: number, rewardId: number): RewardTransaction | null {
+    const fromDonor = this.donors.find(d => d.id === fromDonorId);
+    const toDonor   = this.donors.find(d => d.id === toDonorId);
+    const def       = this._rewardDefs().find(d => d.id === rewardId);
+    if (!fromDonor || !toDonor || !def || !def.isActive || !def.isGiftable) return null;
+    if (fromDonorId === toDonorId) return null;
+
+    const now = new Date();
+    if (def.validFrom && now < def.validFrom) return null;
+    if (def.validTo   && now > def.validTo)   return null;
+    if (fromDonor.loyaltyPoints < def.pointsRequired) return null;
+    if (def.totalRedemptionLimit != null && def.totalRedemptions >= def.totalRedemptionLimit) return null;
+
+    (fromDonor as any).loyaltyPoints -= def.pointsRequired;
+    this._rewardDefs.update(list => list.map(d => d.id === rewardId ? { ...d, totalRedemptions: d.totalRedemptions + 1 } : d));
+
+    const voucherCode = def.rewardType === RewardType.Voucher ? `VCH-${Date.now().toString(36).toUpperCase()}` : undefined;
+    const fromName = `${fromDonor.firstName} ${fromDonor.lastName}`;
+    const toName   = `${toDonor.firstName} ${toDonor.lastName}`;
+
+    const gifterTxn: RewardTransaction = {
+      id: Date.now(), referenceNumber: `RTX-${Date.now()}`,
+      donorId: fromDonorId, donorName: fromName,
+      rewardId, rewardName: def.name, rewardType: def.rewardType, rewardValue: def.value,
+      pointsUsed: def.pointsRequired, status: RedemptionStatus.Fulfilled,
+      isGift: true, giftedToId: toDonorId, giftedToName: toName,
+      createdAt: now, approvedAt: now, fulfilledAt: now, voucherCode,
+    };
+    const recipientTxn: RewardTransaction = {
+      id: Date.now() + 1, referenceNumber: `RTX-${Date.now() + 1}`,
+      donorId: toDonorId, donorName: toName,
+      rewardId, rewardName: def.name, rewardType: def.rewardType, rewardValue: def.value,
+      pointsUsed: 0, status: RedemptionStatus.Approved,
+      isGift: true, giftedFromId: fromDonorId, giftedFromName: fromName,
+      createdAt: now, approvedAt: now, voucherCode,
+    };
+    this._rewardTxns.update(list => [gifterTxn, recipientTxn, ...list]);
+    return gifterTxn;
   }
 
   // ── Phase 1: Redemption status management ─────────────────────────────────

@@ -141,6 +141,7 @@ export interface RewardDefinition {
   validFrom?: Date;
   validTo?: Date;
   isActive: boolean;
+  isGiftable?: boolean;            // whether this reward can be gifted to another donor
   maxRedemptionsPerUser?: number;
   totalRedemptionLimit?: number;
   totalRedemptions: number;
@@ -166,6 +167,12 @@ export interface RewardTransaction {
   rejectedAt?: Date;
   cancelledAt?: Date;
   rejectionReason?: string;
+  /** Gifting fields */
+  isGift?: boolean;
+  giftedToId?: number;     // set on gifter's txn
+  giftedToName?: string;   // set on gifter's txn
+  giftedFromId?: number;   // set on recipient's txn
+  giftedFromName?: string; // set on recipient's txn
 }
 
 /** A single targeting criterion for a campaign (Req 6) */
