@@ -11,7 +11,7 @@ export enum ReceiptDelivery { Email = 1, SMS, Print, None }
 export enum LocationStatus  { Open = 1, Closed, Busy }
 export enum StaffRole       { Attendant = 1, PresortWorker, Manager, Admin }
 export enum DonationStatus { Scheduled = 1, CheckedIn, Completed, Cancelled, NoShow }
-export enum ScheduledDonationType   { WalkIn = 1, Scheduled, Pickup }
+export enum DonationMethod   { WalkIn = 1, Scheduled, Pickup }
 export enum DonationScope      { Items = 1, Monetary, Both }
 
 // ── Phase 1 enums ────────────────────────────────────────────────────────────
@@ -76,10 +76,10 @@ export const LocationStatusLabel: Record<LocationStatus, string> = {
   [LocationStatus.Closed]: 'Closed',
   [LocationStatus.Busy]:   'Busy',
 };
-export const ScheduledDonationTypeLabel: Record<ScheduledDonationType, string> = {
-  [ScheduledDonationType.WalkIn]:    'Walk-in',
-  [ScheduledDonationType.Scheduled]: 'Scheduled',
-  [ScheduledDonationType.Pickup]:    'Pickup',
+export const DonationMethodLabel: Record<DonationMethod, string> = {
+  [DonationMethod.WalkIn]:    'Walk-in',
+  [DonationMethod.Scheduled]: 'Scheduled',
+  [DonationMethod.Pickup]:    'Pickup',
 };
 export const DonationScopeLabel: Record<DonationScope, string> = {
   [DonationScope.Items]:    'Donate Items',
@@ -390,7 +390,7 @@ export interface ToastModel {
   message: string;
 }
 
-// DonationStatus and ScheduledDonationType are declared as enums above.
+// DonationStatus and DonationMethod are declared as enums above.
 export interface ScheduledDonation {
   id: string;
   donorId?: string;
@@ -400,7 +400,7 @@ export interface ScheduledDonation {
   address?: string;
   locationId?: string;
   locationName?: string;
-  type: ScheduledDonationType;
+  method: DonationMethod;
   date: Date;
   timeSlot: string;
   status: DonationStatus;

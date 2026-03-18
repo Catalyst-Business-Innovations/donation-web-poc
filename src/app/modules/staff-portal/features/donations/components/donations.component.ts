@@ -8,8 +8,8 @@ import { ModalComponent } from '../../../../../shared/components/modal/modal.com
 import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 import { QrCodeComponent } from '../../../../../shared/components/qr-code/qr-code.component';
 import {
-  ScheduledDonation, DonationStatus, ScheduledDonationType,
-  DonationStatusLabel, ScheduledDonationTypeLabel,
+  ScheduledDonation, DonationStatus, DonationMethod,
+  DonationStatusLabel, DonationMethodLabel,
   Donation, Donor, DonorTier
 } from '../../../../../core/models/domain.models';
 
@@ -27,7 +27,7 @@ export class DonationsComponent {
 
   // expose for template
   protected readonly AS = DonationStatus;
-  protected readonly AT = ScheduledDonationType;
+  protected readonly AT = DonationMethod;
   protected readonly DS = DonationStatus;
 
   protected activeTab = signal<'scheduled-donations' | 'completions'>('scheduled-donations');
@@ -107,17 +107,17 @@ export class DonationsComponent {
     return m[s] ?? 'badge-gray';
   }
 
-  typeBadge(type: ScheduledDonationType): string {
-    const m: Record<ScheduledDonationType, string> = {
-      [ScheduledDonationType.Scheduled]: 'badge-purple',
-      [ScheduledDonationType.WalkIn]:    'badge-gray',
-      [ScheduledDonationType.Pickup]:    'badge-warning',
+  typeBadge(type: DonationMethod): string {
+    const m: Record<DonationMethod, string> = {
+      [DonationMethod.Scheduled]: 'badge-purple',
+      [DonationMethod.WalkIn]:    'badge-gray',
+      [DonationMethod.Pickup]:    'badge-warning',
     };
     return m[type] ?? 'badge-gray';
   }
 
-  typeLabel(type: ScheduledDonationType): string {
-    return ScheduledDonationTypeLabel[type] ?? String(type);
+  typeLabel(type: DonationMethod): string {
+    return DonationMethodLabel[type] ?? String(type);
   }
 
   openDetail(a: ScheduledDonation): void {
