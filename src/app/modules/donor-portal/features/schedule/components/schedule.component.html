@@ -29,7 +29,7 @@
               <div>
                 <div class="loc-preview__name">{{ loc.name }}</div>
                 <div class="loc-preview__meta">{{ loc.address }}</div>
-                <div class="loc-preview__meta loc-preview__meta--hours">🕐 {{ loc.hours }}</div>
+                <div class="loc-preview__meta loc-preview__meta--hours"><app-icon name="clock" [size]="13"></app-icon> {{ loc.hours }}</div>
               </div>
               <span class="badge {{ loc.status === LS.Open ? 'badge-success' : 'badge-warning' }}">
                 {{ LSL[loc.status] }}
@@ -76,7 +76,7 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">🛒 Giving Cart</div>
+            <div class="card-title"><app-icon name="cart" [size]="16"></app-icon> Giving Cart</div>
             <div class="card-subtitle">Add items to speed up check-in</div>
           </div>
           <button class="btn btn-primary btn-sm" (click)="showAdd.set(true)">+ Add Item</button>
@@ -84,7 +84,7 @@
 
         @if (cart().length === 0) {
           <div class="empty-state empty-state--padded">
-            <div class="empty-state-icon empty-state-icon--lg">🛒</div>
+            <div class="empty-state-icon empty-state-icon--lg"><app-icon name="cart" [size]="36"></app-icon></div>
             <div class="empty-state-title">Cart is empty</div>
             <div class="empty-state-text">Add items you plan to bring.</div>
           </div>
@@ -190,30 +190,30 @@
       <!-- Details grid -->
       <div class="apt-detail-grid">
         <div class="apt-row">
-          <span class="apt-key">📍 Store</span>
+          <span class="apt-key"><app-icon name="map-pin" [size]="13"></app-icon> Store</span>
           <strong class="apt-val">{{ selectedVisit()!.location }}</strong>
         </div>
         <div class="apt-row">
-          <span class="apt-key">📅 Date</span>
+          <span class="apt-key"><app-icon name="calendar" [size]="13"></app-icon> Date</span>
           <strong class="apt-val">{{ selectedVisit()!.date | date: 'MMMM d, yyyy' }}</strong>
         </div>
         <div class="apt-row">
-          <span class="apt-key">🕐 Time</span>
+          <span class="apt-key"><app-icon name="clock" [size]="13"></app-icon> Time</span>
           <strong class="apt-val">{{ selectedVisit()!.time }}</strong>
         </div>
         @if (selectedVisit()!.recurring) {
           <div class="apt-row">
-            <span class="apt-key">🔁 Frequency</span>
+            <span class="apt-key"><app-icon name="refresh" [size]="13"></app-icon> Frequency</span>
             <strong class="apt-val">{{ selectedVisit()!.recurring }}</strong>
           </div>
         }
         <div class="apt-row">
-          <span class="apt-key">📦 Items Planned</span>
+          <span class="apt-key"><app-icon name="package" [size]="13"></app-icon> Items Planned</span>
           <strong class="apt-val">{{ selectedVisit()!.items }}</strong>
         </div>
         @if (selectedVisit()!.notes) {
           <div class="apt-row">
-            <span class="apt-key">📝 Notes</span>
+            <span class="apt-key"><app-icon name="file-text" [size]="13"></app-icon> Notes</span>
             <span class="apt-val">{{ selectedVisit()!.notes }}</span>
           </div>
         }
@@ -225,7 +225,7 @@
 <!-- Schedule Confirmation Modal -->
 <app-modal
   [open]="showConfirmation()"
-  [title]="'📅 Donation Scheduled!'"
+  title="Donation Scheduled!"
   confirmText="Done"
   [showCancel]="false"
   (closed)="closeConfirmation()"
@@ -245,7 +245,7 @@
     </div>
 
     <div class="confirm-modal__details">
-      <div class="confirm-modal__details-title">📍 Scheduled Donation Details</div>
+      <div class="confirm-modal__details-title"><app-icon name="map-pin" [size]="14"></app-icon> Scheduled Donation Details</div>
       <div class="confirm-modal__details-grid">
         <div class="confirm-modal__detail-row">
           <span class="confirm-modal__detail-key">Store:</span>
@@ -274,7 +274,7 @@
 
     <div class="confirm-modal__notice">
       <div class="confirm-modal__notice-inner">
-        <span class="confirm-modal__notice-icon">✅</span>
+        <span class="confirm-modal__notice-icon"><app-icon name="check-circle" [size]="18"></app-icon></span>
         <div class="confirm-modal__notice-text">
           <strong>Confirmation sent!</strong>
           Check your email for scheduled donation details and directions. You'll receive a reminder 24 hours before your

@@ -6,7 +6,7 @@
       <div class="topbar-subtitle">{{ topSubtitle() }}</div>
     </div>
     <div class="topbar-actions">
-      <button class="btn btn-ghost" (click)="cancel()">✕ Cancel</button>
+      <button class="btn btn-ghost" (click)="cancel()"><app-icon name="close" [size]="14"></app-icon> Cancel</button>
     </div>
   </div>
 
@@ -14,11 +14,17 @@
   <div class="stepper">
     @for (s of steps(); track s.n) {
       <div class="step" [class.active]="st.step() === s.n" [class.done]="st.step() > s.n">
-        <div class="step-num">{{ st.step() > s.n ? '✓' : s.n }}</div>
+        <div class="step-num">
+          @if (st.step() > s.n) {
+            <app-icon name="checkmark" [size]="14"></app-icon>
+          } @else {
+            {{ s.n }}
+          }
+        </div>
         <span>{{ s.label }}</span>
       </div>
       @if (!$last) {
-        <div class="step-arrow">→</div>
+        <div class="step-arrow"><app-icon name="arrow-right" [size]="12"></app-icon></div>
       }
     }
   </div>
@@ -29,7 +35,7 @@
       <!-- Donor chip -->
       @if (st.donor() === null) {
         <div class="sb-donor-chip sb-donor-anon">
-          <div class="sb-donor-avatar sb-donor-avatar-anon">👤</div>
+          <div class="sb-donor-avatar sb-donor-avatar-anon"><app-icon name="user" [size]="18"></app-icon></div>
           <div class="sb-donor-info">
             <span class="sb-donor-name">Anonymous</span>
             <span class="sb-donor-meta">No loyalty points</span>
@@ -54,7 +60,13 @@
         <div class="sb-divider"></div>
         <div class="sb-stat">
           <div class="sb-val sb-val-sm">
-            {{ st.donationType() === DT.Items ? '📦' : st.donationType() === DT.Monetary ? '💵' : '🎁' }}
+            @if (st.donationType() === DT.Items) {
+              <app-icon name="package" [size]="20"></app-icon>
+            } @else if (st.donationType() === DT.Monetary) {
+              <app-icon name="dollar" [size]="20"></app-icon>
+            } @else {
+              <app-icon name="gift" [size]="20"></app-icon>
+            }
           </div>
           <div class="sb-lbl">
             {{
@@ -87,7 +99,11 @@
         <div class="sb-divider"></div>
         <div class="sb-stat">
           <div class="sb-val">${{ (monetary() ?? 0).toFixed(0) }}</div>
-          <div class="sb-lbl">Money @if (paymentMethod()) { | {{ paymentMethod() === 'cash' ? '💵 Cash' : '💳 Card' }} }</div>
+          <div class="sb-lbl">Money @if (paymentMethod()) { | @if (paymentMethod() === 'cash') {
+              <app-icon name="dollar" [size]="11"></app-icon> Cash
+            } @else {
+              <app-icon name="credit-card" [size]="11"></app-icon> Card
+            } }</div>
         </div>
       }
 
@@ -249,7 +265,7 @@
           }
 
           @if (sdNotFound()) {
-            <div class="appt-not-found">⚠ No scheduled donations found for "{{ sdQ }}"</div>
+            <div class="appt-not-found"><app-icon name="alert-circle" [size]="14"></app-icon> No scheduled donations found for "{{ sdQ }}"</div>
           }
         </div>
       </div>
@@ -299,7 +315,7 @@
         }
         <div class="dtype-grid">
           <button class="dtype-card" [class.active]="st.donationType() === DT.Items" (click)="selectType(DT.Items)">
-            <div class="dtype-icon">&#128230;</div>
+            <div class="dtype-icon"><app-icon name="package" [size]="36"></app-icon></div>
             <div class="dtype-title">Donate Items</div>
             <div class="dtype-desc">Clothing, electronics, furniture and more</div>
           </button>
@@ -308,12 +324,12 @@
             [class.active]="st.donationType() === DT.Monetary"
             (click)="selectType(DT.Monetary)"
           >
-            <div class="dtype-icon">&#128181;</div>
+            <div class="dtype-icon"><app-icon name="dollar" [size]="36"></app-icon></div>
             <div class="dtype-title">Monetary Donation</div>
             <div class="dtype-desc">Cash, credit card, or tap-to-pay</div>
           </button>
           <button class="dtype-card" [class.active]="st.donationType() === DT.Both" (click)="selectType(DT.Both)">
-            <div class="dtype-icon">&#127873;</div>
+            <div class="dtype-icon"><app-icon name="gift" [size]="36"></app-icon></div>
             <div class="dtype-title">Items &amp; Monetary</div>
             <div class="dtype-desc">Donate goods and make a payment together</div>
           </button>
@@ -457,7 +473,7 @@
                   [class.active]="paymentMethod() === 'cash'"
                   (click)="selectPaymentMethod('cash')"
                 >
-                  <span class="pm-icon">&#128181;</span>
+                  <span class="pm-icon"><app-icon name="dollar" [size]="28"></app-icon></span>
                   <span class="pm-label">Cash</span>
                 </button>
               }
@@ -466,7 +482,7 @@
                 [class.active]="paymentMethod() === 'card'"
                 (click)="selectPaymentMethod('card')"
               >
-                <span class="pm-icon">&#128179;</span>
+                <span class="pm-icon"><app-icon name="credit-card" [size]="28"></app-icon></span>
                 <span class="pm-label">Card</span>
               </button>
             </div>
@@ -490,7 +506,7 @@
                       <strong>${{ (cashTendered()! - monetary()!).toFixed(2) }}</strong>
                     </div>
                   } @else {
-                    <div class="change-insufficient">&#9888; Insufficient — need ${{ monetary()!.toFixed(2) }}</div>
+                    <div class="change-insufficient"><app-icon name="alert-circle" [size]="14"></app-icon> Insufficient — need ${{ monetary()!.toFixed(2) }}</div>
                   }
                 }
               </div>
@@ -499,7 +515,7 @@
             @if (paymentMethod() === 'card') {
               @if (!cardApproved() && !cardDeclined()) {
                 <div class="card-terminal">
-                  <div class="terminal-icon">&#128179;</div>
+                  <div class="terminal-icon"><app-icon name="credit-card" [size]="40"></app-icon></div>
                   <div class="terminal-msg">Tap or insert card on the terminal</div>
                   <div class="terminal-sub">Waiting for customer to tap or swipe...</div>
                   <div class="terminal-pulse"></div>
@@ -549,7 +565,7 @@
           <div class="rs-overview-bar rs-overview-bar--mb">
             @if (st.donor() === null) {
               <div class="sb-donor-chip sb-donor-anon">
-                <div class="sb-donor-avatar sb-donor-avatar-anon">👤</div>
+                <div class="sb-donor-avatar sb-donor-avatar-anon"><app-icon name="user" [size]="18"></app-icon></div>
                 <div class="sb-donor-info">
                   <span class="sb-donor-name">Anonymous</span>
                   <span class="sb-donor-meta">No loyalty points</span>
@@ -603,10 +619,10 @@
               <div class="rs-pay-amount">${{ (monetary() ?? 0).toFixed(2) }}</div>
               <div class="rs-pay-method">
                 @if (paymentMethod() === 'cash') {
-                  <span class="rs-method-badge">💵 Cash</span>
+                  <span class="rs-method-badge"><app-icon name="dollar" [size]="12"></app-icon> Cash</span>
                 }
                 @if (paymentMethod() === 'card') {
-                  <span class="rs-method-badge">💳 Card</span>
+                  <span class="rs-method-badge"><app-icon name="credit-card" [size]="12"></app-icon> Card</span>
                 }
               </div>
             </div>

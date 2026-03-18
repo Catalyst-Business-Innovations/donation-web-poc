@@ -4,11 +4,12 @@ import { MockDataService } from '../../../../../core/services/mock-data.service'
 import { ToastService } from '../../../../../core/services/toast.service';
 import { AdminDashboardMapper } from '../models/admin-dashboard.models';
 import { DonationStatus, DonationStatusLabel } from '../../../../../core/models/domain.models';
+import { IconComponent } from '../../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [DecimalPipe, DatePipe],
+  imports: [DecimalPipe, DatePipe, IconComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss'
 })

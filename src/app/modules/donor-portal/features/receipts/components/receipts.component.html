@@ -12,7 +12,7 @@
 
 <div class="page-content">
   <div class="irs-banner">
-    <span class="irs-banner__icon">⚖️</span>
+    <span class="irs-banner__icon"><app-icon name="info" [size]="24"></app-icon></span>
     <div>
       <div class="irs-banner__title">IRS Tax Deduction Information</div>
       <div class="irs-banner__body">
@@ -70,7 +70,7 @@
 </div>
 
 <!-- Receipt Detail Modal -->
-<app-modal [open]="!!selectedReceipt()" title="📄 Tax Receipt Details" [showFooter]="false" (closed)="closeModal()">
+<app-modal [open]="!!selectedReceipt()" title="Tax Receipt Details" [showFooter]="false" (closed)="closeModal()">
   @if (selectedReceipt(); as receipt) {
     <div class="receipt-modal">
       <!-- Receipt Header -->
@@ -124,8 +124,8 @@
 
       <!-- Action Buttons -->
       <div class="receipt-modal__actions">
-        <button class="btn btn-primary receipt-modal__actions-btn" (click)="downloadPDF()">📥 Download PDF</button>
-        <button class="btn btn-secondary receipt-modal__actions-btn" (click)="emailReceipt()">📧 Email Copy</button>
+        <button class="btn btn-primary receipt-modal__actions-btn" (click)="downloadPDF()"><app-icon name="download" [size]="14"></app-icon> Download PDF</button>
+        <button class="btn btn-secondary receipt-modal__actions-btn" (click)="emailReceipt()"><app-icon name="mail" [size]="14"></app-icon> Email Copy</button>
       </div>
     </div>
   }

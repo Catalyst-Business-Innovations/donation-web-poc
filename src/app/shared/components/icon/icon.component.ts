@@ -51,7 +51,8 @@ export type IconName =
   | 'printer'
   | 'award'
   | 'sliders'
-  | 'bell';
+  | 'bell'
+  | 'cart';
 
 @Component({
   selector: 'app-icon',

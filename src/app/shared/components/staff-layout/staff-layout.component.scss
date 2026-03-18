@@ -256,7 +256,9 @@
 .sl-arrow {
   color: var(--gray-400);
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  transition: transform var(--transition);
   &.open {
     transform: rotate(180deg);
   }
