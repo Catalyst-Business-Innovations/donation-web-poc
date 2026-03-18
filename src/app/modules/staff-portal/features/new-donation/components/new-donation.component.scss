@@ -81,7 +81,7 @@
 
 .quick-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
@@ -132,6 +132,10 @@
   &.anon-btn:hover {
     border-color: var(--accent);
     background: var(--accent-light);
+  }
+  &.add-donor-btn:hover {
+    border-color: var(--secondary);
+    background: var(--secondary-light);
   }
   &.quick-items-btn:hover {
     border-color: var(--secondary);
@@ -804,6 +808,22 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+.input-prefix-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-prefix {
+  position: absolute;
+  left: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-500);
+  pointer-events: none;
+}
+.input-with-prefix {
+  padding-left: 26px !important;
+}
 .preset-btn {
   padding: 8px 14px;
   border: 2px solid var(--gray-200);
@@ -1039,5 +1059,152 @@
     align-items: center;
     gap: 4px;
   }
+}
+
+// ── Donation Confirmation Modal ─────────────────────────────────────────────
+.confirm-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cm-hero {
+  background: linear-gradient(135deg, var(--secondary), #16a34a);
+  border-radius: var(--radius-xl);
+  padding: 28px 20px 22px;
+  text-align: center;
+  color: #fff;
+}
+.cm-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  margin-bottom: 12px;
+}
+.cm-hero-title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+.cm-hero-sub {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+.cm-id-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.cm-id-block {
+  flex: 1;
+}
+.cm-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--gray-400);
+  margin-bottom: 3px;
+}
+.cm-id-val {
+  font-size: 16px;
+  font-weight: 900;
+  font-family: monospace;
+  letter-spacing: 1.5px;
+  color: var(--primary);
+}
+.cm-receipt-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-700);
+}
+.cm-qr-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.cm-qr-frame {
+  padding: 10px;
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--gray-200);
+}
+.cm-qr-hint {
+  font-size: 10px;
+  color: var(--gray-400);
+  font-weight: 600;
+}
+
+.cm-summary {
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.cm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--gray-100);
+  &:last-child { border-bottom: none; }
+}
+.cm-row-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gray-600);
+}
+
+.cm-points-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--secondary-light);
+  border: 1px solid var(--secondary);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  color: var(--secondary-dark, #15803d);
+}
+.cm-points-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.cm-points-sub {
+  font-size: 11px;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+.cm-link-hint {
+  font-size: 11px;
+  color: var(--gray-400);
+  text-align: center;
+  margin-top: 5px;
+}
+.cm-linked-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--secondary-light);
+  border: 1px solid var(--secondary);
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  color: var(--secondary-dark, #15803d);
+  font-weight: 600;
 }
 

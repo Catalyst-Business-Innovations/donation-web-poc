@@ -66,6 +66,10 @@
               <app-icon name="user" [size]="24"></app-icon>
               <span>Anonymous</span>
             </button>
+            <button class="quick-btn add-donor-btn" (click)="enrollForm = { firstName: '', lastName: '', phone: '', email: '' }; showEnroll.set(true)">
+              <app-icon name="plus" [size]="24"></app-icon>
+              <span>Add Donor</span>
+            </button>
           </div>
           <div class="id-divider">or search</div>
           <div class="search-bar" style="margin-bottom: 8px">
@@ -105,11 +109,11 @@
           </div>
           <div class="quick-grid">
             <button class="quick-btn quick-items-btn" (click)="quickDonate(DT.Items)">
-              <span style="font-size: 26px">&#128230;</span>
+              <app-icon name="package" [size]="26"></app-icon>
               <span>Donate Items</span>
             </button>
             <button class="quick-btn quick-money-btn" (click)="quickDonate(DT.Monetary)">
-              <span style="font-size: 26px">&#128181;</span>
+              <app-icon name="dollar" [size]="26"></app-icon>
               <span>Donate Money</span>
             </button>
           </div>
@@ -120,7 +124,7 @@
           <div class="card-header">
             <div>
               <div class="card-title">Search Scheduled Donation</div>
-              <div class="card-subtitle">Enter Donation ID or scan QR</div>
+              <div class="card-subtitle">Enter Reference # or scan QR</div>
             </div>
           </div>
           <div class="appt-lookup-row">
@@ -243,19 +247,16 @@
             <div class="dtype-icon">&#128230;</div>
             <div class="dtype-title">Donate Items</div>
             <div class="dtype-desc">Clothing, electronics, furniture and more</div>
-            <div class="dtype-cta">Select &#8594;</div>
           </button>
           <button class="dtype-card" (click)="selectType(DT.Monetary)">
             <div class="dtype-icon">&#128181;</div>
             <div class="dtype-title">Monetary Donation</div>
             <div class="dtype-desc">Cash, credit card, or tap-to-pay</div>
-            <div class="dtype-cta">Select &#8594;</div>
           </button>
           <button class="dtype-card" (click)="selectType(DT.Both)">
             <div class="dtype-icon">&#127873;</div>
             <div class="dtype-title">Items &amp; Monetary</div>
             <div class="dtype-desc">Donate goods and make a payment together</div>
-            <div class="dtype-cta">Select &#8594;</div>
           </button>
         </div>
       </div>
@@ -401,13 +402,17 @@
             <button class="preset-btn" [class.active]="customMon()" (click)="customMon.set(true)">Custom</button>
           </div>
           @if (customMon()) {
-            <input
-              class="form-input"
-              type="number"
-              style="margin-top: 10px"
-              placeholder="Enter amount"
-              (input)="setMonetary($any($event.target).valueAsNumber)"
-            />
+            <div class="input-prefix-wrap" style="margin-top: 10px">
+              <span class="input-prefix">$</span>
+              <input
+                class="form-input input-with-prefix"
+                type="number"
+                placeholder="0.00"
+                min="1"
+                step="1"
+                (input)="monetary.set($any($event.target).valueAsNumber || null)"
+              />
+            </div>
           }
         </div>
 
@@ -468,7 +473,7 @@
           [disabled]="!canProceedFromMoney()"
           (click)="st.nextStep()"
         >
-          Review &#8594;
+          Review
         </button>
 
       </div>
@@ -599,83 +604,89 @@
 <!-- Donation Confirmation Modal -->
 <app-modal
   [open]="showConfirmation()"
-  [title]="'Donation Complete!'"
-  confirmText="Done"
+  title="Donation Complete!"
+  confirmLabel="Done — New Donation"
+  confirmVariant="success"
   [showCancel]="false"
+  size="md"
   (closed)="closeConfirmation()"
   (confirmed)="closeConfirmation()"
 >
-  <div style="text-align: center; padding: 20px">
+  <div class="confirm-modal">
 
-    <!-- Donation ID + QR -->
-    <div style="margin-bottom: 20px">
-      <h3 style="color: var(--secondary); margin-bottom: 6px">Donation ID</h3>
-      <div style="font-size: 22px; font-weight: 800; color: var(--primary); font-family: monospace; letter-spacing: 2px">
-        {{ donationId() }}
+    <!-- Hero banner -->
+    <div class="cm-hero">
+      <div class="cm-hero-icon">
+        <app-icon name="check-circle" [size]="44"></app-icon>
       </div>
-    </div>
-    <div style="margin-bottom: 20px">
-      <div style="display: inline-block; padding: 14px; background: white; border-radius: 8px; border: 2px solid var(--gray-200)">
-        <app-qr-code [value]="donationId()" [size]="140"></app-qr-code>
-      </div>
-      <div style="font-size: 11px; color: var(--gray-500); margin-top: 6px">Scan to view donation details</div>
+      <div class="cm-hero-title">Thank you!</div>
+      <div class="cm-hero-sub">Donation recorded successfully</div>
     </div>
 
-    <!-- Donation Summary -->
-    <div style="background: var(--gray-50); border-radius: 8px; padding: 14px; margin-bottom: 16px; text-align: left">
-      <div style="font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px">Donation Summary</div>
+    <!-- Reference # + QR side by side -->
+    <div class="cm-id-row">
+      <div class="cm-id-block">
+        <div class="cm-label">Reference #</div>
+        <div class="cm-id-val">{{ donationId() }}</div>
+        <div class="cm-label" style="margin-top: 10px">Receipt #</div>
+        <div class="cm-receipt-val">{{ receiptNum }}</div>
+      </div>
+      <div class="cm-qr-block">
+        <div class="cm-qr-frame">
+          <app-qr-code [value]="donationId()" [size]="110"></app-qr-code>
+        </div>
+        <div class="cm-qr-hint">Scan for details</div>
+      </div>
+    </div>
+
+    <!-- Summary rows -->
+    <div class="cm-summary">
       @if (st.donationType() !== DT.Monetary) {
-        <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--gray-200)">
-          <span style="font-size: 13px; color: var(--gray-600)">Items Donated</span>
-          <strong style="font-size: 13px">{{ st.totalItems() }} item{{ st.totalItems() === 1 ? '' : 's' }}</strong>
+        <div class="cm-row">
+          <span class="cm-row-label"><app-icon name="package" size="14" /> Items Donated</span>
+          <strong>{{ st.totalItems() }} item{{ st.totalItems() === 1 ? '' : 's' }}</strong>
         </div>
       }
       @if (st.donationType() !== DT.Items) {
-        <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--gray-200)">
-          <span style="font-size: 13px; color: var(--gray-600)">Monetary Donation</span>
-          <strong style="font-size: 13px">${{ (monetary() ?? 0).toFixed(2) }}</strong>
+        <div class="cm-row">
+          <span class="cm-row-label"><app-icon name="dollar" size="14" /> Monetary</span>
+          <strong>${{ (monetary() ?? 0).toFixed(2) }}</strong>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--gray-200)">
-          <span style="font-size: 13px; color: var(--gray-600)">Payment Method</span>
-          <strong style="font-size: 13px">{{ paymentMethod() === 'cash' ? '💵 Cash' : '💳 Card / Tap' }}</strong>
+        <div class="cm-row">
+          <span class="cm-row-label"><app-icon name="credit-card" size="14" /> Payment</span>
+          <strong>{{ paymentMethod() === 'cash' ? 'Cash' : 'Card / Tap' }}</strong>
         </div>
       }
-      <div style="display: flex; justify-content: space-between; padding: 7px 0">
-        <span style="font-size: 13px; color: var(--gray-600)">Receipt #</span>
-        <strong style="font-size: 13px">{{ receiptNum }}</strong>
+      <div class="cm-row">
+        <span class="cm-row-label"><app-icon name="calendar" size="14" /> Date</span>
+        <strong>{{ today | date: 'MMM d, yyyy' }}</strong>
       </div>
     </div>
 
     <!-- Points awarded -->
     @if (st.donor()) {
-      <div style="background: var(--success-light); border: 1px solid var(--success); border-radius: 8px; padding: 14px; margin-bottom: 16px">
-        <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px">
-          Points Awarded to {{ st.donor()!.displayName }}
+      <div class="cm-points-banner">
+        <app-icon name="star" [size]="20"></app-icon>
+        <div>
+          <div class="cm-points-title">Points awarded to {{ st.donor()!.displayName }}</div>
+          <div class="cm-points-sub">Thank you for your continued support!</div>
         </div>
-        <div style="font-size: 12px; color: var(--gray-600)">Thank you for your continued support!</div>
       </div>
     }
 
-    <div style="font-size: 12px; color: var(--gray-500)">
-      {{ today | date: 'MMM d, yyyy' }}
-    </div>
-
-    <!-- Req 1: Link anonymous donation to a donor (shown when donation is anonymous) -->
+    <!-- Link to donor (anonymous) -->
     @if (st.donor() === null && donationId()) {
-      <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-200)">
-        <button class="btn btn-secondary" style="width: 100%" (click)="showAssociateModal.set(true)">
-          &#128279; Link to Donor Account
+      @if (!associatedDonor()) {
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 4px" (click)="showAssociateModal.set(true)">
+          <app-icon name="user" size="14" /> Link to Donor Account
         </button>
-        <div style="font-size: 11px; color: var(--gray-500); margin-top: 6px; text-align: center">
-          Associate this donation with an existing donor to award loyalty points
+        <div class="cm-link-hint">Associate this donation with a donor to award loyalty points</div>
+      } @else {
+        <div class="cm-linked-badge">
+          <app-icon name="check-circle" size="16" />
+          Linked to <strong>{{ associatedDonor()!.displayName }}</strong>
         </div>
-      </div>
-    }
-    @if (associatedDonor()) {
-      <div style="margin-top: 12px; padding: 10px 14px; background: var(--success-light); border: 1px solid var(--success); border-radius: 8px; font-size: 13px; color: var(--gray-800); display: flex; align-items: center; gap: 8px">
-        <span>&#10003;</span>
-        <span>Linked to <strong>{{ associatedDonor()!.displayName }}</strong></span>
-      </div>
+      }
     }
   </div>
 </app-modal>
