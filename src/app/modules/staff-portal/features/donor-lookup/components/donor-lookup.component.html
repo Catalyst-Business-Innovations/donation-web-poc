@@ -123,6 +123,7 @@
   [open]="modalMode() === 'edit'"
   [title]="modalTitle"
   [confirmLabel]="confirmLabel"
+  [confirmDisabled]="!enrollForm.firstName.trim() || !enrollForm.lastName.trim() || !enrollForm.phone.trim()"
   (closed)="closeModal()"
   (confirmed)="saveEnrollment()"
 >

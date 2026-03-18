@@ -1560,6 +1560,27 @@ export class MockDataService {
     return undefined;
   }
 
+  updateDonor(id: string, patch: Partial<Donor>): void {
+    const index = this.donors.findIndex(d => d.id === id);
+    if (index >= 0) {
+      (this.donors as Donor[])[index] = { ...this.donors[index], ...patch };
+    }
+  }
+
+  addDonor(donor: Omit<Donor, 'id' | 'joinDate' | 'totalDonations' | 'lifetimeValue' | 'loyaltyPoints' | 'loyaltyTier'>): Donor {
+    const newDonor: Donor = {
+      ...donor,
+      id: `d-${Date.now()}`,
+      joinDate: new Date(),
+      totalDonations: 0,
+      lifetimeValue: 0,
+      loyaltyPoints: 0,
+      loyaltyTier: DonorTier.Bronze,
+    };
+    (this.donors as Donor[]).unshift(newDonor);
+    return newDonor;
+  }
+
   // Simulated rewards/points
   getAvailableRewards() {
     return [

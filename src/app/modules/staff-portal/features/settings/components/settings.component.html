@@ -159,6 +159,7 @@
   [open]="modalMode() === 'add-reward' || modalMode() === 'edit-reward'"
   [title]="modalTitle"
   [confirmLabel]="confirmLabel"
+  [confirmDisabled]="!rewardForm.name.trim() || rewardForm.pointsRequired <= 0"
   (closed)="closeModal()"
   (confirmed)="saveRewardForm()"
 >
@@ -195,6 +196,7 @@
   [open]="modalMode() === 'add-category' || modalMode() === 'edit-category'"
   [title]="modalTitle"
   [confirmLabel]="confirmLabel"
+  [confirmDisabled]="!categoryForm.name.trim() || !categoryForm.icon.trim()"
   (closed)="closeModal()"
   (confirmed)="saveCategoryForm()"
 >

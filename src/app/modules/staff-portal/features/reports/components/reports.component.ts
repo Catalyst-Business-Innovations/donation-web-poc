@@ -29,4 +29,32 @@ export class ReportsComponent {
   ];
   protected readonly DS = DonationStatus;
   protected readonly DSL = DonationStatusLabel;
-}
+  exportCsv(): void {
+    const today = this.mockData.donations
+      .filter(d => d.locationId === this.loc.id)
+      .slice(0, 50);
+    const header = 'Receipt #,Time,Donor,Items,Est. Value,Status';
+    const rows = today.map(d =>
+      [
+        d.receiptNumber,
+        d.timestamp.toLocaleTimeString(),
+        d.donorName ?? 'Anonymous',
+        d.totalItems,
+        d.totalEstimatedValue.toFixed(2),
+        DonationStatusLabel[d.status] ?? d.status
+      ].join(',')
+    );
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `report-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.toast.success('Exported', 'CSV downloaded successfully.');
+  }
+
+  printReport(): void {
+    window.print();
+  }}

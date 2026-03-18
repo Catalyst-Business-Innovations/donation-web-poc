@@ -4,8 +4,8 @@
     <div class="topbar-subtitle">Today's performance at {{ loc.name }}</div>
   </div>
   <div class="topbar-actions">
-    <button class="btn btn-secondary" (click)="toast.success('Exported', 'Report exported to CSV.')">Export CSV</button>
-    <button class="btn btn-primary" (click)="toast.info('Print', 'Sending to printer...')">Print</button>
+    <button class="btn btn-secondary" (click)="exportCsv()">Export CSV</button>
+    <button class="btn btn-primary" (click)="printReport()">Print</button>
   </div>
 </div>
 

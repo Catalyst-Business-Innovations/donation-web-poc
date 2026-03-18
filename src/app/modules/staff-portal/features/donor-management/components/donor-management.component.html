@@ -99,6 +99,7 @@
   [open]="mode() !== null"
   [title]="modalTitle"
   [confirmLabel]="confirmLabel"
+  [confirmDisabled]="(mode() === 'add' || mode() === 'edit') && !canSaveDonor"
   (closed)="close()"
   (confirmed)="mode() === 'view' ? openEdit(active()!) : confirm()"
 >

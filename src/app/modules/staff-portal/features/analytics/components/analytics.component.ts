@@ -54,4 +54,27 @@ export class AnalyticsComponent {
   locColor(i: number): string {
     return ['blue', 'green', 'yellow', 'red'][i] ?? 'blue';
   }
+
+  exportCsv(): void {
+    const a = this.a;
+    const rows = [
+      'Metric,Value',
+      `Total Donations,${a.totalDonations}`,
+      `Total Value,$${a.totalValue.toFixed(2)}`,
+      `Active Donors,${a.activeDonors}`,
+      `New Donors This Month,${a.newDonorsThisMonth}`,
+      `Repeat Donor Rate,${(a.repeatDonorRate * 100).toFixed(1)}%`,
+      `Avg Process Time,${a.avgProcessTimeMin} min`,
+      `Identification Rate,${(a.identificationRate * 100).toFixed(1)}%`,
+    ];
+    const csv = rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `analytics-${new Date().toISOString().split('T')[0]}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    this.toast.success('Exported', 'Analytics data downloaded as CSV.');
+  }
 }

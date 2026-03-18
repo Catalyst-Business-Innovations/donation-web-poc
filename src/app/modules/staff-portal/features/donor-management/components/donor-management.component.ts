@@ -60,8 +60,36 @@ export class DonorManagementComponent {
     this.mode.set(null);
   }
 
+  get canSaveDonor(): boolean {
+    return !!this.form.firstName.trim() && !!this.form.lastName.trim() && !!this.form.phone.trim();
+  }
+
   confirm(): void {
-    this.toast.success('Saved!', this.mode() === 'add' ? 'New donor registered.' : 'Donor info saved.');
+    if (!this.canSaveDonor) {
+      this.toast.warning('Incomplete', 'First name, last name and phone are required.');
+      return;
+    }
+    const m = this.mode();
+    if (m === 'edit' && this.active()) {
+      this.svc.updateDonor(this.active()!.id, {
+        firstName: this.form.firstName.trim(),
+        lastName:  this.form.lastName.trim(),
+        email:     this.form.email.trim(),
+        phone:     this.form.phone.trim(),
+        address:   this.form.address.trim(),
+      });
+      this.toast.success('Saved!', `${this.form.firstName} ${this.form.lastName}'s info updated.`);
+    } else if (m === 'add') {
+      this.svc.addDonor({
+        firstName: this.form.firstName.trim(),
+        lastName:  this.form.lastName.trim(),
+        email:     this.form.email.trim(),
+        phone:     this.form.phone.trim(),
+        address:   this.form.address.trim(),
+        preferredLocationId: this.svc.session.locationId,
+      });
+      this.toast.success('Enrolled!', `${this.form.firstName} ${this.form.lastName} registered.`);
+    }
     this.close();
   }
 

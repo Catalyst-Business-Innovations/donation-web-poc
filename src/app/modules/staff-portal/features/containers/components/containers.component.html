@@ -10,7 +10,7 @@
       <button class="btn btn-secondary btn-sm" (click)="openMerge()" [disabled]="selectionCount() < 2">Merge</button>
       <button class="btn btn-secondary btn-sm" (click)="openBulkStatus()">Bulk Status</button>
     }
-    <button class="btn btn-secondary" (click)="toast.info('Print', 'Use individual Print Label buttons to print.')">Print Labels</button>
+    <button class="btn btn-secondary" (click)="printSelectedLabels()">Print Labels</button>
     <button class="btn btn-primary" (click)="openCreate()">+ New Container</button>
   </div>
 </div>

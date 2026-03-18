@@ -339,6 +339,13 @@ export class ContainersComponent {
   }
 
   // ── Print label ────────────────────────────────────────────────────────────
+  printSelectedLabels(): void {
+    const ids = Array.from(this.selectedIds());
+    const containers = this.mockData.containers.filter(c => ids.includes(c.id));
+    containers.forEach(c => this.printLabel(c));
+    this.toast.success('Printing', `${containers.length} label(s) sent to print.`);
+  }
+
   printLabel(c: Container): void {
     const contentsHtml = c.contents.length > 0
       ? c.contents.map(x =>
