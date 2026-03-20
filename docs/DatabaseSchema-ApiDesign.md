@@ -36,7 +36,7 @@ String values are stored in the database columns. ORM converters handle mapping 
 | `UserType` **[NEW]** | Internal, External |
 | `Status` **[NEW]** | Active, Inactive |
 | `DonorTier` | Bronze, Silver, Gold, Platinum |
-| `ContainerStatus` | Available, ReadyForSorting, Sorting, InUse |
+| `ContainerStatus` | Available, ReadyForSorting, Sorting, InUse, Closed |
 | `ContainerDest` | Production, Reserve, Warehouse, Transfer, Salvage, Ecommerce |
 | `ItemCondition` | Sellable, NeedsRefurbishment, Salvage, Dispose |
 | `ContainerType` | Gaylord, CartRack, Pallet, Tote, Baler |
@@ -52,6 +52,7 @@ String values are stored in the database columns. ORM converters handle mapping 
 | `RedemptionStatus` | Pending, Approved, Rejected, Fulfilled, Cancelled |
 | `CampaignStatus` | Draft, Active, Paused, Completed |
 | `NotificationChannel` | Email, SMS, Both |
+| `PresortStatus` **[NEW]** | Queued, InProgress, Completed |
 | `LoyaltyPointTransactionReason` **[NEW]** | DonationEarned, RedemptionDebit, GiftSent, GiftReceived, ManualAdjust, Expiry |
 | `BadgeType` **[NEW]** | FirstDonation, Donations10, Donations25, Donations50, CommunityHero, YearRoundDonor |
 | `TaxReceiptStatus` **[NEW]** | Pending, Ready, Sent |
@@ -60,6 +61,26 @@ String values are stored in the database columns. ORM converters handle mapping 
 ---
 
 ## Database Schema
+
+### Base Entity
+
+All tables that own a surrogate primary key extend `BaseAuditableEntity` in the .NET domain layer.
+The following columns are **inherited and not repeated in individual table definitions below**:
+
+```sql
+-- Columns inherited from BaseAuditableEntity on every full-entity table:
+Id                BIGSERIAL       PRIMARY KEY,
+CreatedAt         TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+CreatedById       BIGINT          NOT NULL REFERENCES SharedUsers(Id),
+LastModifiedAt    TIMESTAMPTZ,                                          -- NULL until first update
+LastModifiedById  BIGINT          REFERENCES SharedUsers(Id),
+IsDeleted         BOOLEAN         NOT NULL DEFAULT FALSE                -- soft-delete flag
+```
+
+> **Type convention:** All `Id` columns are `BIGSERIAL` (maps to C# `long`). All foreign-key references to `Id` columns are `BIGINT`.
+
+**Exception tables** — these use a composite or foreign-key primary key and do **not** inherit `BaseAuditableEntity`:
+`DonationCategories`, `ContainerCapacity`, `LoyaltyTierConfig`, `AppConfig`, `DonorPreferences`
 
 ---
 
@@ -74,7 +95,7 @@ ALTER TABLE SharedUsers
   ADD COLUMN UserType VARCHAR(20) NOT NULL DEFAULT 'Internal';  -- UserType enum
 
 -- Internal users  → Donors.UserId is NULL; user operates via platform roles/permissions
--- External users  → Donors record  (UserType = 2)
+-- External users  → Donors record  (UserType = 'External')
 ```
 
 ---
@@ -88,9 +109,9 @@ Two new tables are added:
 ```sql
 -- [NEW] Structured open/close times per day; replaces the unstructured Hours string on Stores
 StoreHours (
-  Id          SERIAL      PRIMARY KEY,
-  CompanyId   INT         NOT NULL REFERENCES SharedCompanies(Id),
-  StoreId     INT         NOT NULL REFERENCES Stores(Id) ON DELETE CASCADE,
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId   BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
+  StoreId     BIGINT      NOT NULL REFERENCES Stores(Id) ON DELETE CASCADE,
   DayOfWeek   SMALLINT    NOT NULL,                        -- DayOfWeek enum (0=Sun … 6=Sat)
   OpenTime    TIME,                                        -- NULL when IsClosed = TRUE
   CloseTime   TIME,
@@ -101,9 +122,9 @@ StoreHours (
 
 -- [NEW] Bookable time slots per store; replaces the hardcoded '9:00 AM … 5:00 PM' array in the UI
 TimeSlots (
-  Id            SERIAL      PRIMARY KEY,
-  CompanyId     INT         NOT NULL REFERENCES SharedCompanies(Id),
-  StoreId       INT         NOT NULL REFERENCES Stores(Id) ON DELETE CASCADE,
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId     BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
+  StoreId       BIGINT      NOT NULL REFERENCES Stores(Id) ON DELETE CASCADE,
   StartTime     TIME        NOT NULL,                      -- e.g. 09:00
   EndTime       TIME        NOT NULL,                      -- e.g. 10:00
   MaxCapacity   INT         NOT NULL DEFAULT 5,            -- max concurrent bookings
@@ -128,20 +149,18 @@ Donors are **External** platform users. `UserId` links to `Users` for self-servi
 
 ```sql
 Donors (
-  Id                  SERIAL          PRIMARY KEY,
-  CompanyId           INT             NOT NULL REFERENCES SharedCompanies(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId           BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
   ReferenceNumber     VARCHAR(20)     UNIQUE NOT NULL,     -- e.g. DNR-001
-  UserId              INT             UNIQUE REFERENCES SharedUsers(Id),  -- NULL = anonymous; UserType = External
+  UserId              BIGINT          UNIQUE REFERENCES SharedUsers(Id),  -- NULL = anonymous; UserType = External
   LoyaltyTier         VARCHAR(20)     NOT NULL DEFAULT 'Bronze',  -- DonorTier enum
   LoyaltyPoints       INT             NOT NULL DEFAULT 0,  -- denormalized from LoyaltyPointTransactions
   TotalDonations      INT             NOT NULL DEFAULT 0,  -- denormalized count
   LifetimeValue       DECIMAL(12,2)   NOT NULL DEFAULT 0,  -- denormalized sum
-  PreferredStoreId    INT             REFERENCES Stores(Id),
+  PreferredStoreId    BIGINT          REFERENCES Stores(Id),
   JoinDate            DATE            NOT NULL,
   LastDonationDate    DATE,
-  Status              VARCHAR(20)     NOT NULL DEFAULT 'Active',  -- Status enum
-  CreatedAt           TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-  UpdatedAt           TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+  Status              VARCHAR(20)     NOT NULL DEFAULT 'Active'  -- Status enum
 )
 ```
 
@@ -152,9 +171,9 @@ Donors (
 ```sql
 -- [NEW] Explicit badge records; donor dashboard already displays these
 DonorBadges (
-  Id          SERIAL      PRIMARY KEY,
-  CompanyId   INT         NOT NULL REFERENCES SharedCompanies(Id),
-  DonorId     INT         NOT NULL REFERENCES Donors(Id) ON DELETE CASCADE,
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId   BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
+  DonorId     BIGINT      NOT NULL REFERENCES Donors(Id) ON DELETE CASCADE,
   BadgeType   VARCHAR(30)  NOT NULL,                       -- BadgeType enum
   EarnedAt    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (DonorId, BadgeType)
@@ -170,16 +189,16 @@ Replaces the single `LoyaltyPoints` balance column with an append-only audit log
 
 ```sql
 LoyaltyPointTransactions (
-  Id          SERIAL      PRIMARY KEY,
-  CompanyId   INT         NOT NULL REFERENCES SharedCompanies(Id),
-  DonorId     INT         NOT NULL REFERENCES Donors(Id),
-  Delta       INT         NOT NULL,                        -- positive = credit, negative = debit
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  -- Append-only — LastModifiedAt/LastModifiedById will always be NULL
+  CompanyId   BIGINT       NOT NULL REFERENCES SharedCompanies(Id),
+  DonorId     BIGINT       NOT NULL REFERENCES Donors(Id),
+  Delta       INT          NOT NULL,                       -- positive = credit, negative = debit
   Reason      VARCHAR(30)  NOT NULL,                       -- LoyaltyPointTransactionReason enum
-  RefId       INT,                                         -- DonationId, RewardTransactionId, etc.
+  RefId       BIGINT,                                      -- DonationId, RewardTransactionId, etc.
   RefType     VARCHAR(50),                                 -- 'Donation', 'RewardTransaction', 'Manual'
   Note        TEXT,                                        -- staff note for ManualAdjust entries
-  ExpiresAt   TIMESTAMPTZ,                                 -- NULL = never expires; set for credit entries per AppConfig.PointsExpiryDays
-  CreatedAt   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  ExpiresAt   TIMESTAMPTZ                                  -- NULL = never expires; set for credit entries per AppConfig.PointsExpiryDays
 )
 ```
 
@@ -198,19 +217,19 @@ A donation with `Scope = Both` will have rows of each type.
 
 ```sql
 Donations (
-  Id                    SERIAL          PRIMARY KEY,
-  CompanyId             INT             NOT NULL REFERENCES SharedCompanies(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId             BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
   ReferenceNumber       VARCHAR(20)     UNIQUE NOT NULL,
   ReceiptNumber         VARCHAR(30)     UNIQUE,                        -- NULL until Completed
-  DonorId               INT             REFERENCES Donors(Id),         -- NULL = anonymous; set at check-in or post-payment association
+  DonorId               BIGINT          REFERENCES Donors(Id),         -- NULL = anonymous; set at check-in or post-payment association
   IsAssociatedLater     BOOLEAN         NOT NULL DEFAULT FALSE,        -- TRUE when DonorId was linked after completion (Req 1)
   AssociatedAt          TIMESTAMPTZ,                                   -- timestamp of post-payment association
   -- Anonymous walk-in contact (populated when DonorId is NULL)
   GuestName             VARCHAR(200),
   GuestPhone            VARCHAR(30),
   GuestEmail            VARCHAR(255),
-  StoreId               INT             NOT NULL REFERENCES Stores(Id),
-  AttendantId           INT             REFERENCES SharedUsers(Id),           -- NULL for donor self-scheduled
+  StoreId               BIGINT          NOT NULL REFERENCES Stores(Id),
+  AttendantId           BIGINT          REFERENCES SharedUsers(Id),    -- NULL for donor self-scheduled
   Status                VARCHAR(20)     NOT NULL,                      -- DonationStatus enum; set explicitly by API (no default — varies by Method)
   Method                VARCHAR(20)     NOT NULL DEFAULT 'WalkIn',     -- DonationMethod enum
   Scope                 VARCHAR(20)     NOT NULL DEFAULT 'Items',      -- DonationScope enum
@@ -223,22 +242,20 @@ Donations (
   Notes                 TEXT,
   -- Scheduling fields (populated when Method = Scheduled or Pickup; NULL for WalkIn)
   ScheduledDate         DATE,
-  TimeSlotId            INT             REFERENCES TimeSlots(Id),
+  TimeSlotId            BIGINT          REFERENCES TimeSlots(Id),
   Recurring             VARCHAR(20),                                    -- 'none','weekly','biweekly','monthly'
   PickupAddress         TEXT,                                           -- for Method = Pickup
   ExpectedItemCount     INT,                                            -- pre-planned estimate
   CancellationReason    TEXT,                                           -- required when Status = Cancelled
-  CancelledByUserId     INT             REFERENCES SharedUsers(Id),
-  DonationAt            TIMESTAMPTZ     NOT NULL DEFAULT NOW(),         -- when the physical donation event occurred
-  CreatedAt             TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-  UpdatedAt             TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+  CancelledByUserId     BIGINT          REFERENCES SharedUsers(Id),
+  DonationAt            TIMESTAMPTZ     NOT NULL DEFAULT NOW()          -- when the physical donation event occurred
 )
 
 -- Covers both physical items (Scope=Items) and monetary entries (Scope=Monetary) in one table
 DonationItems (
-  Id                       SERIAL          PRIMARY KEY,
-  CompanyId                INT             NOT NULL REFERENCES SharedCompanies(Id),
-  DonationId               INT             NOT NULL REFERENCES Donations(Id) ON DELETE CASCADE,
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId                BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
+  DonationId               BIGINT          NOT NULL REFERENCES Donations(Id) ON DELETE CASCADE,
   ReferenceNumber          VARCHAR(20)     UNIQUE NOT NULL,
   Scope                    VARCHAR(20)     NOT NULL DEFAULT 'Items',    -- DonationScope enum
   -- Physical item fields (Scope = Items)
@@ -254,15 +271,14 @@ DonationItems (
   PaymentMethod            VARCHAR(20),                                  -- PaymentMethod enum
   CardTxnRef               VARCHAR(100),                                 -- card processor reference
   CashTendered             DECIMAL(12,2),                                -- for cash payments
-  ChangeGiven              DECIMAL(12,2),
-  CreatedAt                TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-  UpdatedAt                TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+  ChangeGiven              DECIMAL(12,2)
 )
 
 -- Pre-planned item categories for scheduled donations (donor's "giving cart")
+-- Exception: composite PK — does NOT inherit BaseAuditableEntity
 DonationCategories (
-  CompanyId     INT         NOT NULL REFERENCES SharedCompanies(Id),
-  DonationId    INT         NOT NULL REFERENCES Donations(Id) ON DELETE CASCADE,
+  CompanyId     BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
+  DonationId    BIGINT      NOT NULL REFERENCES Donations(Id) ON DELETE CASCADE,
   CategoryKey   VARCHAR(50) NOT NULL REFERENCES Categories(Key),
   PRIMARY KEY (DonationId, CategoryKey)
 )
@@ -275,22 +291,21 @@ DonationCategories (
 ```sql
 -- One row per completed donation; auto-created when Donation.Status → Completed
 Receipts (
-  Id              SERIAL      PRIMARY KEY,
-  CompanyId       INT         NOT NULL REFERENCES SharedCompanies(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId       BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
   ReferenceNumber VARCHAR(30) UNIQUE NOT NULL,
-  DonationId      INT         NOT NULL UNIQUE REFERENCES Donations(Id),
-  DonorId         INT         REFERENCES Donors(Id),
+  DonationId      BIGINT      NOT NULL UNIQUE REFERENCES Donations(Id),
+  DonorId         BIGINT      REFERENCES Donors(Id),
   PrintedAt       TIMESTAMPTZ,
   EmailedAt       TIMESTAMPTZ,
-  SmsSentAt       TIMESTAMPTZ,
-  CreatedAt       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  SmsSentAt       TIMESTAMPTZ
 )
 
 -- Annual tax receipt roll-up per donor per year
 TaxReceipts (
-  Id              SERIAL          PRIMARY KEY,
-  CompanyId       INT             NOT NULL REFERENCES SharedCompanies(Id),
-  DonorId         INT             NOT NULL REFERENCES Donors(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId       BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
+  DonorId         BIGINT          NOT NULL REFERENCES Donors(Id),
   Year            SMALLINT        NOT NULL,
   TotalDonations  INT             NOT NULL DEFAULT 0,
   TotalItems      INT             NOT NULL DEFAULT 0,
@@ -298,7 +313,6 @@ TaxReceipts (
   Status          VARCHAR(20)     NOT NULL DEFAULT 'Pending',          -- TaxReceiptStatus enum
   GeneratedAt     TIMESTAMPTZ,
   SentAt          TIMESTAMPTZ,
-  CreatedAt       TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
   UNIQUE (DonorId, Year)
 )
 ```
@@ -309,73 +323,73 @@ TaxReceipts (
 
 ```sql
 -- [NEW] Config-driven capacity limits per container type (replaces hardcoded UI values)
+-- Exception: composite PK — does NOT inherit BaseAuditableEntity
 ContainerCapacity (
-  CompanyId       INT         NOT NULL REFERENCES SharedCompanies(Id),
+  CompanyId       BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
   ContainerType   VARCHAR(20) NOT NULL,                                -- ContainerType enum
   MaxItems        INT         NOT NULL,                                -- Gaylord=400, CartRack=80, Pallet=200, Tote=50
-  UpdatedAt       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (CompanyId, ContainerType)
 )
 
 Containers (
-  Id                    SERIAL          PRIMARY KEY,
-  CompanyId             INT             NOT NULL REFERENCES SharedCompanies(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId             BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
   ReferenceNumber       VARCHAR(20)     UNIQUE NOT NULL,
   Barcode               VARCHAR(100)    UNIQUE NOT NULL,
-  DonationId            INT             REFERENCES Donations(Id),
+  DonationId            BIGINT          REFERENCES Donations(Id),
   ContainerType         VARCHAR(20)     NOT NULL,                       -- ContainerType enum
   PresortMethod         VARCHAR(20),                                    -- PresortMethod enum
-  PresortWorkerId       INT             REFERENCES SharedUsers(Id),
+  PresortWorkerId       BIGINT          REFERENCES SharedUsers(Id),
   Destination           VARCHAR(20),                                    -- ContainerDest enum
   Status                VARCHAR(30)     NOT NULL DEFAULT 'Available',  -- ContainerStatus enum
   DeptKey               VARCHAR(50)     REFERENCES Departments(Key),
   CatKey                VARCHAR(50)     REFERENCES Categories(Key),
-  StoreId               INT             NOT NULL REFERENCES Stores(Id),
+  StoreId               BIGINT          NOT NULL REFERENCES Stores(Id),
   TotalItems            INT             NOT NULL DEFAULT 0,
   TotalEstimatedValue   DECIMAL(12,2)   NOT NULL DEFAULT 0,
   SalvageWeightLbs      DECIMAL(8,2),
   IsSeasonal            BOOLEAN         NOT NULL DEFAULT FALSE,
   SeasonalTag           VARCHAR(100),
-  ParentContainerId     INT             REFERENCES Containers(Id),      -- self-ref for splits
-  TransferToStoreId     INT             REFERENCES Stores(Id),
+  ParentContainerId     BIGINT          REFERENCES Containers(Id),      -- self-ref for splits
+  TransferToStoreId     BIGINT          REFERENCES Stores(Id),
   Notes                 TEXT,
   PresortedAt           TIMESTAMPTZ,
-  ClosedAt              TIMESTAMPTZ,
-  CreatedAt             TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-  UpdatedAt             TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+  ClosedAt              TIMESTAMPTZ
 )
 
 ContainerContents (
-  Id            SERIAL      PRIMARY KEY,
-  CompanyId     INT         NOT NULL REFERENCES SharedCompanies(Id),
-  ContainerId   INT         NOT NULL REFERENCES Containers(Id) ON DELETE CASCADE,
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId     BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
+  ContainerId   BIGINT      NOT NULL REFERENCES Containers(Id) ON DELETE CASCADE,
   CategoryKey   VARCHAR(50) REFERENCES Categories(Key),
   Quantity      INT         NOT NULL DEFAULT 0,
-  Condition     VARCHAR(30)  NOT NULL,                                  -- ItemCondition enum
+  Condition     VARCHAR(30) NOT NULL,                                   -- ItemCondition enum
   EcommerceQty  INT         NOT NULL DEFAULT 0
 )
 
--- Audit log of container merges
+-- Audit log of container merges — append-only
 ContainerMerges (
-  Id                  SERIAL      PRIMARY KEY,
-  CompanyId           INT         NOT NULL REFERENCES SharedCompanies(Id),
-  TargetContainerId   INT         NOT NULL REFERENCES Containers(Id),
-  SourceContainerId   INT         NOT NULL REFERENCES Containers(Id),
-  MergedByUserId      INT         REFERENCES SharedUsers(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  -- Append-only — LastModifiedAt/LastModifiedById will always be NULL
+  CompanyId           BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
+  TargetContainerId   BIGINT      NOT NULL REFERENCES Containers(Id),
+  SourceContainerId   BIGINT      NOT NULL REFERENCES Containers(Id),
+  MergedByUserId      BIGINT      REFERENCES SharedUsers(Id),
   MergedAt            TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )
 
 -- [NEW] Explicit presort queue — enables server-side aging queries and workload reporting
 PresortQueue (
-  Id                  SERIAL      PRIMARY KEY,
-  CompanyId           INT         NOT NULL REFERENCES SharedCompanies(Id),
-  DonationId          INT         NOT NULL UNIQUE REFERENCES Donations(Id),
-  StoreId             INT         NOT NULL REFERENCES Stores(Id),
-  AssignedToUserId    INT         REFERENCES SharedUsers(Id),
-  ContainerId         INT         REFERENCES Containers(Id),           -- container assigned during presort
-  ReceivedAt          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  StartedAt           TIMESTAMPTZ,
-  CompletedAt         TIMESTAMPTZ
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId           BIGINT       NOT NULL REFERENCES SharedCompanies(Id),
+  DonationId          BIGINT       NOT NULL UNIQUE REFERENCES Donations(Id),
+  StoreId             BIGINT       NOT NULL REFERENCES Stores(Id),
+  AssignedToUserId    BIGINT       REFERENCES SharedUsers(Id),
+  ContainerId         BIGINT       REFERENCES Containers(Id),           -- container assigned during presort
+  Status              VARCHAR(20)  NOT NULL DEFAULT 'Queued',           -- PresortStatus enum
+  ReceivedAt          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  StartedAt           TIMESTAMPTZ,                                      -- set when Status → InProgress
+  CompletedAt         TIMESTAMPTZ                                      -- set when Status → Completed
 )
 ```
 
@@ -385,8 +399,8 @@ PresortQueue (
 
 ```sql
 RewardDefinitions (
-  Id                      SERIAL          PRIMARY KEY,
-  CompanyId               INT             NOT NULL REFERENCES SharedCompanies(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId               BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
   ReferenceNumber         VARCHAR(20)     UNIQUE NOT NULL,
   Name                    VARCHAR(200)    NOT NULL,
   Description             TEXT,
@@ -400,24 +414,22 @@ RewardDefinitions (
   IsGiftable              BOOLEAN         NOT NULL DEFAULT FALSE,
   MaxRedemptionsPerUser   INT,                                          -- NULL = unlimited
   TotalRedemptionLimit    INT,                                          -- NULL = unlimited
-  TotalRedemptions        INT             NOT NULL DEFAULT 0,           -- denormalized
-  CreatedAt               TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+  TotalRedemptions        INT             NOT NULL DEFAULT 0            -- denormalized
 )
 
 RewardTransactions (
-  Id                SERIAL          PRIMARY KEY,
-  CompanyId         INT             NOT NULL REFERENCES SharedCompanies(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId         BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
   ReferenceNumber   VARCHAR(20)     UNIQUE NOT NULL,
-  DonorId           INT             NOT NULL REFERENCES Donors(Id),
-  RewardId          INT             NOT NULL REFERENCES RewardDefinitions(Id),
+  DonorId           BIGINT          NOT NULL REFERENCES Donors(Id),
+  RewardId          BIGINT          NOT NULL REFERENCES RewardDefinitions(Id),
   PointsUsed        INT             NOT NULL,
   Status            VARCHAR(20)     NOT NULL DEFAULT 'Pending',         -- RedemptionStatus enum
   VoucherCode       VARCHAR(100),
   -- Gifting: two rows are written for a gift (one for gifter, one for recipient)
   IsGift            BOOLEAN         NOT NULL DEFAULT FALSE,
-  GiftedToId        INT             REFERENCES Donors(Id),              -- set on gifter's row
-  GiftedFromId      INT             REFERENCES Donors(Id),              -- set on recipient's row
-  CreatedAt         TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+  GiftedToId        BIGINT          REFERENCES Donors(Id),              -- set on gifter's row
+  GiftedFromId      BIGINT          REFERENCES Donors(Id),              -- set on recipient's row
   ApprovedAt        TIMESTAMPTZ,
   FulfilledAt       TIMESTAMPTZ,
   RejectedAt        TIMESTAMPTZ,
@@ -425,16 +437,17 @@ RewardTransactions (
   RejectionReason   TEXT
 )
 
--- [NEW] Status-change audit trail for dispute resolution
+-- [NEW] Status-change audit trail for dispute resolution — append-only
 RewardTransactionAuditLog (
-  Id                  SERIAL      PRIMARY KEY,
-  CompanyId           INT         NOT NULL REFERENCES SharedCompanies(Id),
-  TransactionId       INT         NOT NULL REFERENCES RewardTransactions(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  -- Append-only — LastModifiedAt/LastModifiedById will always be NULL
+  CompanyId           BIGINT       NOT NULL REFERENCES SharedCompanies(Id),
+  TransactionId       BIGINT       NOT NULL REFERENCES RewardTransactions(Id),
   OldStatus           VARCHAR(20),                                      -- RedemptionStatus enum
   NewStatus           VARCHAR(20)  NOT NULL,                            -- RedemptionStatus enum
-  ChangedByUserId     INT         REFERENCES SharedUsers(Id),
+  ChangedByUserId     BIGINT       REFERENCES SharedUsers(Id),
   Reason              TEXT,
-  ChangedAt           TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  ChangedAt           TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 )
 ```
 
@@ -444,25 +457,22 @@ RewardTransactionAuditLog (
 
 ```sql
 Campaigns (
-  Id                  SERIAL          PRIMARY KEY,
-  CompanyId           INT             NOT NULL REFERENCES SharedCompanies(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  -- CreatedById (from base) replaces the former CreatedByUserId column
+  CompanyId           BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
   ReferenceNumber     VARCHAR(20)     UNIQUE NOT NULL,
   Name                VARCHAR(200)    NOT NULL,
   Description         TEXT,
   StartDate           DATE            NOT NULL,
   EndDate             DATE            NOT NULL,
   CampaignStatus      VARCHAR(20)     NOT NULL DEFAULT 'Draft',         -- CampaignStatus enum
-  Channel             VARCHAR(20)     NOT NULL,                         -- NotificationChannel enum
-  Status              VARCHAR(20)     NOT NULL DEFAULT 'Active',        -- Status enum
-  CreatedByUserId     INT             REFERENCES SharedUsers(Id),
-  CreatedAt           TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-  UpdatedAt           TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+  Channel             VARCHAR(20)     NOT NULL                          -- NotificationChannel enum
 )
 
 CampaignTargetCriteria (
-  Id                SERIAL      PRIMARY KEY,
-  CompanyId         INT         NOT NULL REFERENCES SharedCompanies(Id),
-  CampaignId        INT         NOT NULL REFERENCES Campaigns(Id) ON DELETE CASCADE,
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId         BIGINT      NOT NULL REFERENCES SharedCompanies(Id),
+  CampaignId        BIGINT      NOT NULL REFERENCES Campaigns(Id) ON DELETE CASCADE,
   DepartmentKey     VARCHAR(50),
   CategoryKey       VARCHAR(50),
   SubCategoryKey    VARCHAR(50),
@@ -472,27 +482,28 @@ CampaignTargetCriteria (
 
 -- One row per channel per campaign
 CampaignTemplates (
-  Id          SERIAL      PRIMARY KEY,
-  CompanyId   INT         NOT NULL REFERENCES SharedCompanies(Id),
-  CampaignId  INT         NOT NULL REFERENCES Campaigns(Id) ON DELETE CASCADE,
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId   BIGINT       NOT NULL REFERENCES SharedCompanies(Id),
+  CampaignId  BIGINT       NOT NULL REFERENCES Campaigns(Id) ON DELETE CASCADE,
   Channel     VARCHAR(20)  NOT NULL,                                    -- NotificationChannel enum
   Subject     VARCHAR(500),
   Body        TEXT,
   Blocks      JSONB,                                                    -- EmailBlock[] (variable nested structure)
-  UpdatedAt   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (CampaignId, Channel)
 )
 
+-- Append-only notification send log
 CampaignNotifications (
-  Id              SERIAL          PRIMARY KEY,
-  CompanyId       INT             NOT NULL REFERENCES SharedCompanies(Id),
-  CampaignId      INT             NOT NULL REFERENCES Campaigns(Id),
-  DonorId         INT             NOT NULL REFERENCES Donors(Id),
-  Channel         VARCHAR(20)     NOT NULL,                             -- NotificationChannel enum
-  SentAt          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-  Success             BOOLEAN         NOT NULL,
-  FailureReason       TEXT,
-  ExternalMessageId   VARCHAR(100)                                      -- provider message ID for delivery correlation
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  -- Append-only — LastModifiedAt/LastModifiedById will always be NULL
+  CompanyId         BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
+  CampaignId        BIGINT          NOT NULL REFERENCES Campaigns(Id),
+  DonorId           BIGINT          NOT NULL REFERENCES Donors(Id),
+  Channel           VARCHAR(20)     NOT NULL,                           -- NotificationChannel enum
+  SentAt            TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+  Success           BOOLEAN         NOT NULL,
+  FailureReason     TEXT,
+  ExternalMessageId VARCHAR(100)                                        -- provider message ID for delivery correlation
 )
 ```
 
@@ -502,25 +513,26 @@ CampaignNotifications (
 
 ```sql
 -- One row per store; each store has its own operational settings
+-- Exception: FK primary key — does NOT inherit BaseAuditableEntity
 AppConfig (
-  StoreId                   INT         PRIMARY KEY REFERENCES Stores(Id),
-  CompanyId                 INT         NOT NULL REFERENCES SharedCompanies(Id),  -- for RLS; derived from Stores.CompanyId
+  StoreId                   BIGINT      PRIMARY KEY REFERENCES Stores(Id),
+  CompanyId                 BIGINT      NOT NULL REFERENCES SharedCompanies(Id),  -- for RLS; derived from Stores.CompanyId
   IsCashAccepted            BOOLEAN     NOT NULL DEFAULT TRUE,
   AssociationWindowHours    INT         NOT NULL DEFAULT 24,
   PointsPerItem             INT         NOT NULL DEFAULT 10,
   PointsPerDollar           INT         NOT NULL DEFAULT 20,
-  PointsCalcMethod          VARCHAR(20)  NOT NULL DEFAULT 'PerItem',   -- PointsCalcMethod enum
+  PointsCalcMethod          VARCHAR(20) NOT NULL DEFAULT 'PerItem',    -- PointsCalcMethod enum
   PointsExpiryDays          INT,                                       -- NULL = points never expire; drives expiry job
   MaxPointsPerDonation      INT,                                       -- NULL = no cap per donation
   RequireApproval           BOOLEAN     NOT NULL DEFAULT FALSE,
   EmailForReceipt           BOOLEAN     NOT NULL DEFAULT FALSE,
   EmailForLogin             BOOLEAN     NOT NULL DEFAULT FALSE,
-  EmailForCampaigns         BOOLEAN     NOT NULL DEFAULT TRUE,
-  UpdatedAt                 TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  EmailForCampaigns         BOOLEAN     NOT NULL DEFAULT TRUE
 )
 
+-- Exception: composite PK — does NOT inherit BaseAuditableEntity
 LoyaltyTierConfig (
-  CompanyId           INT             NOT NULL REFERENCES SharedCompanies(Id),
+  CompanyId           BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
   Tier                VARCHAR(20)     NOT NULL,                         -- DonorTier enum
   Label               VARCHAR(50)     NOT NULL,
   MinDonations        INT             NOT NULL,
@@ -600,15 +612,8 @@ SharedUsers ──< RewardTransactionAuditLog (ChangedByUserId)
 **Base URL:** `/api/v1`
 **Auth:** Bearer JWT (shared domain cookie forwarded as `Authorization` header)
 **Timestamps:** UTC ISO 8601
-**Pagination:** All list endpoints accept `?Page=1&PageSize=25` and return:
-```json
-{ "Data": [], "TotalCount": 0, "Page": 1, "PageSize": 25 }
 ```
-**Error shape:**
-```json
-{ "Code": "VALIDATION_ERROR", "Message": "...", "Details": [] }
-```
-**Soft deletes:** `Status = Inactive (2)` — no hard `DELETE` on Donors, Campaigns, or RewardDefinitions.
+**Soft deletes:** `DELETE` endpoints set `IsDeleted = true` (from `BaseAuditableEntity`) — no hard deletes. `Status` remains a separate business-state column.
 
 ---
 
@@ -619,6 +624,7 @@ SharedUsers ──< RewardTransactionAuditLog (ChangedByUserId)
 | `GET` | `/Donors` | List — `?Query=&Tier=&StoreId=&Page=` |
 | `POST` | `/Donors` | Create donor — links to an existing `Users` record (UserType=External) or creates an anonymous donor with no UserId |
 | `GET` | `/Donors/{Id}` | Donor detail |
+| `PUT` | `/Donors/{Id}` | Update donor — mutable fields: `PreferredStoreId`, `Status`. PII (name, email, phone) is on `SharedUsers` and updated via the platform user API |
 | `DELETE` | `/Donors/{Id}` | Soft delete (Status = Inactive) |
 | `GET` | `/Donors/{Id}/Donations` | Donation history — `?Year=&Status=&Method=&Page=` |
 | `GET` | `/Donors/{Id}/Loyalty` | Points balance, tier, progress to next tier |
@@ -633,15 +639,17 @@ SharedUsers ──< RewardTransactionAuditLog (ChangedByUserId)
 ### Donations
 
 Handles both **walk-in completions** and **scheduled/pickup appointments** in one resource.
-Use `?Method=1` for walk-ins, `?Method=2` for scheduled, `?Method=3` for pickups.
-Use `?Status=1` (Scheduled) to get the appointment queue; `?Status=3` (Completed) for processed donations.
+Use `?Method=WalkIn`, `?Method=Scheduled`, or `?Method=Pickup` to filter by method.
+Use `?Status=Scheduled` to get the appointment queue; `?Status=Completed` for processed donations.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/Donations` | List — `?Status=&Method=&StoreId=&DonorId=&Date=&From=&To=&Page=` |
 | `POST` | `/Donations` | Create — for walk-ins set Method=WalkIn; for appointments set Method=Scheduled/Pickup and scheduling fields |
 | `GET` | `/Donations/{Id}` | Detail with items |
+| `PUT` | `/Donations/{Id}` | Update donation — mutable fields: `Notes`, `ReceiptDelivery`, `ScheduledDate`, `TimeSlotId`, `Recurring`, `PickupAddress`, `ExpectedItemCount`, `Scope`. Not allowed after `Status = Completed` |
 | `POST` | `/Donations/{Id}/Items` | Add item (Scope=Items) or monetary entry (Scope=Monetary) |
+| `PUT` | `/Donations/{Id}/Items/{ItemId}` | Update item — mutable fields: `Quantity`, `Condition`, `EstimatedValuePerItem`, `Amount`, `PaymentMethod`, `CardTxnRef`, `CashTendered`, `ChangeGiven` |
 | `DELETE` | `/Donations/{Id}/Items/{ItemId}` | Remove item |
 | `POST` | `/Donations/{Id}/ChangeStatus` | Transition status — body: `{ TransitionTo, Reason? }`. Valid values: `CheckedIn` (donor arrives), `Completed` (creates Receipt, awards points, enqueues presort), `Cancelled` (Reason required), `NoShow` (scheduled only) |
 | `POST` | `/Donations/{Id}/Associate` | Set `DonorId` on an anonymous donation (Req 1) within `AssociationWindowHours`; sets `IsAssociatedLater = true` and stamps `AssociatedAt` |
@@ -655,6 +663,7 @@ Use `?Status=1` (Scheduled) to get the appointment queue; `?Status=3` (Completed
 | `GET` | `/TimeSlots` | All slots — `?StoreId=` |
 | `GET` | `/TimeSlots/Available` | Available slots with remaining capacity — `?StoreId=1&Date=2026-04-01` |
 | `POST` | `/TimeSlots` | Create slot (Admin) |
+| `PUT` | `/TimeSlots/{Id}` | Update slot — mutable fields: `StartTime`, `EndTime`, `MaxCapacity`, `Status` |
 
 ---
 
@@ -665,7 +674,8 @@ Use `?Status=1` (Scheduled) to get the appointment queue; `?Status=3` (Completed
 | `GET` | `/Containers` | List — `?Status=&StoreId=&DeptKey=&Destination=&Page=` |
 | `POST` | `/Containers` | Create container |
 | `GET` | `/Containers/{Id}` | Detail with contents |
-| `POST` | `/Containers/{Id}/Contents` | Add or update contents |
+| `PUT` | `/Containers/{Id}` | Update container — mutable fields: `Destination`, `DeptKey`, `CatKey`, `PresortMethod`, `Notes`, `IsSeasonal`, `SeasonalTag` |
+| `PUT` | `/Containers/{Id}/Contents` | Replace full contents list for container |
 | `POST` | `/Containers/{Id}/ChangeStatus` | Transition status — body: `{ TransitionTo }`. Valid values: `Available`, `ReadyForSorting`, `Sorting`, `InUse`, `Closed` |
 | `POST` | `/Containers/{Id}/Transfer` | Initiate transfer to another store |
 | `POST` | `/Containers/Merge` | Merge list of containers into one target |
@@ -687,8 +697,9 @@ Use `?Status=1` (Scheduled) to get the appointment queue; `?Status=3` (Completed
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/Rewards` | List definitions — `?Status=1` (Active) |
+| `GET` | `/Rewards` | List definitions — `?Status=Active` |
 | `POST` | `/Rewards` | Create reward (Admin) |
+| `PUT` | `/Rewards/{Id}` | Update reward — mutable fields: `Name`, `Description`, `PointsRequired`, `Value`, `ValidFrom`, `ValidTo`, `MinDonorTier`, `IsGiftable`, `MaxRedemptionsPerUser`, `TotalRedemptionLimit` |
 | `DELETE` | `/Rewards/{Id}` | Soft delete (Status = Inactive) |
 | `GET` | `/RewardTransactions` | List all redemptions — `?DonorId=&Status=&Page=` |
 | `POST` | `/RewardTransactions` | Redeem a reward |
@@ -704,6 +715,8 @@ Use `?Status=1` (Scheduled) to get the appointment queue; `?Status=3` (Completed
 | `GET` | `/Campaigns` | List — `?Status=&Page=` |
 | `POST` | `/Campaigns` | Create campaign |
 | `GET` | `/Campaigns/{Id}` | Detail |
+| `PUT` | `/Campaigns/{Id}` | Update campaign — mutable fields: `Name`, `Description`, `StartDate`, `EndDate`, `Channel`. Only allowed when `CampaignStatus = Draft` or `Paused` |
+| `PUT` | `/Campaigns/{Id}/Template` | Replace email or SMS template — body: `{ Channel, Subject?, Body?, Blocks? }` |
 | `DELETE` | `/Campaigns/{Id}` | Soft delete |
 | `POST` | `/Campaigns/{Id}/ChangeStatus` | Transition status — body: `{ TransitionTo }`. Valid values: `Active`, `Paused`, `Completed` |
 | `GET` | `/Campaigns/{Id}/PreviewAudience` | Matching donor count + sample before send |
@@ -734,6 +747,7 @@ Use `?Status=1` (Scheduled) to get the appointment queue; `?Status=3` (Completed
 | `GET` | `/Stores/{Id}` | Store detail |
 | `GET` | `/Stores/{Id}/Stats` | Today's donations, items, revenue |
 | `GET` | `/Stores/{Id}/Hours` | Structured hours (StoreHours rows) |
+| `PUT` | `/Stores/{Id}/Hours` | Replace full week schedule — body: array of `{ DayOfWeek, OpenTime, CloseTime, IsClosed }` |
 
 ---
 
@@ -754,8 +768,11 @@ Use `?Status=1` (Scheduled) to get the appointment queue; `?Status=3` (Completed
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/Stores/{StoreId}/Config` | Get store AppConfig |
+| `PUT` | `/Stores/{StoreId}/Config` | Update store AppConfig (Manager+) — all fields are mutable |
 | `GET` | `/Config/LoyaltyTiers` | All tier configurations (global) |
+| `PUT` | `/Config/LoyaltyTiers/{Tier}` | Update tier thresholds, multiplier, perks (Admin) |
 | `GET` | `/Config/ContainerCapacity` | Max items per container type (global) |
+| `PUT` | `/Config/ContainerCapacity/{ContainerType}` | Update max items for a container type (Admin) |
 
 ---
 
@@ -813,7 +830,7 @@ The donation API exposes only the session bootstrap endpoint.
 | 6 | **`POST /Donations/{Id}/Associate`** | Sets `DonorId` on an anonymous donation within `AssociationWindowHours`. Uses the same `DonorId` column — no separate `AssociatedDonorId` needed. `IsAssociatedLater` flag and `AssociatedAt` timestamp record that the link happened post-completion. |
 | 7 | **Consistent pagination envelope** | All list endpoints return `{ Data, TotalCount, Page, PageSize }`. The POC uses unbounded in-memory arrays. |
 | 8 | **`GET /Campaigns/{Id}/PreviewAudience`** | Returns matching donor count before triggering a send, preventing accidental mass notifications. |
-| 9 | **Soft deletes via `Status`** | `DELETE` on Donors, Campaigns, and RewardDefinitions sets `Status = Inactive (2)` — preserves audit history. |
+| 9 | **Soft deletes via `IsDeleted`** | `DELETE` endpoints set `IsDeleted = true` from `BaseAuditableEntity` — no hard deletes. `Status` is a separate business-state field. |
 | 10 | **`GET /Users/Me`** | Session bootstrap endpoint returns `UserType` and resolved `DonorId`; avoids embedding user identity in every request body. |
 
 ---
@@ -922,14 +939,14 @@ Tracks per-donor communication opt-in/out. Required for GDPR / CAN-SPAM complian
 Campaign sends must check `CampaignOptIn = TRUE` before targeting a donor.
 
 ```sql
+-- Exception: FK primary key — does NOT inherit BaseAuditableEntity
 DonorPreferences (
-  DonorId             INT             PRIMARY KEY REFERENCES Donors(Id) ON DELETE CASCADE,
-  CompanyId           INT             NOT NULL REFERENCES SharedCompanies(Id),
+  DonorId             BIGINT          PRIMARY KEY REFERENCES Donors(Id) ON DELETE CASCADE,
+  CompanyId           BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
   EmailOptIn          BOOLEAN         NOT NULL DEFAULT TRUE,
   SmsOptIn            BOOLEAN         NOT NULL DEFAULT TRUE,
   CampaignOptIn       BOOLEAN         NOT NULL DEFAULT TRUE,
-  PreferredChannel    VARCHAR(20),                           -- NotificationChannel enum; NULL = no preference
-  UpdatedAt           TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+  PreferredChannel    VARCHAR(20)                            -- NotificationChannel enum; NULL = no preference
 )
 ```
 
@@ -937,10 +954,11 @@ DonorPreferences (
 Immutable audit trail of every consent change. Required for GDPR accountability obligation.
 
 ```sql
+-- Append-only — LastModifiedAt/LastModifiedById will always be NULL
 ConsentLog (
-  Id          SERIAL          PRIMARY KEY,
-  CompanyId   INT             NOT NULL REFERENCES SharedCompanies(Id),
-  DonorId     INT             NOT NULL REFERENCES Donors(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  CompanyId   BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
+  DonorId     BIGINT          NOT NULL REFERENCES Donors(Id),
   Field       VARCHAR(50)     NOT NULL,         -- 'EmailOptIn', 'SmsOptIn', 'CampaignOptIn'
   OldValue    BOOLEAN,
   NewValue    BOOLEAN         NOT NULL,
@@ -957,15 +975,15 @@ Records full or partial refunds on monetary donations.
 On refund, also write a `LoyaltyPointTransactions` debit (`Reason = RedemptionDebit`) for any points awarded on the original donation.
 
 ```sql
+-- Append-only — LastModifiedAt/LastModifiedById will always be NULL
 DonationRefunds (
-  Id                  SERIAL          PRIMARY KEY,
-  CompanyId           INT             NOT NULL REFERENCES SharedCompanies(Id),
-  DonationId          INT             NOT NULL REFERENCES Donations(Id),
+  -- BaseAuditableEntity: Id, CreatedAt, CreatedById, LastModifiedAt, LastModifiedById, IsDeleted
+  -- ProcessedByUserId is captured via CreatedById from base
+  CompanyId           BIGINT          NOT NULL REFERENCES SharedCompanies(Id),
+  DonationId          BIGINT          NOT NULL REFERENCES Donations(Id),
   Amount              DECIMAL(12,2)   NOT NULL CHECK (Amount > 0),
   Reason              TEXT,
-  RefundTxnRef        VARCHAR(100),               -- card processor refund reference
-  ProcessedByUserId   INT             REFERENCES SharedUsers(Id),
-  CreatedAt           TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+  RefundTxnRef        VARCHAR(100)                -- card processor refund reference
 )
 ```
 
@@ -1013,6 +1031,7 @@ Return `HTTP 429 Too Many Requests` with `Retry-After` header when limit exceede
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/Donors/{Id}/Preferences` | Get communication opt-in settings |
+| `PUT` | `/Donors/{Id}/Preferences` | Update opt-in/out — writes `ConsentLog` entry for every changed field |
 | `POST` | `/Donors/{Id}/Anonymise` | GDPR right-to-erasure — replaces PII with anonymised values; preserves financial audit trail (ledger, receipts) |
 
 #### Refunds
