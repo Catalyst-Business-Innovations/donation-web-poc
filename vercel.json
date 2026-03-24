@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build -- --configuration=production",
+  "outputDirectory": "dist/brijjworks-donation-app/browser",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
