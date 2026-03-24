@@ -7,14 +7,14 @@
       </div>
       <div class="card-subtitle">Add items to speed up check-in</div>
     </div>
-    <button class="btn btn-primary btn-sm" (click)="showAdd.set(true)">+ Add Item</button>
+    <button class="btn btn-primary btn-sm" (click)="openModal()">+ Add Item</button>
   </div>
 
   @if (items().length === 0) {
     <div class="empty-state empty-state--padded">
       <div class="empty-state-icon empty-state-icon--lg"><app-icon name="cart" [size]="36"></app-icon></div>
       <div class="empty-state-title">Cart is empty</div>
-      <div class="empty-state-text">Add items you plan to bring.</div>
+      <div class="empty-state-text">Tap "+ Add Item" to start building your cart.</div>
     </div>
   } @else {
     @for (item of items(); track item.id) {
@@ -33,32 +33,54 @@
     }
     <div class="cart-total">{{ totalItems() }} items total</div>
   }
-
-  @if (showAdd()) {
-    <div class="add-item-form">
-      <div class="form-group">
-        <label class="form-label">Category</label>
-        <select class="form-select" [(ngModel)]="newItem.category">
-          <option value="">Select...</option>
-          @for (cat of categories(); track cat) {
-            <option [value]="cat">{{ cat }}</option>
-          }
-        </select>
-      </div>
-      <div class="add-row">
-        <div class="form-group add-row__group--flex">
-          <label class="form-label">Description</label>
-          <input class="form-input" [(ngModel)]="newItem.description" placeholder="e.g. Winter jackets" />
-        </div>
-        <div class="form-group add-row__group--qty">
-          <label class="form-label">Qty</label>
-          <input class="form-input" type="number" min="1" [(ngModel)]="newItem.qty" />
-        </div>
-      </div>
-      <div class="add-actions">
-        <button class="btn btn-primary" (click)="addItem()">Add</button>
-        <button class="btn btn-secondary" (click)="showAdd.set(false)">Cancel</button>
-      </div>
-    </div>
-  }
 </div>
+
+<!-- Add Item Modal -->
+<app-modal
+  [open]="showModal()"
+  title="Add Item to Cart"
+  [confirmLabel]="selectedCategory() ? 'Add to Cart' : 'Select a category'"
+  [confirmDisabled]="!selectedCategory()"
+  (confirmed)="addItem()"
+  (closed)="closeModal()"
+>
+  <div class="add-modal">
+    <div class="add-modal__section-label">Choose a category</div>
+    <div class="add-modal__chips">
+      @for (cat of categories(); track cat) {
+        <button
+          class="add-modal__chip"
+          [class.active]="selectedCategory() === cat"
+          (click)="selectCategory(cat)"
+        >
+          <app-icon name="package" [size]="14"></app-icon>
+          {{ cat }}
+        </button>
+      }
+    </div>
+
+    @if (selectedCategory()) {
+      <div class="add-modal__details">
+        <div class="add-modal__selected">
+          <app-icon name="check-circle" [size]="14"></app-icon>
+          {{ selectedCategory() }}
+        </div>
+
+        <div class="add-modal__fields">
+          <div class="form-group add-modal__field--desc">
+            <label class="form-label">Description (optional)</label>
+            <input
+              class="form-input"
+              [(ngModel)]="description"
+              placeholder="e.g. Winter jackets, kids shoes..."
+            />
+          </div>
+          <div class="form-group add-modal__field--qty">
+            <label class="form-label">Quantity</label>
+            <input class="form-input" type="number" min="1" [(ngModel)]="qty" />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</app-modal>

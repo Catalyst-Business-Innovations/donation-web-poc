@@ -1,3 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+:host > .card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .empty-state {
   &--padded {
     padding: 24px;
@@ -46,31 +58,80 @@
   margin-top: 4px;
 }
 
-.add-item-form {
-  margin-top: 12px;
-  padding: 14px;
-  background: var(--gray-50);
-  border-radius: var(--radius-lg);
-}
+// ── Add Item Modal ──────────────────────────────────────────────────────────
 
-.add-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
+.add-modal {
+  &__section-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    margin-bottom: 12px;
+  }
 
-  &__group--flex {
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all var(--transition);
+
+    &:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    &.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: var(--white);
+    }
+  }
+
+  &__details {
+    border-top: 1px solid var(--gray-200);
+    padding-top: 16px;
+  }
+
+  &__selected {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--secondary-light);
+    color: var(--secondary);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  &__fields {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__field--desc {
     flex: 1;
-    margin: 0;
   }
 
-  &__group--qty {
+  &__field--qty {
     width: 80px;
-    margin: 0;
   }
-}
-
-.add-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
 }

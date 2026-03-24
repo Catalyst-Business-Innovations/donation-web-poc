@@ -1,30 +1,30 @@
 <div class="topbar">
   <div>
     <div class="topbar-title">Schedule Donation</div>
-    <div class="topbar-subtitle">Pre-plan your visit and set up a Giving cart</div>
+    <div class="topbar-subtitle">Add items to your cart, then choose a store and time</div>
   </div>
 </div>
 
 <div class="page-content">
   <div class="sched-grid">
-    <app-schedule-form
-      [locations]="locations"
-      [timeSlots]="timeSlots"
-      [today]="today"
-      [(selectedLocation)]="selectedLocation"
-      [(selectedDate)]="selectedDate"
-      [(selectedTime)]="selectedTime"
-      [(notes)]="notes"
-      (submitRequested)="onSubmit()"
+    <app-cart-editor
+      [items]="cart()"
+      [categories]="categories"
+      [totalItems]="totalCartItems"
+      (itemAdded)="onAddCartItem($event)"
+      (itemRemoved)="onRemoveCartItem($event)"
     />
 
     <div class="right-col">
-      <app-cart-editor
-        [items]="cart()"
-        [categories]="categories"
-        [totalItems]="totalCartItems"
-        (itemAdded)="onAddCartItem($event)"
-        (itemRemoved)="onRemoveCartItem($event)"
+      <app-schedule-form
+        [locations]="locations"
+        [timeSlots]="timeSlots"
+        [today]="today"
+        [(selectedLocation)]="selectedLocation"
+        [(selectedDate)]="selectedDate"
+        [(selectedTime)]="selectedTime"
+        [(notes)]="notes"
+        (submitRequested)="onSubmit()"
       />
 
       <app-upcoming-visits-list
