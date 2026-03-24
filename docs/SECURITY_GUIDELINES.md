@@ -41,7 +41,189 @@ All auth cookies **must** include:
 { path: '/', secure: false, sameSite: 'Lax' }
 ```
 
-**Note:** `HttpOnly` cannot be set from JavaScript — this must be configured on the backend when the Company app sets the cookies.
+**Note:** `HttpOnly` cannot be set from JavaScript — this must be configured on the backend. See section 1.2.1 below.
+
+### 1.2.1 Backend Cookie Configuration (.NET 9)
+
+The backend **must** set auth cookies with proper security attributes. The Angular frontend reads the `accessToken` cookie for JWT decoding, but the `refreshToken` and `sessionId` cookies should be `HttpOnly` (invisible to JavaScript).
+
+**Company API / Donation API — .NET 9 implementation:**
+
+```csharp
+// Program.cs — Cookie policy
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.Domain = ".rcscbs.com"; // or ".brijjworks.com" for production
+});
+```
+
+**Setting tokens on login/refresh response:**
+
+```csharp
+// AuthController.cs
+[HttpPost("login")]
+public IActionResult Login([FromBody] LoginRequest request)
+{
+    var result = _authService.Authenticate(request);
+    if (!result.Success) return Unauthorized(new { message = "Invalid credentials" });
+
+    // Access token — NOT HttpOnly (Angular needs to read claims for routing/display)
+    Response.Cookies.Append("accessToken", result.AccessToken, new CookieOptions
+    {
+        HttpOnly = false,    // Frontend reads this to decode JWT claims
+        Secure = true,       // HTTPS only
+        SameSite = SameSiteMode.Lax,
+        Domain = ".rcscbs.com",
+        Path = "/",
+        Expires = DateTimeOffset.UtcNow.AddMinutes(15),
+    });
+
+    // Refresh token — HttpOnly (never accessible to JavaScript)
+    Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
+    {
+        HttpOnly = true,     // Not accessible via document.cookie or ngx-cookie-service
+        Secure = true,
+        SameSite = SameSiteMode.Lax,
+        Domain = ".rcscbs.com",
+        Path = "/",
+        Expires = DateTimeOffset.UtcNow.AddDays(7),
+    });
+
+    // Session ID — HttpOnly
+    Response.Cookies.Append("sessionId", result.SessionId, new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Lax,
+        Domain = ".rcscbs.com",
+        Path = "/",
+        Expires = DateTimeOffset.UtcNow.AddDays(7),
+    });
+
+    return Ok(new { message = "Authenticated" });
+}
+```
+
+**Token refresh endpoint:**
+
+```csharp
+// AuthController.cs
+[HttpPost("refresh")]
+public IActionResult Refresh()
+{
+    // Read refresh token from HttpOnly cookie (not from request body)
+    var refreshToken = Request.Cookies["refreshToken"];
+    if (string.IsNullOrEmpty(refreshToken))
+        return Unauthorized(new { message = "No refresh token" });
+
+    var result = _authService.RefreshAccessToken(refreshToken);
+    if (!result.Success) return Unauthorized(new { message = "Invalid refresh token" });
+
+    // Set new access token cookie
+    Response.Cookies.Append("accessToken", result.AccessToken, new CookieOptions
+    {
+        HttpOnly = false,
+        Secure = true,
+        SameSite = SameSiteMode.Lax,
+        Domain = ".rcscbs.com",
+        Path = "/",
+        Expires = DateTimeOffset.UtcNow.AddMinutes(15),
+    });
+
+    // Rotate refresh token (issue new one, invalidate old)
+    Response.Cookies.Append("refreshToken", result.NewRefreshToken, new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Lax,
+        Domain = ".rcscbs.com",
+        Path = "/",
+        Expires = DateTimeOffset.UtcNow.AddDays(7),
+    });
+
+    return Ok(new { accessToken = result.AccessToken });
+}
+```
+
+**Logout endpoint — clear all cookies:**
+
+```csharp
+// AuthController.cs
+[HttpPost("signout")]
+public IActionResult SignOut()
+{
+    var sessionId = Request.Cookies["sessionId"];
+    if (!string.IsNullOrEmpty(sessionId))
+        _authService.InvalidateSession(sessionId);
+
+    var cookieOptions = new CookieOptions
+    {
+        Domain = ".rcscbs.com",
+        Path = "/",
+        Expires = DateTimeOffset.UtcNow.AddDays(-1), // Expire immediately
+    };
+
+    Response.Cookies.Delete("accessToken", cookieOptions);
+    Response.Cookies.Delete("refreshToken", cookieOptions);
+    Response.Cookies.Delete("sessionId", cookieOptions);
+
+    return Ok(new { message = "Signed out" });
+}
+```
+
+**CORS configuration (Program.cs):**
+
+```csharp
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DonationApp", policy =>
+    {
+        policy
+            .WithOrigins(
+                "https://donation.dev.rcscbs.com",
+                "https://donation.stg.rcscbs.com",
+                "https://donation.brijjworks.com",
+                "http://localhost:4200"  // Development only
+            )
+            .AllowCredentials()          // Required for cookie-based auth
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+app.UseCors("DonationApp");
+```
+
+**Anti-forgery / CSRF (Program.cs):**
+
+```csharp
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-XSRF-TOKEN";
+    options.Cookie.Name = "XSRF-TOKEN";
+    options.Cookie.HttpOnly = false;    // Angular reads this to send in header
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.Domain = ".rcscbs.com";
+});
+```
+
+**Cookie security summary:**
+
+| Cookie | HttpOnly | Secure | SameSite | Expires | Read by Frontend |
+|--------|----------|--------|----------|---------|-----------------|
+| `accessToken` | `false` | `true` | `Lax` | 15 min | Yes (JWT decode for claims) |
+| `refreshToken` | `true` | `true` | `Lax` | 7 days | No (sent automatically by browser) |
+| `sessionId` | `true` | `true` | `Lax` | 7 days | No (sent automatically by browser) |
+| `XSRF-TOKEN` | `false` | `true` | `Lax` | Session | Yes (Angular reads and sends as header) |
+
+**Frontend implications:**
+- `AuthService.getAccessToken()` reads `accessToken` cookie via `ngx-cookie-service` — works because it's not `HttpOnly`
+- `AuthService.getRefreshToken()` will return `null` in production (cookie is `HttpOnly`) — the refresh endpoint reads it from the request cookie automatically
+- The interceptor's refresh flow must change: instead of sending `refreshToken` in the POST body, it should call the refresh endpoint with `withCredentials: true` and let the browser send the cookie
 
 ### 1.3 Session Isolation
 
