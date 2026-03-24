@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { staffAuthGuard } from './core/guards/staff-auth.guard';
+import { donorAuthGuard } from './core/guards/donor-auth.guard';
 
 export const routes: Routes = [
   {
@@ -29,6 +30,7 @@ export const routes: Routes = [
   },
   {
     path: 'donor',
+    canActivate: [donorAuthGuard],
     loadComponent: () => import('./modules/donor-portal/donor-portal.component').then(m => m.DonorPortalComponent),
     loadChildren: () => import('./modules/donor-portal/donor-portal.routes').then(m => m.donorRoutes)
   },

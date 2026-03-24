@@ -11,25 +11,21 @@ const REQUEST_TIMEOUT_MS = 30_000;
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  private authService = inject(AuthService);
-  private toastService = inject(ToastService);
+  private readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
 
   private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+  private refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-  // Routes that should not show error toasts or trigger redirects
   private readonly PUBLIC_ROUTES = ['/assets/', '/home'];
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Skip interceptor for asset requests
+  intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     if (this.isPublicRoute(req.url)) {
       return next.handle(req);
     }
 
-    // Get token from cookie (set by Company app)
     const token = this.authService.getAccessToken();
-
-    // Clone request and add Authorization header if token exists
     if (token) {
       req = this.addAuthHeader(req, token);
     }
@@ -37,7 +33,6 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       timeout(REQUEST_TIMEOUT_MS),
       catchError((error: HttpErrorResponse | Error) => {
-        // Handle timeout errors
         if (error.name === 'TimeoutError') {
           this.toastService.error('Request timed out. Please try again.');
           return throwError(() => error);
@@ -47,100 +42,87 @@ export class AuthInterceptor implements HttpInterceptor {
           if (error.status === 401) {
             return this.handle401Error(req, next);
           } else if (error.status === 403) {
-            this.handleForbiddenError();
+            this.toastService.error('Access denied. You do not have permission to access this resource.');
           } else if (error.status === 400) {
             this.handleBadRequestError(error);
           } else if (error.status === 404) {
-            this.handleNotFoundError();
+            this.toastService.error('The requested resource was not found.');
           } else if (error.status === 500) {
-            this.handleServerError();
+            this.toastService.error('A server error occurred. Please try again later.');
           }
         }
 
         return throwError(() => error);
-      }),
+      })
     );
   }
 
-  /**
-   * Add Authorization header to request
-   */
-  private addAuthHeader(request: HttpRequest<any>, token: string): HttpRequest<any> {
+  private addAuthHeader(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
     return request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
+      setHeaders: { Authorization: `Bearer ${token}` },
     });
   }
 
   /**
-   * Handle 401 Unauthorized error
-   * Attempts to refresh token, or redirects to Company app login
+   * Handle 401 — attempt token refresh, or redirect to the appropriate login page.
    */
-  private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  private handle401Error(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
       const refreshToken = this.authService.getRefreshToken();
 
-      if (refreshToken) {
+      if (refreshToken && !refreshToken.startsWith('refresh-')) {
+        // Real refresh token — attempt refresh via Company API (production)
         return this.authService.refreshAccessToken(refreshToken).pipe(
-          switchMap((response) => {
+          switchMap(response => {
             this.isRefreshing = false;
             this.authService.setAccessToken(response.accessToken);
             this.refreshTokenSubject.next(response.accessToken);
-
-            // Retry original request with new token
             return next.handle(this.addAuthHeader(req, response.accessToken));
           }),
-          catchError((err) => {
+          catchError(err => {
             this.isRefreshing = false;
-            this.authService.clearAuthData();
-
-            // Redirect to Company app login
-            this.toastService.error('Your session has expired. Please log in again.');
-            this.authService.redirectToLogin();
-
+            this.redirectToLogin('Your session has expired. Please log in again.');
             return throwError(() => err);
-          }),
+          })
         );
       } else {
+        // Dev mock token or no refresh token — redirect to login
         this.isRefreshing = false;
-        this.authService.clearAuthData();
-
-        // Redirect to Company app login
-        this.authService.redirectToLogin();
-
-        return throwError(() => new Error('No refresh token available'));
+        this.redirectToLogin('Your session has expired. Please log in again.');
+        return throwError(() => new Error('Session expired'));
       }
     } else {
-      // If refresh is already in progress, queue the request
+      // Refresh already in progress — queue and retry when new token arrives
       return this.refreshTokenSubject.pipe(
-        filter((token) => token !== null),
+        filter(token => token !== null),
         take(1),
-        switchMap((token) => {
-          return next.handle(this.addAuthHeader(req, token!));
-        }),
+        switchMap(token => next.handle(this.addAuthHeader(req, token!)))
       );
     }
   }
 
   /**
-   * Handle 403 Forbidden error
+   * Redirect to the appropriate login page based on the current URL path.
+   * Staff routes → /staff/login, Donor routes → /donor/login.
    */
-  private handleForbiddenError(): void {
-    this.toastService.error('Access denied. You do not have permission to access this resource.');
+  private redirectToLogin(message: string): void {
+    this.authService.clearAuthData();
+    this.toastService.error(message);
+
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/donor')) {
+      this.router.navigate(['/donor/login']);
+    } else {
+      this.router.navigate(['/staff/login']);
+    }
   }
 
-  /**
-   * Handle 400 Bad Request error
-   * Sanitizes error messages before displaying to avoid exposing raw API internals.
-   */
   private handleBadRequestError(error: HttpErrorResponse): void {
     const rawMessage = error.error?.message;
     if (rawMessage && typeof rawMessage === 'string') {
-      // Sanitize: strip anything that looks like a stack trace or internal detail
       const sanitized = rawMessage.length > 200 ? rawMessage.substring(0, 200) + '...' : rawMessage;
       this.toastService.error(sanitized);
     } else {
@@ -148,24 +130,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
   }
 
-  /**
-   * Handle 404 Not Found error
-   */
-  private handleNotFoundError(): void {
-    this.toastService.error('The requested resource was not found.');
-  }
-
-  /**
-   * Handle 500 Internal Server Error
-   */
-  private handleServerError(): void {
-    this.toastService.error('A server error occurred. Please try again later.');
-  }
-
-  /**
-   * Check if route is public
-   */
   private isPublicRoute(url: string): boolean {
-    return this.PUBLIC_ROUTES.some((route) => url.includes(route));
+    return this.PUBLIC_ROUTES.some(route => url.includes(route));
   }
 }

@@ -83,6 +83,25 @@ This is a **token-consuming app** — it does not have its own login flow. Users
 - `staffTokenGuard` and `donorAuthGuard` protect their respective portals
 - Login redirect goes to `companyUrl/login` with a `returnUrl` parameter
 
+### Authentication & Session
+
+Two separate auth flows:
+- **Staff Portal** — Token from Company app SSO (simulated in dev via `DevAuthService`)
+- **Donor Portal** — Direct login with email/password (simulated in dev via `DevAuthService`)
+
+Key services:
+- **`AuthService`** — JWT cookie CRUD, token decode (cached), expiry check with 10s buffer
+- **`DevAuthService`** — Dev-only mock JWT generation for both portals
+- **`CurrentUserService`** — Reactive user context (portal, donor/staff identity, displayName, initials, email)
+- **`staffAuthGuard`** / **`donorAuthGuard`** — Role-based route guards (JWT + role validation)
+- **`AuthInterceptor`** — Bearer header injection, 401 token refresh, portal-aware redirect, 30s timeout
+
+Session rules:
+- Login clears any previous session before creating a new one
+- Guards enforce role isolation (donor can't access staff portal and vice versa)
+- Login pages auto-redirect if already authenticated with correct role
+- Sign out clears all cookies + storage + cache
+
 ### State & Data
 
 - **`MockDataService`** provides all seed data in development. It is the single source of truth for domain objects.
@@ -118,4 +137,6 @@ All environments share the same shape: `donationApiUrl`, `companyApiUrl`, `compa
 
 ## Reference
 
-- [UI Guidelines SOP](docs/UI_GUIDELINES.md) — Full coding agent SOP for components, services, models, mappers
+- [UI Guidelines SOP](docs/UI_GUIDELINES.md) — Coding agent SOP for components, services, models, mappers (v3.0)
+- [Staff Portal Auth](docs/AUTH_STAFF_PORTAL.md) — Staff authentication flow, guards, JWT structure, session lifecycle
+- [Donor Portal Auth](docs/AUTH_DONOR_PORTAL.md) — Donor authentication flow, identity resolution, cross-portal protection

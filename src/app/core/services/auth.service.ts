@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { jwtDecode } from 'jwt-decode';
 import { Observable } from 'rxjs';
@@ -13,109 +12,65 @@ import { isSafeRedirectUrl } from '../utils/url-validator';
   providedIn: 'root',
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private cookieService = inject(CookieService);
+  private readonly http = inject(HttpClient);
+  private readonly cookieService = inject(CookieService);
 
-  /**
-   * Check if the app is running on localhost
-   */
+  /** Cached decoded token — invalidated on setTokens/clearAuthData */
+  private cachedUserInfo: UserInfo | null = null;
+  private cachedTokenString: string | null = null;
+
   private isLocalhost(): boolean {
     return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   }
 
-  /**
-   * Redirect to Company app login
-   * This app doesn't handle login - users login via Company app
-   */
-  redirectToLogin(): void {
-    const currentUrl = window.location.href;
-    const returnUrl = isSafeRedirectUrl(currentUrl) ? currentUrl : '/';
-    const loginUrl = `${environment.companyUrl}/shared/login?returnUrl=${encodeURIComponent(returnUrl)}`;
-    window.location.href = loginUrl;
-  }
+  // ── Token Management ─────────────────────────────────────────────────────
 
-  /**
-   * Refresh access token using Company API
-   */
-  refreshAccessToken(refreshToken: string): Observable<RefreshTokenResponse> {
-    const url = `${environment.companyApiUrl}/auth/refresh`;
-    return this.http.post<RefreshTokenResponse>(url, { refreshToken });
-  }
-
-  /**
-   * Logout user via Company API
-   */
-  logout(userDetails: SignOutRequest): Observable<any> {
-    const url = `${environment.companyApiUrl}/Auth/SignOut`;
-    return this.http.post(url, userDetails);
-  }
-
-  /**
-   * Note: Tokens are set by Company app, not this app
-   * This method is kept for completeness but should rarely be used
-   * Tokens are shared via domain-scoped cookies set by Company app
-   */
   setTokens(accessToken: string, refreshToken: string, sessionId: string): void {
     if (!accessToken || !refreshToken || !sessionId) {
       console.error('setTokens: all token values must be non-empty');
       return;
     }
 
-    if (this.isLocalhost()) {
-      this.cookieService.set('accessToken', accessToken, { path: '/' });
-      this.cookieService.set('refreshToken', refreshToken, { path: '/' });
-      this.cookieService.set('sessionId', sessionId, { path: '/' });
-    } else {
-      // Use domain-scoped cookies for cross-subdomain authentication
-      const domain = `.${environment.domainName}`;
-      this.cookieService.set('accessToken', accessToken, { path: '/', domain });
-      this.cookieService.set('refreshToken', refreshToken, { path: '/', domain });
-      this.cookieService.set('sessionId', sessionId, { path: '/', domain });
-    }
+    this.invalidateCache();
+
+    const opts = this.isLocalhost()
+      ? { path: '/' }
+      : { path: '/', domain: `.${environment.domainName}` };
+
+    this.cookieService.set('accessToken', accessToken, opts);
+    this.cookieService.set('refreshToken', refreshToken, opts);
+    this.cookieService.set('sessionId', sessionId, opts);
   }
 
-  /**
-   * Get access token from cookie
-   */
-  getAccessToken(): string | null {
-    return this.cookieService.get('accessToken') || null;
-  }
-
-  /**
-   * Get refresh token from cookie
-   */
-  getRefreshToken(): string | null {
-    return this.cookieService.get('refreshToken') || null;
-  }
-
-  /**
-   * Get session ID from cookie
-   */
-  getSessionId(): string | null {
-    return this.cookieService.get('sessionId') || null;
-  }
-
-  /**
-   * Update access token in cookie
-   */
   setAccessToken(accessToken: string): void {
     if (!accessToken) {
       console.error('setAccessToken: token must be non-empty');
       return;
     }
 
-    if (this.isLocalhost()) {
-      this.cookieService.set('accessToken', accessToken, { path: '/' });
-    } else {
-      const domain = `.${environment.domainName}`;
-      this.cookieService.set('accessToken', accessToken, { path: '/', domain });
-    }
+    this.invalidateCache();
+
+    const opts = this.isLocalhost()
+      ? { path: '/' }
+      : { path: '/', domain: `.${environment.domainName}` };
+
+    this.cookieService.set('accessToken', accessToken, opts);
   }
 
-  /**
-   * Decode JWT token
-   */
+  getAccessToken(): string | null {
+    return this.cookieService.get('accessToken') || null;
+  }
+
+  getRefreshToken(): string | null {
+    return this.cookieService.get('refreshToken') || null;
+  }
+
+  getSessionId(): string | null {
+    return this.cookieService.get('sessionId') || null;
+  }
+
+  // ── Token Decoding ───────────────────────────────────────────────────────
+
   decodeToken(token: string): DecodedToken | null {
     try {
       return jwtDecode<DecodedToken>(token);
@@ -126,68 +81,61 @@ export class AuthService {
   }
 
   /**
-   * Get user info from token
+   * Get user info from current JWT token.
+   * Caches the decoded result to avoid repeated base64 decoding.
    */
   getUserInfo(): UserInfo | null {
     const token = this.getAccessToken();
     if (!token) {
+      this.cachedUserInfo = null;
+      this.cachedTokenString = null;
       return null;
     }
-    return this.decodeToken(token) as UserInfo | null;
-  }
 
-  /**
-   * Store user info in localStorage
-   */
-  setUserInfo(userInfo: UserInfo): void {
-    localStorage.setItem(STORAGE_KEYS.USER_INFO, JSON.stringify(userInfo));
-  }
-
-  /**
-   * Get user info from localStorage
-   */
-  getUserInfoFromStorage(): UserInfo | null {
-    const userStr = localStorage.getItem(STORAGE_KEYS.USER_INFO);
-    if (!userStr) {
-      return null;
+    // Return cached if token hasn't changed
+    if (token === this.cachedTokenString && this.cachedUserInfo) {
+      return this.cachedUserInfo;
     }
-    try {
-      return JSON.parse(userStr);
-    } catch (error) {
-      console.error('Error parsing user info from storage', error);
-      return null;
-    }
+
+    this.cachedTokenString = token;
+    this.cachedUserInfo = this.decodeToken(token) as UserInfo | null;
+    return this.cachedUserInfo;
   }
 
+  // ── Authentication Check ─────────────────────────────────────────────────
+
   /**
-   * Check if user is authenticated
-   * Includes a 10-second buffer before token expiry to allow proactive refresh
+   * Check if user has a valid, non-expired JWT.
+   * Includes a 10-second buffer before expiry to allow proactive refresh.
    */
   isAuthenticated(): boolean {
     const token = this.getAccessToken();
-    if (!token) {
-      return false;
-    }
+    if (!token) return false;
 
-    // Check if token is expired
     const decoded = this.decodeToken(token);
-    if (!decoded || !decoded.exp) {
-      return false;
-    }
+    if (!decoded?.exp) return false;
 
-    const expirationTime = decoded.exp * 1000; // Convert to milliseconds
-    return Date.now() < expirationTime - 10000; // 10s buffer before expiry
+    const expirationTime = decoded.exp * 1000;
+    return Date.now() < expirationTime - 10000;
   }
 
+  // ── Session Cleanup ──────────────────────────────────────────────────────
+
   /**
-   * Clear all authentication data
+   * Clear all authentication data — cookies, localStorage, sessionStorage.
+   * Only removes auth-related keys, not unrelated app state.
    */
   clearAuthData(): void {
-    // Clear localStorage
-    localStorage.removeItem(STORAGE_KEYS.USER_INFO);
-    sessionStorage.clear();
+    this.invalidateCache();
 
-    // Delete cookies
+    // Clear auth-related storage keys only
+    localStorage.removeItem(STORAGE_KEYS.USER_INFO);
+    sessionStorage.removeItem(STORAGE_KEYS.STAFF_RETURN_URL);
+    sessionStorage.removeItem(STORAGE_KEYS.DONOR_RETURN_URL);
+    sessionStorage.removeItem(STORAGE_KEYS.STAFF_AUTHENTICATED);
+    sessionStorage.removeItem(STORAGE_KEYS.DONOR_AUTHENTICATED);
+
+    // Delete auth cookies
     if (this.isLocalhost()) {
       this.cookieService.delete('accessToken', '/');
       this.cookieService.delete('refreshToken', '/');
@@ -197,41 +145,57 @@ export class AuthService {
       this.cookieService.delete('accessToken', '/', domain);
       this.cookieService.delete('refreshToken', '/', domain);
       this.cookieService.delete('sessionId', '/', domain);
-
-      // Also try without leading dot
       this.cookieService.delete('accessToken', '/', environment.domainName);
       this.cookieService.delete('refreshToken', '/', environment.domainName);
       this.cookieService.delete('sessionId', '/', environment.domainName);
     }
 
-    // Delete all cookies as fallback
+    // Fallback: clear all cookies on this path
     this.cookieService.deleteAll('/');
   }
 
+  // ── Company App Integration (production) ─────────────────────────────────
+
   /**
-   * Perform full logout and redirect to Company app
+   * Redirect to Company app login.
+   * Used in production when SSO is integrated.
+   */
+  redirectToLogin(): void {
+    const currentUrl = window.location.href;
+    const returnUrl = isSafeRedirectUrl(currentUrl) ? currentUrl : '/';
+    const loginUrl = `${environment.companyUrl}/shared/login?returnUrl=${encodeURIComponent(returnUrl)}`;
+    window.location.href = loginUrl;
+  }
+
+  refreshAccessToken(refreshToken: string): Observable<RefreshTokenResponse> {
+    const url = `${environment.companyApiUrl}/auth/refresh`;
+    return this.http.post<RefreshTokenResponse>(url, { refreshToken });
+  }
+
+  logout(userDetails: SignOutRequest): Observable<unknown> {
+    const url = `${environment.companyApiUrl}/Auth/SignOut`;
+    return this.http.post(url, userDetails);
+  }
+
+  /**
+   * Full logout — calls Company API to invalidate server session,
+   * clears local data, then redirects. For production use.
    */
   performLogout(): void {
     const sessionId = this.getSessionId();
     const userId = this.getUserInfo()?.userid;
 
+    this.clearAuthData();
+
     if (sessionId) {
       this.logout({ sessionId, userId }).subscribe({
-        next: () => {
-          this.clearAuthData();
-          // Redirect to Company app after logout
-          window.location.href = environment.companyUrl;
-        },
-        error: (error) => {
-          console.error('Logout error:', error);
-          // Clear data even if API call fails
-          this.clearAuthData();
-          window.location.href = environment.companyUrl;
-        },
+        error: (error) => console.error('Logout API error:', error),
       });
-    } else {
-      this.clearAuthData();
-      window.location.href = environment.companyUrl;
     }
+  }
+
+  private invalidateCache(): void {
+    this.cachedUserInfo = null;
+    this.cachedTokenString = null;
   }
 }

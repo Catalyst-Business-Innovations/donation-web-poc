@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
 import { DevAuthService } from '@core/services/dev-auth.service';
 import { STORAGE_KEYS } from '@core/constants/storage-keys';
 
@@ -12,14 +13,30 @@ import { STORAGE_KEYS } from '@core/constants/storage-keys';
   styleUrl: './donor-login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DonorLoginComponent {
+export class DonorLoginComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly devAuth = inject(DevAuthService);
 
   email = '';
   password = '';
   loading = signal(false);
   error = signal('');
+
+  ngOnInit(): void {
+    // If already authenticated as donor, redirect to the portal
+    if (this.authService.isAuthenticated()) {
+      const userInfo = this.authService.getUserInfo();
+      if (userInfo?.role === 'donor') {
+        const returnUrl = sessionStorage.getItem(STORAGE_KEYS.DONOR_RETURN_URL) || '/donor/dashboard';
+        sessionStorage.removeItem(STORAGE_KEYS.DONOR_RETURN_URL);
+        this.router.navigateByUrl(returnUrl);
+        return;
+      }
+      // Authenticated but wrong role — clear and show login
+      this.devAuth.logout();
+    }
+  }
 
   login(): void {
     this.error.set('');
@@ -30,7 +47,7 @@ export class DonorLoginComponent {
 
     this.loading.set(true);
 
-    // Simulate network delay
+    // Simulate network delay — in production, donor will do actual login via API
     setTimeout(() => {
       this.loading.set(false);
 
@@ -39,7 +56,6 @@ export class DonorLoginComponent {
         return;
       }
 
-      // Create simulated JWT session — matches donor by email
       this.devAuth.loginAsDonor(this.email);
 
       const returnUrl = sessionStorage.getItem(STORAGE_KEYS.DONOR_RETURN_URL) || '/donor/dashboard';

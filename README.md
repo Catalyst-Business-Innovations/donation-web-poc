@@ -100,7 +100,12 @@ features/<feature-name>/
 
 ## Authentication
 
-Token-consuming app — authenticates via shared JWT cookie from the Company app across `*.rcscbs.com` / `*.brijjworks.com` subdomains.
+Two separate auth flows for the two portals:
+
+- **Staff Portal** — Token from Company app SSO (simulated in dev via `DevAuthService`)
+- **Donor Portal** — Direct login with email/password (simulated in dev via `DevAuthService`)
+
+Both portals use JWT tokens stored in cookies, role-based route guards, and `CurrentUserService` for reactive user context. See the auth docs below for full flow details.
 
 ## Environments
 
@@ -118,5 +123,9 @@ Token-consuming app — authenticates via shared JWT cookie from the Company app
 
 ## Documentation
 
-- [UI Guidelines SOP](docs/UI_GUIDELINES.md) — Coding agent SOP for components, services, models, mappers (v3.0)
-- [CLAUDE.md](CLAUDE.md) — Claude Code configuration and project context
+| Document | Description |
+|----------|-------------|
+| [UI Guidelines SOP](docs/UI_GUIDELINES.md) | Coding agent SOP — components, services, models, mappers (v3.0) |
+| [Staff Portal Auth](docs/AUTH_STAFF_PORTAL.md) | Staff authentication flow, guards, JWT structure, session lifecycle |
+| [Donor Portal Auth](docs/AUTH_DONOR_PORTAL.md) | Donor authentication flow, identity resolution, cross-portal protection |
+| [CLAUDE.md](CLAUDE.md) | Claude Code configuration and project context |

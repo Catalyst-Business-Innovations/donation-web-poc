@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
 import { DevAuthService } from '@core/services/dev-auth.service';
 import { STORAGE_KEYS } from '@core/constants/storage-keys';
 
@@ -12,14 +13,30 @@ import { STORAGE_KEYS } from '@core/constants/storage-keys';
   styleUrl: './staff-login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StaffLoginComponent {
+export class StaffLoginComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly devAuth = inject(DevAuthService);
 
   username = '';
   password = '';
   loading = signal(false);
   error = signal('');
+
+  ngOnInit(): void {
+    // If already authenticated as staff, redirect to the portal
+    if (this.authService.isAuthenticated()) {
+      const userInfo = this.authService.getUserInfo();
+      if (userInfo?.role === 'staff') {
+        const returnUrl = sessionStorage.getItem(STORAGE_KEYS.STAFF_RETURN_URL) || '/staff/new-donation';
+        sessionStorage.removeItem(STORAGE_KEYS.STAFF_RETURN_URL);
+        this.router.navigateByUrl(returnUrl);
+        return;
+      }
+      // Authenticated but wrong role — clear and show login
+      this.devAuth.logout();
+    }
+  }
 
   login(): void {
     this.error.set('');
@@ -30,7 +47,7 @@ export class StaffLoginComponent {
 
     this.loading.set(true);
 
-    // Simulate network delay
+    // Simulate network delay — in production, staff gets token from Company app SSO
     setTimeout(() => {
       this.loading.set(false);
 
@@ -39,7 +56,6 @@ export class StaffLoginComponent {
         return;
       }
 
-      // Create simulated JWT session
       this.devAuth.loginAsStaff(this.username);
 
       const returnUrl = sessionStorage.getItem(STORAGE_KEYS.STAFF_RETURN_URL) || '/staff/new-donation';
