@@ -1,6 +1,28 @@
 import { Injectable } from '@angular/core';
 import { Donor, Donation, Container } from '../models/domain.models';
 
+interface StoredDonor extends Omit<Donor, 'joinDate' | 'lastDonationDate'> {
+  joinDate: string;
+  lastDonationDate?: string;
+}
+
+interface StoredDonation extends Omit<Donation, 'timestamp'> {
+  timestamp: string;
+}
+
+interface StoredContainer extends Omit<Container, 'createdAt' | 'updatedAt'> {
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ExportedData {
+  donors?: Donor[];
+  donations?: Donation[];
+  containers?: Container[];
+  version?: string;
+  exportedAt?: string;
+}
+
 /**
  * Service for persisting donation app data to localStorage
  * Provides methods to save and restore state across sessions
@@ -11,7 +33,7 @@ export class StorageService {
     donors: 'donation-app-donors',
     donations: 'donation-app-donations',
     containers: 'donation-app-containers',
-    version: 'donation-app-version'
+    version: 'donation-app-version',
   };
 
   private readonly CURRENT_VERSION = '1.0.0';
@@ -34,12 +56,12 @@ export class StorageService {
     try {
       const data = localStorage.getItem(this.STORAGE_KEYS.donors);
       if (!data) return null;
-      const donors = JSON.parse(data);
+      const donors: StoredDonor[] = JSON.parse(data);
       // Convert date strings back to Date objects
-      return donors.map((d: any) => ({
+      return donors.map((d) => ({
         ...d,
         joinDate: new Date(d.joinDate),
-        lastDonationDate: new Date(d.lastDonationDate)
+        lastDonationDate: d.lastDonationDate ? new Date(d.lastDonationDate) : undefined,
       }));
     } catch (error) {
       console.error('Failed to load donors from localStorage:', error);
@@ -61,11 +83,11 @@ export class StorageService {
     try {
       const data = localStorage.getItem(this.STORAGE_KEYS.donations);
       if (!data) return null;
-      const donations = JSON.parse(data);
+      const donations: StoredDonation[] = JSON.parse(data);
       // Convert date strings back to Date objects
-      return donations.map((d: any) => ({
+      return donations.map((d) => ({
         ...d,
-        timestamp: new Date(d.timestamp)
+        timestamp: new Date(d.timestamp),
       }));
     } catch (error) {
       console.error('Failed to load donations from localStorage:', error);
@@ -87,12 +109,12 @@ export class StorageService {
     try {
       const data = localStorage.getItem(this.STORAGE_KEYS.containers);
       if (!data) return null;
-      const containers = JSON.parse(data);
+      const containers: StoredContainer[] = JSON.parse(data);
       // Convert date strings back to Date objects
-      return containers.map((c: any) => ({
+      return containers.map((c) => ({
         ...c,
         createdAt: new Date(c.createdAt),
-        updatedAt: new Date(c.updatedAt)
+        updatedAt: new Date(c.updatedAt),
       }));
     } catch (error) {
       console.error('Failed to load containers from localStorage:', error);
@@ -115,7 +137,7 @@ export class StorageService {
   // ─── Utility Methods ───
 
   clearAll(): void {
-    Object.values(this.STORAGE_KEYS).forEach(key => {
+    Object.values(this.STORAGE_KEYS).forEach((key) => {
       localStorage.removeItem(key);
     });
     localStorage.setItem(this.STORAGE_KEYS.version, this.CURRENT_VERSION);
@@ -136,16 +158,16 @@ export class StorageService {
         donations: this.loadDonations(),
         containers: this.loadContainers(),
         version: this.CURRENT_VERSION,
-        exportedAt: new Date().toISOString()
+        exportedAt: new Date().toISOString(),
       },
       null,
-      2
+      2,
     );
   }
 
   importData(jsonData: string): boolean {
     try {
-      const data = JSON.parse(jsonData);
+      const data: ExportedData = JSON.parse(jsonData);
       if (data.donors) this.saveDonors(data.donors);
       if (data.donations) this.saveDonations(data.donations);
       if (data.containers) this.saveContainers(data.containers);

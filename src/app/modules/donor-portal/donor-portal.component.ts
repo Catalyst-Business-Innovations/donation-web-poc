@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {
   DonorLayoutComponent,
@@ -19,6 +19,7 @@ import { CurrentUserService } from '../../core/services/current-user.service';
       <router-outlet />
     </app-donor-layout>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DonorPortalComponent implements OnInit {
   private readonly currentUser = inject(CurrentUserService);

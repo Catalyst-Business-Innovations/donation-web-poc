@@ -92,7 +92,7 @@ export class CampaignService {
     campaignId: number,
     form: CampaignFormState,
     currentStatus: CampaignStatus,
-    currentHistory: any[],
+    currentHistory: CampaignNotification[],
     emailBlocks: EmailBlock[],
     emailSubject: string,
     smsBody: string

@@ -3,8 +3,12 @@ import { ToastService } from '@core/services/toast.service';
 import {
   Campaign,
   CampaignStatus,
+  CampaignNotification,
   NotificationChannel,
   CampaignTargetCriteria,
+  DonationDepartment,
+  DeptCategory,
+  SubCategory,
   EmailBlock,
   EmailBlockType,
   EmailStarterTemplate
@@ -69,7 +73,7 @@ export class CampaignsPageComponent {
   protected readonly wizardStep = signal(1);
   protected readonly editingCampaignId = signal<number | null>(null);
   protected readonly editingCampaignStatus = signal<CampaignStatus>(CampaignStatus.Draft);
-  protected readonly editingCampaignHistory = signal<any[]>([]);
+  protected readonly editingCampaignHistory = signal<CampaignNotification[]>([]);
   protected readonly form = signal<CampaignFormState>(emptyForm());
   protected readonly criterionDraft = signal<CriterionDraftState>({
     departmentKey: '',
@@ -284,11 +288,11 @@ export class CampaignsPageComponent {
   onCriterionAdded(): void {
     const d = this.criterionDraft();
     if (!d.departmentKey) return;
-    const dept = this.departments.find((dep: any) => dep.key === d.departmentKey);
+    const dept = this.departments.find((dep: DonationDepartment) => dep.key === d.departmentKey);
     const deptCats = dept?.categories ?? [];
-    const cat = deptCats.find((c: any) => c.key === d.categoryKey);
+    const cat = deptCats.find((c: DeptCategory) => c.key === d.categoryKey);
     const catSubs = cat?.subCategories ?? [];
-    const sub = catSubs.find((s: any) => s.key === d.subCategoryKey);
+    const sub = catSubs.find((s: SubCategory) => s.key === d.subCategoryKey);
     const criterion: CampaignTargetCriteria = {
       departmentKey: dept?.key,
       departmentName: dept?.name,

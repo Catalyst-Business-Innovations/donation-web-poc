@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { StaffLayoutComponent, StaffNavSection } from '../../shared/components/staff-layout/staff-layout.component';
 import { CurrentUserService } from '../../core/services/current-user.service';
@@ -16,6 +16,7 @@ import { CurrentUserService } from '../../core/services/current-user.service';
       <router-outlet />
     </app-staff-layout>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StaffPortalComponent implements OnInit {
   protected currentUser = inject(CurrentUserService);

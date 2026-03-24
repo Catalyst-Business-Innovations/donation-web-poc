@@ -2,6 +2,7 @@ import {
   Campaign,
   CampaignStatus,
   CampaignStatusLabel,
+  CampaignNotification,
   NotificationChannel,
   NotificationChannelLabel,
   NotificationTemplate,
@@ -98,7 +99,7 @@ export function mapFormToCreateRequest(
 export function mapFormToUpdateRequest(
   form: CampaignFormState,
   currentStatus: CampaignStatus,
-  currentHistory: any[],
+  currentHistory: CampaignNotification[],
   staffId: number,
   emailTemplate?: NotificationTemplate,
   smsTemplate?: NotificationTemplate
