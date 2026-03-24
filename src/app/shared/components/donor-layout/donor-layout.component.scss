@@ -41,7 +41,7 @@
 
   @include bp.lg {
     position: static;
-    transform: translateX(0);
+    transform: none;
     visibility: visible;
   }
 }
@@ -176,8 +176,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   min-width: 0;
 }
 
