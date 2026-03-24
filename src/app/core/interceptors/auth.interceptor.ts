@@ -40,26 +40,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       if (error instanceof HttpErrorResponse) {
-        switch (error.status) {
-          case 401:
-            return handle401(req, next, authService, toastService, router);
-          case 403:
-            toastService.error('Access denied. You do not have permission to access this resource.');
-            break;
-          case 400: {
-            const rawMsg = error.error?.message;
-            const msg = typeof rawMsg === 'string'
-              ? (rawMsg.length > 200 ? rawMsg.substring(0, 200) + '...' : rawMsg)
-              : 'The request could not be processed. Please check your input and try again.';
-            toastService.error(msg);
-            break;
-          }
-          case 404:
-            toastService.error('The requested resource was not found.');
-            break;
-          case 500:
-            toastService.error('A server error occurred. Please try again later.');
-            break;
+        if (error.status === 401) {
+          return handle401(req, next, authService, toastService, router);
+        } else if (error.status >= 400 && error.status < 500) {
+          // Client errors (400, 403, 404, 422, etc.) — show the API message to the user.
+          // These are intentional responses (validation errors, not found, forbidden).
+          toastService.error(extractClientErrorMessage(error));
+        } else if (error.status >= 500) {
+          // Server errors (500, 502, 503, etc.) — never show raw API internals.
+          toastService.error('A server error occurred. Please try again later.');
         }
       }
 
@@ -113,4 +102,40 @@ function doRedirectToLogin(authService: AuthService, toastService: ToastService,
   authService.clearAuthData();
   toastService.error('Your session has expired. Please log in again.');
   router.navigate([router.url.startsWith('/donor') ? '/donor/login' : '/staff/login']);
+}
+
+/**
+ * Extract a user-facing message from a client error (4xx) response.
+ * The API is expected to return meaningful messages for client errors
+ * (validation failures, not found, forbidden, etc.).
+ */
+function extractClientErrorMessage(error: HttpErrorResponse): string {
+  // Try error.error.message (standard API format)
+  if (typeof error.error?.message === 'string' && error.error.message.trim()) {
+    return error.error.message;
+  }
+
+  // Try error.error as a plain string
+  if (typeof error.error === 'string' && error.error.trim()) {
+    return error.error;
+  }
+
+  // Try error.error.errors (validation error array — e.g., 422)
+  if (Array.isArray(error.error?.errors)) {
+    const messages = error.error.errors
+      .map((e: { message?: string }) => e.message)
+      .filter(Boolean);
+    if (messages.length > 0) return messages.join('. ');
+  }
+
+  // Fallback per status code
+  switch (error.status) {
+    case 400: return 'The request could not be processed. Please check your input.';
+    case 403: return 'Access denied. You do not have permission to access this resource.';
+    case 404: return 'The requested resource was not found.';
+    case 409: return 'A conflict occurred. The resource may have been modified.';
+    case 422: return 'Validation failed. Please check your input.';
+    case 429: return 'Too many requests. Please try again later.';
+    default:  return `Request failed (${error.status}). Please try again.`;
+  }
 }

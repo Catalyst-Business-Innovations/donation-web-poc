@@ -128,4 +128,5 @@ Both portals use JWT tokens stored in cookies, role-based route guards, and `Cur
 | [UI Guidelines SOP](docs/UI_GUIDELINES.md) | Coding agent SOP — components, services, models, mappers (v3.0) |
 | [Staff Portal Auth](docs/AUTH_STAFF_PORTAL.md) | Staff authentication flow, guards, JWT structure, session lifecycle |
 | [Donor Portal Auth](docs/AUTH_DONOR_PORTAL.md) | Donor authentication flow, identity resolution, cross-portal protection |
+| [Security Guidelines](docs/SECURITY_GUIDELINES.md) | XSS prevention, CSP, cookie security, input validation, error handling |
 | [CLAUDE.md](CLAUDE.md) | Claude Code configuration and project context |

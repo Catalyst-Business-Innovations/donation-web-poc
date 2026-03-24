@@ -140,3 +140,4 @@ All environments share the same shape: `donationApiUrl`, `companyApiUrl`, `compa
 - [UI Guidelines SOP](docs/UI_GUIDELINES.md) — Coding agent SOP for components, services, models, mappers (v3.0)
 - [Staff Portal Auth](docs/AUTH_STAFF_PORTAL.md) — Staff authentication flow, guards, JWT structure, session lifecycle
 - [Donor Portal Auth](docs/AUTH_DONOR_PORTAL.md) — Donor authentication flow, identity resolution, cross-portal protection
+- [Security Guidelines](docs/SECURITY_GUIDELINES.md) — XSS prevention, CSP, cookie security, input validation, error handling

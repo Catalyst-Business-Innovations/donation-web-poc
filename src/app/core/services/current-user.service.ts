@@ -64,11 +64,29 @@ export class CurrentUserService {
 
   readonly role = computed(() => this.authService.getUserInfo()?.role ?? '');
 
+  /**
+   * @internal Called by DevAuthService and portal shell components only.
+   * Validates that the caller has a matching JWT role before allowing the switch.
+   */
   setPortal(portal: PortalContext): void {
+    const jwtRole = this.authService.getUserInfo()?.role;
+    if (jwtRole && jwtRole !== portal) {
+      console.warn(`setPortal('${portal}') rejected — JWT role is '${jwtRole}'`);
+      return;
+    }
     this._portal.set(portal);
   }
 
+  /**
+   * @internal Called by DevAuthService only.
+   * Validates that the ID matches the JWT userid claim.
+   */
   setDonorId(id: number): void {
+    const jwtUserId = this.authService.getUserInfo()?.userid;
+    if (jwtUserId && Number(jwtUserId) !== id) {
+      console.warn(`setDonorId(${id}) rejected — JWT userid is '${jwtUserId}'`);
+      return;
+    }
     this._donorId.set(id);
   }
 

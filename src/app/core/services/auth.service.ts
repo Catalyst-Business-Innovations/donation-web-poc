@@ -33,10 +33,7 @@ export class AuthService {
 
     this.invalidateCache();
 
-    const opts = this.isLocalhost()
-      ? { path: '/' }
-      : { path: '/', domain: `.${environment.domainName}` };
-
+    const opts = this.getCookieOptions();
     this.cookieService.set('accessToken', accessToken, opts);
     this.cookieService.set('refreshToken', refreshToken, opts);
     this.cookieService.set('sessionId', sessionId, opts);
@@ -49,12 +46,19 @@ export class AuthService {
     }
 
     this.invalidateCache();
+    this.cookieService.set('accessToken', accessToken, this.getCookieOptions());
+  }
 
-    const opts = this.isLocalhost()
-      ? { path: '/' }
-      : { path: '/', domain: `.${environment.domainName}` };
-
-    this.cookieService.set('accessToken', accessToken, opts);
+  /**
+   * Cookie options with security attributes.
+   * Secure: only sent over HTTPS (skipped on localhost for dev).
+   * SameSite: Lax prevents CSRF while allowing navigation-initiated requests.
+   */
+  private getCookieOptions(): { path: string; domain?: string; secure: boolean; sameSite: 'Lax' | 'Strict' | 'None' } {
+    if (this.isLocalhost()) {
+      return { path: '/', secure: false, sameSite: 'Lax' };
+    }
+    return { path: '/', domain: `.${environment.domainName}`, secure: true, sameSite: 'Lax' };
   }
 
   getAccessToken(): string | null {

@@ -136,20 +136,25 @@ export class NewDonationPageComponent implements OnInit, OnDestroy {
     this.terminalChannel = new BroadcastChannel('card-terminal');
     this.terminalChannel.onmessage = (event: MessageEvent) => {
       const data = event.data;
+
+      // Validate message structure before processing
+      if (typeof data !== 'object' || data === null || !('type' in data)) return;
+      if (!['approved', 'declined'].includes(data.type)) return;
+
       if (data.type === 'approved') {
         this.cardApproved.set(true);
         this.cardDeclined.set(false);
         this.cardDeclineReason.set('');
-        this.cardTxnRef.set(data.txnRef ?? '');
+        this.cardTxnRef.set(typeof data.txnRef === 'string' ? data.txnRef : '');
         this.terminalWaiting.set(false);
         this.toast.success('Card Approved', 'Payment authorised successfully.');
       } else if (data.type === 'declined') {
         this.cardDeclined.set(true);
         this.cardApproved.set(false);
-        this.cardDeclineReason.set(data.reason ?? 'Unknown error');
+        this.cardDeclineReason.set(typeof data.reason === 'string' ? data.reason : 'Unknown error');
         this.cardTxnRef.set('');
         this.terminalWaiting.set(false);
-        this.toast.warning('Card Declined', data.reason ?? 'Unknown error');
+        this.toast.warning('Card Declined', typeof data.reason === 'string' ? data.reason : 'Unknown error');
       }
     };
   }
