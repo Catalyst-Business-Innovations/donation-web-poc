@@ -1,8 +1,12 @@
 .form-row-2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-bottom: 12px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .form-section-hdr {
@@ -78,13 +82,20 @@
 
 .edit-info-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 10px;
   background: var(--gray-50);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-sm);
   padding: 12px;
   margin-bottom: 4px;
+
+  @media (min-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .ei-cell {

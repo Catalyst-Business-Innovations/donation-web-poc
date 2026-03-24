@@ -1,18 +1,4 @@
 // ── Topbar ─────────────────────────────────────────────────────────────────
-.donations-topbar {
-  gap: 10px;
-  flex-wrap: nowrap;
-  .topbar-actions {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-}
-.donations-search {
-  width: 240px;
-  flex-shrink: 0;
-}
 
 // ── Table ─────────────────────────────────────────────────────────────────
 .appt-row {
@@ -27,6 +13,12 @@
   font-weight: 700;
   color: var(--primary);
   white-space: nowrap;
+
+  @media (max-width: 768px) {
+    white-space: normal;
+    word-break: break-all;
+    font-size: 10px;
+  }
 }
 .donor-cell {
   max-width: 160px;

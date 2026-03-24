@@ -28,9 +28,13 @@
   margin-top: 8px;
 }
 .exec-result-num {
-  font-size: 52px;
+  font-size: 36px;
   font-weight: 900;
   line-height: 1;
+
+  @media (min-width: 768px) {
+    font-size: 52px;
+  }
 }
 .exec-result-num--success {
   color: var(--secondary);

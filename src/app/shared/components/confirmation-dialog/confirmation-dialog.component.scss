@@ -16,13 +16,22 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  min-width: 400px;
+  width: calc(100vw - 32px);
   max-width: 500px;
   animation: slideIn 0.2s ease-in-out;
+
+  @media (min-width: 640px) {
+    min-width: 400px;
+    width: auto;
+  }
 }
 
 .dialog-header {
-  padding: 20px 24px;
+  padding: 16px;
+
+  @media (min-width: 640px) {
+    padding: 20px 24px;
+  }
   border-bottom: 1px solid #e5e7eb;
 
   h3 {
@@ -34,7 +43,11 @@
 }
 
 .dialog-body {
-  padding: 24px;
+  padding: 16px;
+
+  @media (min-width: 640px) {
+    padding: 24px;
+  }
 
   p {
     margin: 0;
@@ -103,7 +116,11 @@
 }
 
 .dialog-footer {
-  padding: 16px 24px;
+  padding: 12px 16px;
+
+  @media (min-width: 640px) {
+    padding: 16px 24px;
+  }
   border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;

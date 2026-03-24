@@ -9,13 +9,18 @@
 
 .login-card {
   background: #fff;
-  border-radius: 30px;
-  padding: 45px;
+  border-radius: 20px;
+  padding: 24px;
   width: 100%;
   max-width: 480px;
   box-shadow:
     0px 8px 8px -4px #17171708,
     0px 20px 24px -4px #17171714;
+
+  @media (min-width: 640px) {
+    padding: 45px;
+    border-radius: 30px;
+  }
 }
 
 .login-brand {

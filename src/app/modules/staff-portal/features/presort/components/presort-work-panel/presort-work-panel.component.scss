@@ -260,7 +260,11 @@
 .flag-select {
   height: 34px;
   font-size: 12px;
-  width: 180px;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 180px;
+  }
 }
 
 /* Toggle switch */

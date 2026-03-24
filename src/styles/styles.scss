@@ -596,7 +596,11 @@ body {
 /* ── Search bar modifiers ── */
 .search-bar--grow {
   flex: 1;
-  max-width: 380px;
+  max-width: 100%;
+
+  @media (min-width: 768px) {
+    max-width: 380px;
+  }
 }
 .search-bar--fluid {
   flex: 1;
@@ -907,9 +911,15 @@ body {
 .bar-chart {
   display: flex;
   align-items: flex-end;
-  gap: 5px;
-  height: 160px;
-  padding-top: 16px;
+  gap: 4px;
+  height: 120px;
+  padding-top: 12px;
+
+  @media (min-width: 768px) {
+    gap: 5px;
+    height: 160px;
+    padding-top: 16px;
+  }
 }
 .bar-col {
   flex: 1;
@@ -1087,7 +1097,11 @@ body {
 /* ── Empty state ── */
 .empty-state {
   text-align: center;
-  padding: 48px 20px;
+  padding: 24px 16px;
+
+  @media (min-width: 768px) {
+    padding: 48px 20px;
+  }
 }
 .empty-state-icon {
   width: 72px;
