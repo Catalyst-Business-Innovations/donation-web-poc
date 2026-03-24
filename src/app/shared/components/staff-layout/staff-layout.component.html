@@ -43,10 +43,10 @@
         (keydown)="onKeydown($event)"
       >
         <div class="sl-profile">
-          <div class="sl-avatar">{{ userInitials() }}</div>
+          <div class="sl-avatar">{{ currentUser.initials() }}</div>
           <div class="sl-user-info">
-            <div class="sl-user-name">{{ userName() }}</div>
-            <div class="sl-user-role">{{ userRole() }}</div>
+            <div class="sl-user-name">{{ currentUser.displayName() }}</div>
+            <div class="sl-user-role">{{ currentUser.staffSession().locationName }}</div>
           </div>
           <div class="sl-arrow" [class.open]="dropdownOpen()">
             <app-icon name="chevron-down" [size]="14"></app-icon>
@@ -55,9 +55,7 @@
 
         @if (dropdownOpen()) {
           <div class="sl-dropdown" role="menu" (click)="$event.stopPropagation()">
-            @if (storeName()) {
-              <div class="sl-dd-header">{{ storeName() }}</div>
-            }
+            <div class="sl-dd-header">{{ currentUser.staffSession().locationName }}</div>
             @if (logoutRoute()) {
               <a [routerLink]="logoutRoute()" class="sl-dd-item sl-dd-danger" role="menuitem">Sign Out</a>
             }

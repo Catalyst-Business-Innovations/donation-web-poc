@@ -41,10 +41,10 @@
         (keydown)="onKeydown($event)"
       >
         <div class="donor-profile">
-          <div class="donor-avatar">{{ userInitials() }}</div>
+          <div class="donor-avatar">{{ currentUser.initials() }}</div>
           <div class="donor-user-info">
-            <div class="donor-user-name">{{ userName() }}</div>
-            <div class="donor-user-role">{{ userRole() }}</div>
+            <div class="donor-user-name">{{ currentUser.displayName() }}</div>
+            <div class="donor-user-role">{{ currentUser.email() }}</div>
           </div>
           <div class="donor-arrow" [class.open]="dropdownOpen()">
             <app-icon name="chevron-down" [size]="14"></app-icon>

@@ -1,11 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {
   DonorLayoutComponent,
-  DonorNavSection as NavSection
+  DonorNavSection as NavSection,
 } from '../../shared/components/donor-layout/donor-layout.component';
-import { MockDataService } from '../../core/services/mock-data.service';
-import { CurrentDonorService } from '../../core/services/current-donor.service';
+import { CurrentUserService } from '../../core/services/current-user.service';
 
 @Component({
   selector: 'app-donor-portal',
@@ -15,20 +14,15 @@ import { CurrentDonorService } from '../../core/services/current-donor.service';
     <app-donor-layout
       moduleLabel="Donor Portal"
       [sections]="sections"
-      [userName]="donor.firstName + ' ' + donor.lastName"
-      [userInitials]="svc.getInitials(donor.firstName, donor.lastName)"
-      [userRole]="tierCfg.icon + ' ' + tierCfg.label + ' Member'"
       logoutRoute="/donor/login"
     >
       <router-outlet />
     </app-donor-layout>
-  `
+  `,
 })
-export class DonorPortalComponent {
-  protected svc = inject(MockDataService);
-  private readonly currentDonor = inject(CurrentDonorService);
-  protected donor = this.currentDonor.donor();
-  protected tierCfg = this.svc.getTier(this.donor.loyaltyTier);
+export class DonorPortalComponent implements OnInit {
+  private readonly currentUser = inject(CurrentUserService);
+
   readonly sections: NavSection[] = [
     {
       title: '',
@@ -37,12 +31,12 @@ export class DonorPortalComponent {
         { label: 'My Donations', icon: 'list', route: '/donor/history' },
         { label: 'Tax Receipts', icon: 'file-text', route: '/donor/receipts' },
         { label: 'Loyalty & Rewards', icon: 'star', route: '/donor/rewards' },
-        {
-          label: 'Schedule Donation',
-          icon: 'calendar',
-          route: '/donor/schedule'
-        }
-      ]
-    }
+        { label: 'Schedule Donation', icon: 'calendar', route: '/donor/schedule' },
+      ],
+    },
   ];
+
+  ngOnInit(): void {
+    this.currentUser.setPortal('donor');
+  }
 }

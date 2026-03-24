@@ -6,12 +6,13 @@ import {
   OnInit,
   inject,
   input,
-  signal
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { IconComponent, IconName } from '../icon/icon.component';
+import { CurrentUserService } from '../../../core/services/current-user.service';
 
 export interface DonorNavItem {
   label: string;
@@ -30,16 +31,14 @@ export interface DonorNavSection {
   imports: [RouterLink, RouterLinkActive, IconComponent],
   templateUrl: './donor-layout.component.html',
   styleUrl: './donor-layout.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DonorLayoutComponent implements OnInit {
   moduleLabel = input('');
   sections = input<DonorNavSection[]>([]);
-  userName = input('');
-  userInitials = input('');
-  userRole = input('');
   logoutRoute = input('');
 
+  protected readonly currentUser = inject(CurrentUserService);
   dropdownOpen = signal(false);
   activeCrumb = signal('');
 
@@ -62,14 +61,12 @@ export class DonorLayoutComponent implements OnInit {
     this.dropdownOpen.update(v => !v);
   }
 
-  /** Close dropdown on Escape key */
   onKeydown(e: KeyboardEvent) {
     if (e.key === 'Escape' && this.dropdownOpen()) {
       this.dropdownOpen.set(false);
     }
   }
 
-  /** Close dropdown when clicking outside the profile area */
   @HostListener('document:click')
   closeDropdown() {
     this.dropdownOpen.set(false);

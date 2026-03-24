@@ -12,7 +12,8 @@
       "Bash(cp *)",
       "Bash(rm *)",
       "Bash(find *)",
-      "Bash(cd *)"
+      "Bash(cd *)",
+      "Bash(do sed:*)"
     ]
   }
 }
