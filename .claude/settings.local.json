@@ -18,7 +18,10 @@
       "Bash(__NEW_LINE_943433b46a80d1aa__ echo:*)",
       "Bash(npx tsc:*)",
       "Bash(grep -n \"MockDataService\" src/app/modules/*/features/*/pages/*.component.ts)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(grep -r from.*environments/environment /d/Projects/RCS/repos/donation/Donation.Web/src --include=*.ts)",
+      "Bash(grep -r environment.production /d/Projects/RCS/repos/donation/Donation.Web/src/app/modules --include=*.ts)",
+      "Bash(grep -n \"environment.production\\\\|production:\" /d/Projects/RCS/repos/donation/Donation.Web/src/app/core/services/*.ts)"
     ]
   }
 }

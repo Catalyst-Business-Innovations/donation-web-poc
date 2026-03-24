@@ -23,6 +23,12 @@ export class AuthService {
     return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   }
 
+  /** Check if running on the production domain family (rcscbs.com / brijjworks.com) */
+  private isProductionDomain(): boolean {
+    const host = window.location.hostname;
+    return host.endsWith(environment.domainName);
+  }
+
   // ── Token Management ─────────────────────────────────────────────────────
 
   setTokens(accessToken: string, refreshToken: string, sessionId: string): void {
@@ -53,12 +59,18 @@ export class AuthService {
    * Cookie options with security attributes.
    * Secure: only sent over HTTPS (skipped on localhost for dev).
    * SameSite: Lax prevents CSRF while allowing navigation-initiated requests.
+   * Domain-scoped cookies only on production domains (*.brijjworks.com / *.rcscbs.com).
+   * On non-production hosts (Vercel, Netlify, etc.), cookies are host-only (no domain attribute).
    */
   private getCookieOptions(): { path: string; domain?: string; secure: boolean; sameSite: 'Lax' | 'Strict' | 'None' } {
     if (this.isLocalhost()) {
       return { path: '/', secure: false, sameSite: 'Lax' };
     }
-    return { path: '/', domain: `.${environment.domainName}`, secure: true, sameSite: 'Lax' };
+    if (this.isProductionDomain()) {
+      return { path: '/', domain: `.${environment.domainName}`, secure: true, sameSite: 'Lax' };
+    }
+    // Non-production HTTPS hosts (Vercel, Netlify, preview deploys)
+    return { path: '/', secure: true, sameSite: 'Lax' };
   }
 
   getAccessToken(): string | null {
@@ -143,7 +155,7 @@ export class AuthService {
       this.cookieService.delete('accessToken', '/');
       this.cookieService.delete('refreshToken', '/');
       this.cookieService.delete('sessionId', '/');
-    } else {
+    } else if (this.isProductionDomain()) {
       const domain = `.${environment.domainName}`;
       this.cookieService.delete('accessToken', '/', domain);
       this.cookieService.delete('refreshToken', '/', domain);
@@ -151,6 +163,11 @@ export class AuthService {
       this.cookieService.delete('accessToken', '/', environment.domainName);
       this.cookieService.delete('refreshToken', '/', environment.domainName);
       this.cookieService.delete('sessionId', '/', environment.domainName);
+    } else {
+      // Non-production hosts (Vercel, Netlify, etc.) — host-only cookies
+      this.cookieService.delete('accessToken', '/');
+      this.cookieService.delete('refreshToken', '/');
+      this.cookieService.delete('sessionId', '/');
     }
 
     // Fallback: clear all cookies on this path
