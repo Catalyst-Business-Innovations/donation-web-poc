@@ -12,7 +12,7 @@ import { GiftStep } from '../../models/rewards.enum';
   imports: [DecimalPipe, FormsModule, IconComponent, ModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './gift-modal.component.html',
-  styleUrl: './gift-modal.component.scss',
+  styleUrl: './gift-modal.component.scss'
 })
 export class GiftModalComponent {
   reward = input.required<RewardCatalogueItemState | null>();
@@ -26,9 +26,7 @@ export class GiftModalComponent {
   protected searchQuery = signal('');
   protected selectedRecipient = signal<DonorSearchResultState | null>(null);
 
-  protected readonly modalTitle = computed(() =>
-    this.giftStep() === 'search' ? 'Gift a Reward' : 'Confirm Gift'
-  );
+  protected readonly modalTitle = computed(() => (this.giftStep() === 'search' ? 'Gift a Reward' : 'Confirm Gift'));
 
   onSearchChange(query: string): void {
     this.searchQuery.set(query);

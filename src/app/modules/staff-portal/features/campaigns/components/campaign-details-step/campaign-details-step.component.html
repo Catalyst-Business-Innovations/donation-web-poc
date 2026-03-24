@@ -1,0 +1,175 @@
+<div class="wiz-step">
+  <div class="wiz-step-header">
+    <div class="wiz-step-icon-wrap"><app-icon name="settings" size="22" /></div>
+    <div>
+      <h3>Campaign Details</h3>
+      <p>Define the campaign identity, schedule, channel, and targeting.</p>
+    </div>
+  </div>
+
+  <div class="wiz-card">
+    <div class="wiz-card-section">
+      <div class="wiz-card-section-title">
+        <app-icon name="file-text" size="14" />
+        Identity
+      </div>
+      <div class="form-grid">
+        <div class="form-group form-group--full">
+          <label class="form-label">Campaign Name *</label>
+          <input
+            class="form-input"
+            [ngModel]="form().name"
+            (ngModelChange)="updateFormField('name', $event)"
+            placeholder="e.g., Spring Clothing Drive"
+            [disabled]="isViewMode()"
+          />
+        </div>
+        <div class="form-group form-group--full">
+          <label class="form-label">Description</label>
+          <textarea
+            class="form-input"
+            rows="2"
+            [ngModel]="form().description"
+            (ngModelChange)="updateFormField('description', $event)"
+            placeholder="Brief campaign summary..."
+            [disabled]="isViewMode()"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="wiz-card-divider"></div>
+
+    <div class="wiz-card-section">
+      <div class="wiz-card-section-title">
+        <app-icon name="calendar" size="14" />
+        Schedule
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">
+            Start Date
+            <span class="form-label-opt">(optional)</span>
+          </label>
+          <input
+            type="date"
+            class="form-input"
+            [ngModel]="form().effectiveFrom"
+            (ngModelChange)="updateFormField('effectiveFrom', $event)"
+            [disabled]="isViewMode()"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            End Date
+            <span class="form-label-opt">(optional)</span>
+          </label>
+          <input
+            type="date"
+            class="form-input"
+            [ngModel]="form().toDate"
+            (ngModelChange)="updateFormField('toDate', $event)"
+            [disabled]="isViewMode()"
+            [class.input-error]="form().toDate && form().effectiveFrom && form().toDate < form().effectiveFrom"
+          />
+          @if (form().toDate && form().effectiveFrom && form().toDate < form().effectiveFrom) {
+            <div class="form-hint-error">End date must be on or after start date</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="wiz-card-divider"></div>
+
+    <div class="wiz-card-section">
+      <div class="wiz-card-section-title">
+        <app-icon name="send" size="14" />
+        Notification Channel
+      </div>
+      <div class="channel-cards">
+        @for (ch of channelOptions; track ch.value) {
+          <button
+            class="channel-card"
+            [class.selected]="form().channel === ch.value"
+            [disabled]="isViewMode()"
+            (click)="selectChannel(ch.value)"
+          >
+            <div class="channel-card-icon"><app-icon [name]="ch.icon" size="22" /></div>
+            <div class="channel-card-label">{{ ch.label }}</div>
+            <div class="channel-card-desc">{{ ch.desc }}</div>
+            @if (form().channel === ch.value) {
+              <div class="channel-card-check"><app-icon name="checkmark" size="12" /></div>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="wiz-card-divider"></div>
+
+    <div class="wiz-card-section">
+      <div class="wiz-card-section-title">
+        <app-icon name="layers" size="14" />
+        Target Criteria
+        <span class="form-label-opt">(optional — leave empty to target all donors)</span>
+      </div>
+      @if (form().criteria.length > 0) {
+        <div class="criteria-list">
+          @for (c of form().criteria; track $index) {
+            <div class="criterion-chip">
+              <app-icon name="layers" [size]="12"></app-icon>
+              <span>{{ getCriterionLabel(c) }}</span>
+              @if (!isViewMode()) {
+                <button class="criterion-remove" (click)="criterionRemoved.emit($index)" title="Remove">x</button>
+              }
+            </div>
+          }
+        </div>
+      }
+      @if (!isViewMode()) {
+        <div class="criterion-builder">
+          <select
+            class="form-select crit-select"
+            [ngModel]="criterionDraft().departmentKey"
+            (ngModelChange)="updateDraftField('departmentKey', $event, ['categoryKey', 'subCategoryKey'])"
+          >
+            <option value="">-- Department --</option>
+            @for (dept of departments(); track dept.key) {
+              <option [value]="dept.key">{{ dept.name }}</option>
+            }
+          </select>
+          <select
+            class="form-select crit-select"
+            [ngModel]="criterionDraft().categoryKey"
+            [disabled]="!criterionDraft().departmentKey || draftCategories.length === 0"
+            (ngModelChange)="updateDraftField('categoryKey', $event, ['subCategoryKey'])"
+          >
+            <option value="">-- Category --</option>
+            @for (cat of draftCategories; track cat.key) {
+              <option [value]="cat.key">{{ cat.name }}</option>
+            }
+          </select>
+          <select
+            class="form-select crit-select"
+            [ngModel]="criterionDraft().subCategoryKey"
+            [disabled]="!criterionDraft().categoryKey || draftSubCategories.length === 0"
+            (ngModelChange)="updateDraftField('subCategoryKey', $event)"
+          >
+            <option value="">-- Subcategory --</option>
+            @for (sub of draftSubCategories; track sub.key) {
+              <option [value]="sub.key">{{ sub.name }}</option>
+            }
+          </select>
+          <button
+            class="btn btn-secondary crit-add-btn"
+            [disabled]="!criterionDraft().departmentKey"
+            (click)="criterionAdded.emit()"
+          >
+            <app-icon name="plus" [size]="13"></app-icon>
+            Add
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

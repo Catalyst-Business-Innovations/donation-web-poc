@@ -1,0 +1,17 @@
+<div class="search-bar donors-search">
+  <span class="search-icon"><app-icon name="search" size="14" /></span>
+  <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search by name, email, or phone..." />
+</div>
+<select class="form-select f-sel" [ngModel]="tierFilter()" (ngModelChange)="tierFilter.set($event)">
+  <option [ngValue]="''">All Tiers</option>
+  <option [ngValue]="DT.Platinum">Platinum</option>
+  <option [ngValue]="DT.Gold">Gold</option>
+  <option [ngValue]="DT.Silver">Silver</option>
+  <option [ngValue]="DT.Bronze">Bronze</option>
+</select>
+<div class="topbar-divider"></div>
+<button class="btn btn-secondary" (click)="exportRequested.emit()">
+  <app-icon name="upload" [size]="14"></app-icon>
+  Export CSV
+</button>
+<button class="btn btn-primary" (click)="addRequested.emit()">+ Add Donor</button>

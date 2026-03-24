@@ -1,0 +1,168 @@
+<!-- Donation Confirmation Modal -->
+<app-modal
+  [open]="open()"
+  title="Donation Complete!"
+  confirmLabel="Done — New Donation"
+  confirmVariant="success"
+  [showCancel]="false"
+  size="md"
+  (closed)="onClose()"
+  (confirmed)="onClose()"
+>
+  <div class="confirm-modal">
+    <!-- Hero banner -->
+    <div class="cm-hero">
+      <div class="cm-hero-icon">
+        <app-icon name="check-circle" [size]="44"></app-icon>
+      </div>
+      <div class="cm-hero-title">Thank you!</div>
+      <div class="cm-hero-sub">Donation recorded successfully</div>
+    </div>
+
+    <!-- Reference # + QR side by side -->
+    <div class="cm-id-row">
+      <div class="cm-id-block">
+        <div class="cm-label">Reference #</div>
+        <div class="cm-id-val">{{ donationRefNumber() }}</div>
+        <div class="cm-label cm-label--mt">Receipt #</div>
+        <div class="cm-receipt-val">{{ receiptNumber() }}</div>
+      </div>
+      <div class="cm-qr-block">
+        <div class="cm-qr-frame">
+          <app-qr-code [value]="donationRefNumber()" [size]="110"></app-qr-code>
+        </div>
+        <div class="cm-qr-hint">Scan for details</div>
+      </div>
+    </div>
+
+    <!-- Summary rows -->
+    <div class="cm-summary">
+      @if (donationType() !== DT.Monetary) {
+        <div class="cm-row">
+          <span class="cm-row-label">
+            <app-icon name="package" size="14" />
+            Items Donated
+          </span>
+          <strong>{{ totalItems() }} item{{ totalItems() === 1 ? '' : 's' }}</strong>
+        </div>
+      }
+      @if (donationType() !== DT.Items) {
+        <div class="cm-row">
+          <span class="cm-row-label">
+            <app-icon name="dollar" size="14" />
+            Monetary
+          </span>
+          <strong>${{ (monetary() ?? 0).toFixed(2) }}</strong>
+        </div>
+        <div class="cm-row">
+          <span class="cm-row-label">
+            <app-icon name="credit-card" size="14" />
+            Payment
+          </span>
+          <strong>{{ paymentMethod() === 'cash' ? 'Cash' : 'Card' }}</strong>
+        </div>
+      }
+      <div class="cm-row">
+        <span class="cm-row-label">
+          <app-icon name="calendar" size="14" />
+          Date
+        </span>
+        <strong>{{ today | date: 'MMM d, yyyy' }}</strong>
+      </div>
+    </div>
+
+    <!-- Points awarded -->
+    @if (donor()) {
+      <div class="cm-points-banner">
+        <app-icon name="star" [size]="20"></app-icon>
+        <div>
+          <div class="cm-points-title">Points awarded to {{ donor()!.displayName }}</div>
+          <div class="cm-points-sub">Thank you for your continued support!</div>
+        </div>
+      </div>
+    }
+
+    <!-- Link to donor (anonymous) -->
+    @if (donor() === null && donationId()) {
+      @if (!associatedDonor()) {
+        <button class="btn btn-secondary btn-link-donor" (click)="onOpenAssociate()">
+          <app-icon name="user" size="14" />
+          Link to Donor Account
+        </button>
+        <div class="cm-link-hint">Associate this donation with a donor to award loyalty points</div>
+      } @else {
+        <div class="cm-linked-card">
+          <div class="cm-linked-header">
+            <app-icon name="check-circle" [size]="20"></app-icon>
+            <span>Donation Linked Successfully</span>
+          </div>
+          <div class="cm-linked-donor">
+            <div class="cm-linked-avatar">{{ associatedDonor()!.initials }}</div>
+            <div class="cm-linked-info">
+              <div class="cm-linked-name">{{ associatedDonor()!.displayName }}</div>
+              <div class="cm-linked-meta">
+                <app-icon [name]="getTierCfg(associatedDonor()!.tier).icon" [size]="11"></app-icon>
+                {{ getTierCfg(associatedDonor()!.tier).label }} · {{ associatedDonor()!.points | number }} pts
+              </div>
+            </div>
+          </div>
+          <div class="cm-linked-details">
+            <div class="cm-linked-detail-row">
+              <span>Donation Ref</span>
+              <strong>{{ donationRefNumber() }}</strong>
+            </div>
+            <div class="cm-linked-detail-row">
+              <span>Points Awarded</span>
+              <strong class="cm-linked-points">+{{ estPoints() }} pts</strong>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</app-modal>
+
+<!-- Associate donor modal -->
+<app-modal
+  [open]="showAssociateModal()"
+  title="Link to Donor Account"
+  confirmLabel="Confirm Association"
+  [showCancel]="true"
+  cancelLabel="Cancel"
+  [confirmDisabled]="!associatedDonor()"
+  (closed)="onCloseAssociateModal()"
+  (confirmed)="onConfirmAssociation()"
+>
+  <div class="assoc-modal-body">
+    <p class="assoc-modal-hint">
+      Search for the donor to associate with this anonymous donation. Loyalty points will be recalculated and awarded
+      upon confirmation.
+    </p>
+    <div class="search-bar search-bar--mb-8">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input
+        [ngModel]="associateSearchQ()"
+        (ngModelChange)="onAssociateSearchChange($event)"
+        placeholder="Name or phone number..."
+      />
+    </div>
+    @for (d of associateSearchResults(); track d.id) {
+      <div class="donor-result" [class.selected]="associatedDonor()?.id === d.id" (click)="onSelectAssociateDonor(d)">
+        <div class="d-av">{{ d.initials }}</div>
+        <div class="dr-info">
+          <div class="dr-name">{{ d.displayName }}</div>
+          <div class="dr-meta">
+            <app-icon [name]="getTierCfg(d.tier).icon" [size]="12"></app-icon>
+            {{ getTierCfg(d.tier).label }} · {{ d.points | number }} pts
+          </div>
+        </div>
+        @if (associatedDonor()?.id === d.id) {
+          <span class="badge badge-success">Selected</span>
+        }
+      </div>
+    }
+    @if (associateSearchQ().length > 1 && associateSearchResults().length === 0) {
+      <div class="assoc-no-results">No donors found for "{{ associateSearchQ() }}"</div>
+    }
+  </div>
+</app-modal>

@@ -14,8 +14,7 @@ export const donorRoutes: Routes = [
     path: 'history',
     data: { breadcrumb: 'My Donations' },
     canActivate: [donorAuthGuard],
-    loadComponent: () =>
-      import('./features/history/pages/history-page.component').then(m => m.HistoryPageComponent)
+    loadComponent: () => import('./features/history/pages/history-page.component').then(m => m.HistoryPageComponent)
   },
   {
     path: 'receipts',

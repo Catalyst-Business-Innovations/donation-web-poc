@@ -1,0 +1,38 @@
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Recent Donations</div>
+      <div class="card-subtitle">Latest across all stores</div>
+    </div>
+  </div>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Receipt #</th>
+          <th>Time</th>
+          <th>Donor</th>
+          <th>Store</th>
+          <th>Items</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (d of donations(); track d.id) {
+          <tr>
+            <td class="mono">{{ d.receiptNumber }}</td>
+            <td>{{ d.timestamp | date: 'h:mm a' }}</td>
+            <td>{{ d.donorName }}</td>
+            <td>{{ d.locationName }}</td>
+            <td class="td--bold">{{ d.totalItems }}</td>
+            <td>
+              <span class="badge {{ d.statusBadgeClass }}">
+                {{ d.statusLabel }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,79 @@
+<app-container-filters
+  [query]="query()"
+  [statusFilter]="statusFilter()"
+  [selectionCount]="selectionCount()"
+  (queryChanged)="query.set($event)"
+  (statusFilterChanged)="statusFilter.set($event)"
+  (createClicked)="onOpenCreate()"
+  (printLabelsClicked)="onPrintLabels()"
+  (mergeClicked)="onOpenMerge()"
+  (bulkStatusClicked)="onOpenBulkStatus()"
+  (clearSelectionClicked)="onClearSelection()"
+/>
+
+<div class="page-content">
+  <app-container-pipeline-bar
+    [stages]="pipeline()"
+    [activeStatus]="statusFilter()"
+    (stageClicked)="onPipelineStageClicked($event)"
+  />
+
+  <app-container-table
+    [rows]="filteredRows()"
+    [selectedIds]="selectedIds()"
+    [allSelected]="allSelected()"
+    (selectToggled)="onToggleSelect($event)"
+    (selectAllToggled)="onToggleSelectAll()"
+    (detailRequested)="onOpenDetail($event)"
+    (editRequested)="onOpenEdit($event)"
+    (advanceRequested)="onAdvanceStatus($event)"
+    (printRequested)="onPrintSingleLabel($event)"
+  />
+</div>
+
+<app-container-detail-panel
+  [detail]="viewingDetail()"
+  (closed)="onCloseDetail()"
+  (editRequested)="onDetailEditRequested($event)"
+  (advanceRequested)="onAdvanceStatus($event)"
+  (resetRequested)="onResetContainer($event)"
+/>
+
+<app-container-form-modal
+  [createOpen]="creating()"
+  [createForm]="createForm()"
+  [createDeptCats]="createDeptCats()"
+  [editOpen]="editing()"
+  [editForm]="editForm()"
+  [editInfo]="editInfo()"
+  [departments]="departments()"
+  [locations]="locations()"
+  (createClosed)="onCreateClosed()"
+  (createConfirmed)="onCreateConfirmed($event)"
+  (createFormChanged)="onCreateFormChanged($event)"
+  (editClosed)="onEditClosed()"
+  (editConfirmed)="onEditConfirmed($event)"
+  (editFormChanged)="onEditFormChanged($event)"
+/>
+
+<app-container-merge-modal
+  [open]="merging()"
+  [form]="mergeForm()"
+  [selectionCount]="selectionCount()"
+  [mergeTotal]="mergeTotal()"
+  [departments]="departments()"
+  [deptCats]="mergeDeptCats()"
+  [locations]="locations()"
+  (closed)="onMergeClosed()"
+  (confirmed)="onMergeConfirmed($event)"
+  (formChanged)="onMergeFormChanged($event)"
+/>
+
+<app-container-bulk-status-modal
+  [open]="bulkUpdating()"
+  [selectionCount]="selectionCount()"
+  [bulkStatus]="bulkStatus()"
+  (closed)="onBulkStatusClosed()"
+  (confirmed)="onBulkStatusConfirmed($event)"
+  (statusChanged)="onBulkStatusChanged($event)"
+/>

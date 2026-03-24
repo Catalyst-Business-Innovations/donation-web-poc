@@ -1,0 +1,59 @@
+.badge--xs {
+  font-size: 10px;
+}
+.badge--sm {
+  font-size: 11px;
+}
+
+.table-campaign-name {
+  font-weight: 700;
+  font-size: 13px;
+}
+.table-campaign-desc {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.table-cell--date {
+  font-size: 12px;
+}
+.table-cell--bold {
+  font-weight: 700;
+}
+
+.clickable-row {
+  cursor: pointer;
+  &:hover {
+    background: var(--gray-50);
+  }
+}
+
+.tpl-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tpl-ready {
+  color: var(--secondary);
+}
+.tpl-partial {
+  color: var(--warning);
+}
+.tpl-none {
+  color: var(--gray-400);
+}
+
+.table-criteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.btn-sm {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 12px;
+}

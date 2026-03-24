@@ -6,14 +6,14 @@ import {
   RewardTransaction,
   RedemptionStatus,
   RedemptionStatusLabel,
-  RewardTypeLabel,
+  RewardTypeLabel
 } from '@core/models/domain.models';
 import {
   RewardCatalogueItemState,
   RewardTransactionState,
   TierStopState,
   TierProgressState,
-  DonorSearchResultState,
+  DonorSearchResultState
 } from './rewards.state';
 import { RedemptionStatusBadgeClass } from './rewards.enum';
 
@@ -26,7 +26,7 @@ export const mapRewardToCatalogueItem = (r: RewardDefinition, donorPoints: numbe
   pointsRequired: r.pointsRequired,
   isGiftable: !!r.isGiftable,
   canRedeem: donorPoints >= r.pointsRequired,
-  canGift: !!r.isGiftable && donorPoints >= r.pointsRequired,
+  canGift: !!r.isGiftable && donorPoints >= r.pointsRequired
 });
 
 export const mapTransactionToState = (txn: RewardTransaction): RewardTransactionState => ({
@@ -39,21 +39,17 @@ export const mapTransactionToState = (txn: RewardTransaction): RewardTransaction
   isGift: !!txn.isGift,
   giftedToName: txn.giftedToName,
   giftedFromName: txn.giftedFromName,
-  voucherCode: txn.voucherCode,
+  voucherCode: txn.voucherCode
 });
 
-export const mapTierToStop = (
-  t: LoyaltyTierConfig,
-  donorTier: DonorTier,
-  isLast: boolean
-): TierStopState => ({
+export const mapTierToStop = (t: LoyaltyTierConfig, donorTier: DonorTier, isLast: boolean): TierStopState => ({
   tier: t.tier,
   icon: t.icon,
   label: t.label,
   minDonations: t.minDonations,
   isCurrent: t.tier === donorTier,
   isAchieved: t.tier <= donorTier,
-  isLast,
+  isLast
 });
 
 export const mapTiersToProgress = (
@@ -69,7 +65,7 @@ export const mapTiersToProgress = (
     nextTierLabel: nextTier?.label ?? null,
     nextTierIcon: nextTier?.icon ?? null,
     donationsToNext: nextTier ? nextTier.minDonations - totalDonations : 0,
-    totalDonations,
+    totalDonations
   };
 };
 
@@ -78,5 +74,5 @@ export const mapDonorToSearchResult = (d: Donor): DonorSearchResultState => ({
   firstName: d.firstName,
   lastName: d.lastName,
   initials: `${d.firstName[0]}${d.lastName[0]}`,
-  phone: d.phone,
+  phone: d.phone
 });

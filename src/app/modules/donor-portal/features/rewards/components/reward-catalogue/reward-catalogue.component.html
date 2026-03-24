@@ -12,7 +12,10 @@
             <span class="rc-type-badge">{{ r.rewardTypeLabel }}</span>
             <div class="rc-header-meta">
               @if (r.isGiftable) {
-                <span class="rc-gift-badge"><app-icon name="gift" [size]="10"></app-icon> Giftable</span>
+                <span class="rc-gift-badge">
+                  <app-icon name="gift" [size]="10"></app-icon>
+                  Giftable
+                </span>
               }
               <span class="rc-value">${{ r.value | number }}</span>
             </div>
@@ -29,7 +32,8 @@
             <div class="rc-actions">
               @if (r.isGiftable) {
                 <button class="btn btn-secondary btn-sm" [disabled]="!r.canGift" (click)="giftClicked.emit(r)">
-                  <app-icon name="gift" [size]="13"></app-icon> Gift
+                  <app-icon name="gift" [size]="13"></app-icon>
+                  Gift
                 </button>
               }
               <button class="btn btn-primary btn-sm" [disabled]="!r.canRedeem" (click)="redeemClicked.emit(r)">

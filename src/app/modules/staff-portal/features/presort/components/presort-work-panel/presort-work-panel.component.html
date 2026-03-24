@@ -1,0 +1,184 @@
+@if (form().activeId) {
+  <div class="card anim-in">
+    <!-- Status pipeline -->
+    <div class="ps-pipeline">
+      <div class="pipe-step done">
+        <span class="pipe-num"><app-icon name="checkmark" [size]="11"></app-icon></span>
+        <span class="pipe-lbl">Received</span>
+      </div>
+      <div class="pipe-conn done"></div>
+      <div class="pipe-step active">
+        <span class="pipe-num">2</span>
+        <span class="pipe-lbl">In Presort</span>
+      </div>
+      <div class="pipe-conn"></div>
+      <div class="pipe-step">
+        <span class="pipe-num">3</span>
+        <span class="pipe-lbl">Presorted</span>
+      </div>
+      <div class="pipe-conn"></div>
+      <div class="pipe-step">
+        <span class="pipe-num">4</span>
+        <span class="pipe-lbl">Production</span>
+      </div>
+    </div>
+
+    <!-- Container header -->
+    <div class="ps-container-hdr">
+      <div class="ps-hdr-left">
+        <app-icon [name]="containerTypeIcon(form().containerType)" [size]="20" class="ps-hdr-icon"></app-icon>
+        <div>
+          <div class="ps-barcode">{{ activeQueueItem()?.barcode }}</div>
+          <div class="ps-donor-link">{{ activeQueueItem()?.donorVisitLabel }}</div>
+        </div>
+      </div>
+      <div class="ps-hdr-right">
+        <select
+          class="form-select ps-method-select"
+          [value]="form().presortMethod"
+          (change)="presortMethodChanged.emit($any($event.target).value)"
+        >
+          <option [value]="PM.Batch">Batch</option>
+          <option [value]="PM.DockSide">Dock-Side</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Category rows -->
+    <div class="items-section">
+      <div class="items-header">
+        <span class="form-label form-label--flush">Categories</span>
+        <span class="items-total">{{ totalItemCount() }} items</span>
+      </div>
+
+      @for (item of form().items; track item.categoryKey) {
+        <app-presort-item-row
+          [item]="item"
+          [showEcommerce]="form().ecommerce"
+          (adjusted)="itemAdjusted.emit({ categoryKey: item.categoryKey, delta: $event })"
+          (conditionChanged)="itemConditionChanged.emit({ categoryKey: item.categoryKey, condition: $event })"
+          (ecommerceQtyChanged)="itemEcommerceQtyChanged.emit({ categoryKey: item.categoryKey, qty: $event })"
+          (removed)="itemRemoved.emit(item.categoryKey)"
+        />
+      }
+
+      <!-- Salvage weight (conditional) -->
+      @if (hasSalvage()) {
+        <div class="salvage-weight-row">
+          <app-icon name="refresh" [size]="14" class="salvage-icon"></app-icon>
+          <span class="salvage-lbl">Salvage Weight</span>
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            class="form-input salvage-input"
+            placeholder="0.0"
+            [value]="form().salvageWeightLbs ?? ''"
+            (input)="salvageWeightChanged.emit($any($event.target).value)"
+          />
+          <span class="salvage-unit">lbs</span>
+          <span class="salvage-hint">{{ salvageCount() }} salvage items</span>
+        </div>
+      }
+
+      <div class="add-cat-row">
+        <select class="form-select add-cat-select" [(ngModel)]="addCatKey">
+          <option value="">+ Add Category...</option>
+          @for (cat of categories(); track cat.key) {
+            <option [value]="cat.key">{{ cat.icon }} {{ cat.name }}</option>
+          }
+        </select>
+        <button class="btn btn-secondary" [disabled]="!addCatKey" (click)="onAddCategory()">Add</button>
+      </div>
+    </div>
+
+    <!-- Route -->
+    <div class="route-section">
+      <label class="form-label">Route Container To</label>
+      <div class="route-opts">
+        @for (opt of routeOptions; track opt.value) {
+          <button
+            class="route-btn"
+            [class.active]="form().destination === opt.value"
+            (click)="destChanged.emit(opt.value)"
+          >
+            <app-icon [name]="opt.icon" [size]="14"></app-icon>
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Flags -->
+    <div class="flags-section">
+      <div class="flag-item">
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            [checked]="form().isSeasonal"
+            (change)="seasonalChanged.emit($any($event.target).checked)"
+          />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+        <span class="flag-label">Hold for Season</span>
+        @if (form().isSeasonal) {
+          <select
+            class="form-select flag-select"
+            [value]="form().seasonalTag"
+            (change)="seasonalTagChanged.emit($any($event.target).value)"
+          >
+            @for (tag of seasonalTags; track tag) {
+              <option [value]="tag">{{ tag }}</option>
+            }
+          </select>
+        }
+      </div>
+      <div class="flag-item">
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            [checked]="form().ecommerce"
+            (change)="ecommerceChanged.emit($any($event.target).checked)"
+          />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+        <span class="flag-label">E-Commerce Cherry-Pick</span>
+        @if (form().ecommerce) {
+          <span class="flag-hint">Set per-category qty in items above</span>
+        }
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea
+        class="form-input form-textarea"
+        [value]="form().notes"
+        (input)="notesChanged.emit($any($event.target).value)"
+        placeholder="Quality observations, special handling..."
+      ></textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="ps-actions">
+      @if (form().items.length >= 2) {
+        <button class="btn btn-secondary" (click)="splitClicked.emit()">
+          <app-icon name="layers" [size]="15"></app-icon>
+          Split ({{ form().items.length }})
+        </button>
+      }
+      <button class="btn btn-success ps-actions__complete" (click)="completeClicked.emit()">
+        <app-icon name="check-circle" [size]="16"></app-icon>
+        Complete &amp; Label
+      </button>
+      <button class="btn btn-secondary" (click)="cancelClicked.emit()">Cancel</button>
+    </div>
+  </div>
+} @else {
+  <div class="empty-state">
+    <div class="empty-state-icon"><app-icon name="list" [size]="36"></app-icon></div>
+    <div class="empty-state-title">Select a container from the queue</div>
+    <div class="empty-state-text">Click any item on the left to begin presorting</div>
+  </div>
+}

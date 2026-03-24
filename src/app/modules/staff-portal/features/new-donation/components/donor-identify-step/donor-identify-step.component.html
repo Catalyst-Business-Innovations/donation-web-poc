@@ -1,0 +1,164 @@
+<div class="page-content anim-in">
+  <div class="id-grid">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Donor Identification</div>
+          <div class="card-subtitle">Scan QR, search by phone / name, or continue anonymously</div>
+        </div>
+      </div>
+      <div class="quick-grid">
+        <button class="quick-btn qr-btn" (click)="onScanQR()">
+          <app-icon name="scan" [size]="24"></app-icon>
+          <span>Scan QR</span>
+        </button>
+        <button class="quick-btn anon-btn" (click)="onAnonymous()">
+          <app-icon name="user" [size]="24"></app-icon>
+          <span>Anonymous</span>
+        </button>
+        <button class="quick-btn add-donor-btn" (click)="onOpenEnroll()">
+          <app-icon name="plus" [size]="24"></app-icon>
+          <span>Add Donor</span>
+        </button>
+      </div>
+      <div class="id-divider">or search</div>
+      <div class="search-bar search-bar--mb-8">
+        <span class="search-icon"><app-icon name="search" size="14" /></span>
+        <input [ngModel]="searchQ()" (ngModelChange)="onSearchChange($event)" placeholder="Name or phone number..." />
+      </div>
+      @for (d of searchResults(); track d.id) {
+        <div class="donor-result" (click)="onSelectDonor(d)">
+          <div class="d-av">{{ d.initials }}</div>
+          <div class="dr-info">
+            <div class="dr-name">{{ d.displayName }}</div>
+            <div class="dr-meta">
+              <app-icon [name]="getTierCfg(d.tier).icon" [size]="12"></app-icon>
+              {{ getTierCfg(d.tier).label }} · {{ d.points | number }} pts
+            </div>
+            @if (d.phone) {
+              <div class="dr-meta">{{ d.phone }}</div>
+            }
+          </div>
+          <span class="badge badge-gray">{{ d.totalDonations }} visits</span>
+        </div>
+      }
+      @if (searchQ().length > 1 && searchResults().length === 0) {
+        <div class="no-results">
+          <div>No donors found</div>
+          <button class="btn btn-primary btn-enroll-cta" (click)="onOpenEnroll()">+ Enroll New Donor</button>
+        </div>
+      }
+    </div>
+
+    <!-- Quick Donation -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Quick Donation</div>
+          <div class="card-subtitle">Skip identification — donor recorded as anonymous</div>
+        </div>
+      </div>
+      <div class="quick-grid">
+        <button class="quick-btn quick-items-btn" (click)="onQuickDonate(DT.Items)">
+          <app-icon name="package" [size]="26"></app-icon>
+          <span>Donate Items</span>
+        </button>
+        <button class="quick-btn quick-money-btn" (click)="onQuickDonate(DT.Monetary)">
+          <app-icon name="dollar" [size]="26"></app-icon>
+          <span>Donate Money</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scheduled Donation Lookup -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Search Scheduled Donation</div>
+          <div class="card-subtitle">Enter Reference # or scan QR</div>
+        </div>
+      </div>
+      <div class="appt-lookup-row">
+        <input
+          class="form-input"
+          [(ngModel)]="sdQ"
+          placeholder="Reference #, donor name or phone..."
+          (keyup.enter)="onScheduledLookup()"
+        />
+        <button class="btn btn-primary" (click)="onScheduledLookup()">Search</button>
+        <button class="btn btn-secondary" (click)="onScheduledScanQR()">
+          <app-icon name="scan" [size]="14"></app-icon>
+          Scan QR
+        </button>
+      </div>
+
+      @for (appt of sdResults(); track appt.id) {
+        <div class="appt-result">
+          <div class="appt-res-body">
+            <div class="appt-res-id">{{ appt.referenceNumber }}</div>
+            <div class="appt-res-name">{{ appt.donorName }}</div>
+            <div class="appt-res-meta">
+              <app-icon name="map-pin" [size]="11"></app-icon>
+              {{ appt.locationName }}
+              &nbsp;·&nbsp;
+              <app-icon name="calendar" [size]="11"></app-icon>
+              {{ appt.date | date: 'MMM d' }} @ {{ appt.timeSlot }} &nbsp;·&nbsp; {{ appt.itemCount }} items
+            </div>
+            <div class="appt-res-cats">
+              @for (c of appt.categories ?? []; track c) {
+                <span class="badge badge-gray">{{ c }}</span>
+              }
+            </div>
+          </div>
+          <div class="appt-res-actions">
+            <span class="badge {{ sdStatusBadge(appt.status) }}">{{ sdStatusLabel(appt.status) }}</span>
+            @if (appt.status === AS.Scheduled) {
+              <button class="btn btn-success" (click)="onScheduledLoad(appt)">Load &amp; Continue</button>
+            } @else {
+              <span class="appt-res-warn">Cannot load — scheduled donation is {{ sdStatusLabel(appt.status) }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (sdNotFound()) {
+        <div class="appt-not-found">
+          <app-icon name="alert-circle" [size]="14"></app-icon>
+          No scheduled donations found for "{{ sdQ }}"
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Enroll form -->
+  @if (showEnroll()) {
+    <div class="card enroll-card">
+      <div class="card-header">
+        <div class="card-title">Enroll New Donor</div>
+        <div class="card-subtitle">Name + phone or email required</div>
+      </div>
+      <div class="enroll-grid">
+        <div class="form-group">
+          <label class="form-label">First Name *</label>
+          <input class="form-input" [(ngModel)]="enrollForm.firstName" placeholder="First name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name *</label>
+          <input class="form-input" [(ngModel)]="enrollForm.lastName" placeholder="Last name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone *</label>
+          <input class="form-input" [(ngModel)]="enrollForm.phone" placeholder="(555) 000-0000" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" [(ngModel)]="enrollForm.email" placeholder="optional" />
+        </div>
+      </div>
+      <div class="enroll-actions">
+        <button class="btn btn-secondary" (click)="showEnroll.set(false)">Cancel</button>
+        <button class="btn btn-primary" (click)="onEnroll()">Enroll & Continue</button>
+      </div>
+    </div>
+  }
+</div>

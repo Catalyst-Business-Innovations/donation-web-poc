@@ -1,0 +1,44 @@
+<app-modal
+  [open]="!!donation()"
+  title="Link Donation to Donor Account"
+  confirmLabel="Confirm Link"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  [confirmDisabled]="selectedDonorId == null"
+  (closed)="onClose()"
+  (confirmed)="onConfirm()"
+>
+  <div class="link-modal-body">
+    @if (donation(); as d) {
+      <p class="link-modal-desc">
+        Linking
+        <strong>{{ d.referenceNumber }}</strong>
+        — {{ d.totalItems }} items on {{ d.timestamp | date: 'MMM d, yyyy' }}.
+      </p>
+      <p class="link-modal-note">Loyalty points will be recalculated and awarded on confirmation.</p>
+    }
+    <div class="search-bar search-bar--mb">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        placeholder="Search donor name or phone…"
+      />
+    </div>
+    @for (d of searchResults(); track d.id) {
+      <div class="donor-result" [class.selected]="selectedDonorId === d.id" (click)="selectDonor(d.id)">
+        <div class="d-av">{{ d.initials }}</div>
+        <div class="dr-info">
+          <div class="dr-name">{{ d.firstName }} {{ d.lastName }}</div>
+          <div class="dr-meta">{{ d.phone }} · {{ d.loyaltyPoints | number }} pts</div>
+        </div>
+        @if (selectedDonorId === d.id) {
+          <span class="badge badge-success">Selected</span>
+        }
+      </div>
+    }
+    @if (searchQuery().length > 1 && searchResults().length === 0) {
+      <div class="link-modal-empty">No donors found for "{{ searchQuery() }}"</div>
+    }
+  </div>
+</app-modal>

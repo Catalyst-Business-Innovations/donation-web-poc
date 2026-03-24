@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.donors-topbar {
+  .topbar-actions {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+}

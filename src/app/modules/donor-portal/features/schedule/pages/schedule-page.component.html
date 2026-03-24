@@ -36,10 +36,7 @@
   </div>
 </div>
 
-<app-visit-detail-modal
-  [visit]="selectedVisit()"
-  (closed)="onCloseVisitDetail()"
-/>
+<app-visit-detail-modal [visit]="selectedVisit()" (closed)="onCloseVisitDetail()" />
 
 <app-schedule-confirmation-modal
   [open]="showConfirmation()"

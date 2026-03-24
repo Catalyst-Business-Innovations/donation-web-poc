@@ -1,0 +1,38 @@
+<div class="topbar donors-topbar">
+  <div>
+    <div class="topbar-title">Donors</div>
+    <div class="topbar-subtitle">{{ totalDonorCount() | number }} registered donors</div>
+  </div>
+  <div class="topbar-actions">
+    <app-donor-search-bar
+      [(query)]="query"
+      [(tierFilter)]="tierFilter"
+      (exportRequested)="onExportRequested()"
+      (addRequested)="onAddRequested()"
+    />
+  </div>
+</div>
+
+<div class="page-content">
+  <app-donor-table
+    [donors]="filteredDonors()"
+    [totalCount]="totalDonorCount()"
+    (viewRequested)="onViewRequested($event)"
+    (editRequested)="onEditRequested($event)"
+  />
+</div>
+
+<app-donor-detail-modal
+  [donor]="selectedDonorDetail()"
+  [open]="mode() === 'view'"
+  (closed)="onModalClosed()"
+  (editRequested)="onEditFromDetail()"
+/>
+
+<app-donor-form-modal
+  [form]="mode() === 'add' ? { firstName: '', lastName: '', email: '', phone: '', address: '' } : selectedDonorForm()"
+  [mode]="mode() === 'edit' ? 'edit' : 'add'"
+  [open]="mode() === 'add' || mode() === 'edit'"
+  (closed)="onModalClosed()"
+  (confirmed)="onFormConfirmed($event)"
+/>

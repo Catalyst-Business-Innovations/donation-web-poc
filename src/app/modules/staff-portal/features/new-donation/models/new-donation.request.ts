@@ -1,4 +1,4 @@
-import { PaymentMethod, ReceiptDelivery } from '../../../../../core/models/domain.models';
+import { PaymentMethod, ReceiptDelivery } from '@core/models/domain.models';
 
 export interface DonationItemRequest {
   categoryKey: string;

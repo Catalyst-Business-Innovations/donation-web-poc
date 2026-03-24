@@ -1,0 +1,14 @@
+<div class="tab-bar">
+  <button class="tab-btn" [class.active]="activeTab() === 'general'" (click)="tabChanged.emit('general')">
+    <app-icon name="settings" [size]="16"></app-icon>
+    General
+  </button>
+  <button class="tab-btn" [class.active]="activeTab() === 'loyalty'" (click)="tabChanged.emit('loyalty')">
+    <app-icon name="award" [size]="16"></app-icon>
+    Loyalty Tiers
+  </button>
+  <button class="tab-btn" [class.active]="activeTab() === 'rewards'" (click)="tabChanged.emit('rewards')">
+    <app-icon name="gift" [size]="16"></app-icon>
+    Rewards
+  </button>
+</div>

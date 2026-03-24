@@ -12,7 +12,7 @@ import { ReceiptDetailState } from '../models/receipts.state';
   imports: [IconComponent, ReceiptsTableComponent, ReceiptDetailModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './receipts-page.component.html',
-  styleUrl: './receipts-page.component.scss',
+  styleUrl: './receipts-page.component.scss'
 })
 export class ReceiptsPageComponent {
   private readonly receiptsService = inject(ReceiptsService);

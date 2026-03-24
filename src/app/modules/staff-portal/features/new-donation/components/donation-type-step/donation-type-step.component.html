@@ -1,0 +1,26 @@
+<div class="page-content anim-in">
+  <div class="dtype-host">
+    @if (donor()) {
+      <div class="dtype-heading">What would {{ donor()!.displayName }} like to do today?</div>
+    } @else {
+      <div class="dtype-heading">How would you like to donate today?</div>
+    }
+    <div class="dtype-grid">
+      <button class="dtype-card" [class.active]="donationType() === DT.Items" (click)="onSelectType(DT.Items)">
+        <div class="dtype-icon"><app-icon name="package" [size]="36"></app-icon></div>
+        <div class="dtype-title">Donate Items</div>
+        <div class="dtype-desc">Clothing, electronics, furniture and more</div>
+      </button>
+      <button class="dtype-card" [class.active]="donationType() === DT.Monetary" (click)="onSelectType(DT.Monetary)">
+        <div class="dtype-icon"><app-icon name="dollar" [size]="36"></app-icon></div>
+        <div class="dtype-title">Monetary Donation</div>
+        <div class="dtype-desc">Cash, credit card, or tap-to-pay</div>
+      </button>
+      <button class="dtype-card" [class.active]="donationType() === DT.Both" (click)="onSelectType(DT.Both)">
+        <div class="dtype-icon"><app-icon name="gift" [size]="36"></app-icon></div>
+        <div class="dtype-title">Items &amp; Monetary</div>
+        <div class="dtype-desc">Donate goods and make a payment together</div>
+      </button>
+    </div>
+  </div>
+</div>

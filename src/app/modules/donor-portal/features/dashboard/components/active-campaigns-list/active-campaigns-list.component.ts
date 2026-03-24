@@ -9,7 +9,7 @@ import { CampaignSummaryState } from '../../models/dashboard.state';
   imports: [DatePipe, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './active-campaigns-list.component.html',
-  styleUrl: './active-campaigns-list.component.scss',
+  styleUrl: './active-campaigns-list.component.scss'
 })
 export class ActiveCampaignsListComponent {
   campaigns = input.required<CampaignSummaryState[]>();

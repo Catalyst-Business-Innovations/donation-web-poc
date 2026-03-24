@@ -10,7 +10,7 @@ import { RewardCatalogueItemState } from '../../models/rewards.state';
   imports: [DecimalPipe, IconComponent, ModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './redeem-modal.component.html',
-  styleUrl: './redeem-modal.component.scss',
+  styleUrl: './redeem-modal.component.scss'
 })
 export class RedeemModalComponent {
   reward = input.required<RewardCatalogueItemState | null>();

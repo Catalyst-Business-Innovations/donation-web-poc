@@ -1,0 +1,13 @@
+<div class="chart-card">
+  <div class="chart-title">Donation Volume — Last 12 Months</div>
+  <div class="chart-sub">Items processed per month</div>
+  <div class="bar-chart">
+    @for (t of trends(); track t.label) {
+      <div class="bar-col">
+        <div class="bar-val">{{ t.count }}</div>
+        <div class="bar" [class.hi]="$last" [style.--bar-h]="barHeight(t.count)"></div>
+        <div class="bar-lbl">{{ t.label }}</div>
+      </div>
+    }
+  </div>
+</div>

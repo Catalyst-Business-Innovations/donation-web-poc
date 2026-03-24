@@ -1,0 +1,95 @@
+<!-- Header -->
+<div class="wiz-header">
+  <div class="wiz-header-left">
+    <div class="wiz-header-title-group">
+      <span class="intent-badge {{ intentBadgeClass }}">{{ intentBadgeLabel }}</span>
+      <div class="wiz-header-title">{{ wizardTitle() }}</div>
+    </div>
+  </div>
+  <!-- Stepper -->
+  <div class="wiz-stepper">
+    @for (step of wizardSteps(); track step.num; let i = $index) {
+      <button
+        class="wiz-step-btn"
+        [class.active]="currentStep() === step.num"
+        [class.done]="visibleStepNums().indexOf(step.num) < currentStepIndex()"
+        [class.disabled]="isViewMode() ? false : visibleStepNums().indexOf(step.num) > currentStepIndex()"
+        (click)="stepClicked.emit(step.num)"
+      >
+        <span class="wiz-step-num">
+          @if (visibleStepNums().indexOf(step.num) < currentStepIndex()) {
+            <app-icon name="checkmark" size="12" />
+          } @else {
+            {{ visibleStepNums().indexOf(step.num) + 1 }}
+          }
+        </span>
+        <span class="wiz-step-label">{{ step.label }}</span>
+      </button>
+      @if (!$last) {
+        <div class="wiz-step-connector" [class.done]="visibleStepNums().indexOf(step.num) < currentStepIndex()"></div>
+      }
+    }
+  </div>
+  <div class="wiz-header-right">
+    <button class="btn btn-ghost" (click)="closeClicked.emit()" title="Exit wizard">
+      <app-icon name="close" size="16" />
+    </button>
+  </div>
+</div>
+
+<!-- View mode banner -->
+@if (isViewMode()) {
+  <div class="view-mode-banner">
+    <app-icon name="eye" size="14" />
+    <span>You are viewing this campaign in read-only mode.</span>
+    <button class="btn btn-ghost btn-sm" (click)="switchToEditClicked.emit()">
+      <app-icon name="edit" size="12" />
+      Switch to Edit
+    </button>
+  </div>
+}
+
+<!-- Step Content -->
+<div class="wiz-body">
+  <ng-content></ng-content>
+</div>
+
+<!-- Footer -->
+<div class="wiz-footer">
+  <div class="wiz-footer-left">
+    @if (!isFirstStep()) {
+      <button class="btn btn-secondary" (click)="prevClicked.emit()">
+        <app-icon name="arrow-left" size="14" />
+        Back
+      </button>
+    }
+  </div>
+  <div class="wiz-footer-right">
+    @if (isViewMode()) {
+      @if (!isLastStep()) {
+        <button class="btn btn-primary" (click)="nextClicked.emit()">
+          Next
+          <app-icon name="arrow-right" size="14" />
+        </button>
+      } @else {
+        <button class="btn btn-secondary" (click)="closeClicked.emit()">Close</button>
+      }
+    } @else {
+      @if (!isLastStep()) {
+        <button
+          class="btn btn-primary"
+          (click)="nextClicked.emit()"
+          [disabled]="currentStep() === 1 && !canProceedStep1()"
+        >
+          Next
+          <app-icon name="arrow-right" size="14" />
+        </button>
+      } @else {
+        <button class="btn btn-primary btn-save" (click)="saveClicked.emit()" [disabled]="!canProceedStep1()">
+          <app-icon name="check-circle" size="14" />
+          {{ saveButtonLabel }}
+        </button>
+      }
+    }
+  </div>
+</div>

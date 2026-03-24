@@ -31,10 +31,10 @@ import {
   CampaignNotification,
   NotificationChannel,
   NotificationTemplate,
-  DonorTierLabel,
+  DonorTierLabel
 } from '../models/domain.models';
 import { StorageService } from './storage.service';
-import { PresortQueueItem } from '../../modules/staff-portal/features/presort/models/presort.models';
+import { PresortQueueResponse } from '../../modules/staff-portal/features/presort/models/presort.response';
 
 @Injectable({ providedIn: 'root' })
 export class MockDataService {
@@ -59,8 +59,8 @@ export class MockDataService {
     emailReqs: {
       forReceipt: false,
       forLogin: false,
-      forCampaigns: true,
-    },
+      forCampaigns: true
+    }
   });
 
   updateAppConfig(patch: Partial<AppConfig>): void {
@@ -69,48 +69,138 @@ export class MockDataService {
 
   // ── Phase 1: Reward definitions seed data (Req 5) ─────────────────────────
   private _rewardDefs = signal<RewardDefinition[]>([
-    { id: 1, referenceNumber: 'RD-001', name: '$5 Discount',    description: 'Redeemable at POS',   pointsRequired: 100,  rewardType: RewardType.Discount,  value: 5,   isActive: true,  isGiftable: true,  totalRedemptions: 12, createdAt: new Date('2026-01-15') },
-    { id: 2, referenceNumber: 'RD-002', name: '$10 Discount',   description: 'Redeemable at POS',   pointsRequired: 200,  rewardType: RewardType.Discount,  value: 10,  isActive: true,  isGiftable: true,  totalRedemptions: 8,  createdAt: new Date('2026-01-15') },
-    { id: 3, referenceNumber: 'RD-003', name: '$25 Voucher',    description: 'Store credit voucher', pointsRequired: 450,  rewardType: RewardType.Voucher,   value: 25,  isActive: true,  isGiftable: true,  totalRedemptions: 3,  totalRedemptionLimit: 50, createdAt: new Date('2026-02-01') },
-    { id: 4, referenceNumber: 'RD-004', name: '$10 Cashback',   description: 'Direct cashback',      pointsRequired: 250,  rewardType: RewardType.Cashback,  value: 10,  isActive: true,  isGiftable: false, totalRedemptions: 5,  maxRedemptionsPerUser: 3, createdAt: new Date('2026-02-10') },
-    { id: 5, referenceNumber: 'RD-005', name: 'Gift Basket',    description: 'Curated gift basket',  pointsRequired: 900,  rewardType: RewardType.Gift,      value: 50,  isActive: true,  isGiftable: true,  totalRedemptions: 1,  createdAt: new Date('2026-03-01') },
+    {
+      id: 1,
+      referenceNumber: 'RD-001',
+      name: '$5 Discount',
+      description: 'Redeemable at POS',
+      pointsRequired: 100,
+      rewardType: RewardType.Discount,
+      value: 5,
+      isActive: true,
+      isGiftable: true,
+      totalRedemptions: 12,
+      createdAt: new Date('2026-01-15')
+    },
+    {
+      id: 2,
+      referenceNumber: 'RD-002',
+      name: '$10 Discount',
+      description: 'Redeemable at POS',
+      pointsRequired: 200,
+      rewardType: RewardType.Discount,
+      value: 10,
+      isActive: true,
+      isGiftable: true,
+      totalRedemptions: 8,
+      createdAt: new Date('2026-01-15')
+    },
+    {
+      id: 3,
+      referenceNumber: 'RD-003',
+      name: '$25 Voucher',
+      description: 'Store credit voucher',
+      pointsRequired: 450,
+      rewardType: RewardType.Voucher,
+      value: 25,
+      isActive: true,
+      isGiftable: true,
+      totalRedemptions: 3,
+      totalRedemptionLimit: 50,
+      createdAt: new Date('2026-02-01')
+    },
+    {
+      id: 4,
+      referenceNumber: 'RD-004',
+      name: '$10 Cashback',
+      description: 'Direct cashback',
+      pointsRequired: 250,
+      rewardType: RewardType.Cashback,
+      value: 10,
+      isActive: true,
+      isGiftable: false,
+      totalRedemptions: 5,
+      maxRedemptionsPerUser: 3,
+      createdAt: new Date('2026-02-10')
+    },
+    {
+      id: 5,
+      referenceNumber: 'RD-005',
+      name: 'Gift Basket',
+      description: 'Curated gift basket',
+      pointsRequired: 900,
+      rewardType: RewardType.Gift,
+      value: 50,
+      isActive: true,
+      isGiftable: true,
+      totalRedemptions: 1,
+      createdAt: new Date('2026-03-01')
+    }
   ]);
   readonly rewardDefinitions = this._rewardDefs.asReadonly();
 
   // ── Phase 1: Reward transactions seed data (Req 5, 7) ─────────────────────
   private _rewardTxns = signal<RewardTransaction[]>([
     {
-      id: 1, referenceNumber: 'RTX-001', donorId: 1, donorName: 'Michael Johnson',
-      rewardId: 1, rewardName: '$5 Discount', rewardType: RewardType.Discount, rewardValue: 5,
-      pointsUsed: 100, status: RedemptionStatus.Fulfilled,
-      createdAt: new Date('2026-03-10'), approvedAt: new Date('2026-03-10'), fulfilledAt: new Date('2026-03-10'),
+      id: 1,
+      referenceNumber: 'RTX-001',
+      donorId: 1,
+      donorName: 'Michael Johnson',
+      rewardId: 1,
+      rewardName: '$5 Discount',
+      rewardType: RewardType.Discount,
+      rewardValue: 5,
+      pointsUsed: 100,
+      status: RedemptionStatus.Fulfilled,
+      createdAt: new Date('2026-03-10'),
+      approvedAt: new Date('2026-03-10'),
+      fulfilledAt: new Date('2026-03-10')
     },
     {
-      id: 2, referenceNumber: 'RTX-002', donorId: 2, donorName: 'Sarah Williams',
-      rewardId: 3, rewardName: '$25 Voucher', rewardType: RewardType.Voucher, rewardValue: 25,
-      pointsUsed: 450, status: RedemptionStatus.Approved, voucherCode: 'VCH-2026-A1B2',
-      createdAt: new Date('2026-03-12'), approvedAt: new Date('2026-03-12'),
+      id: 2,
+      referenceNumber: 'RTX-002',
+      donorId: 2,
+      donorName: 'Sarah Williams',
+      rewardId: 3,
+      rewardName: '$25 Voucher',
+      rewardType: RewardType.Voucher,
+      rewardValue: 25,
+      pointsUsed: 450,
+      status: RedemptionStatus.Approved,
+      voucherCode: 'VCH-2026-A1B2',
+      createdAt: new Date('2026-03-12'),
+      approvedAt: new Date('2026-03-12')
     },
     {
-      id: 3, referenceNumber: 'RTX-003', donorId: 1, donorName: 'Michael Johnson',
-      rewardId: 2, rewardName: '$10 Discount', rewardType: RewardType.Discount, rewardValue: 10,
-      pointsUsed: 200, status: RedemptionStatus.Pending,
-      createdAt: new Date('2026-03-15'),
-    },
+      id: 3,
+      referenceNumber: 'RTX-003',
+      donorId: 1,
+      donorName: 'Michael Johnson',
+      rewardId: 2,
+      rewardName: '$10 Discount',
+      rewardType: RewardType.Discount,
+      rewardValue: 10,
+      pointsUsed: 200,
+      status: RedemptionStatus.Pending,
+      createdAt: new Date('2026-03-15')
+    }
   ]);
   readonly rewardTransactions = this._rewardTxns.asReadonly();
 
   // ── Phase 1: Campaign seed data (Req 6) ───────────────────────────────────
   private _campaigns = signal<Campaign[]>([
     {
-      id: 1, referenceNumber: 'CMP-001',
+      id: 1,
+      referenceNumber: 'CMP-001',
       name: 'Winter Jacket Drive',
       description: 'Reach donors who have given winter clothing in the past',
       startDate: new Date('2026-04-01'),
       endDate: new Date('2026-04-30'),
       status: CampaignStatus.Draft,
       channel: NotificationChannel.Email,
-      targetCriteria: [{ categoryKey: 'clothing', categoryName: 'Clothing', subCategoryKey: 'womens', subCategoryName: "Women's" }],
+      targetCriteria: [
+        { categoryKey: 'clothing', categoryName: 'Clothing', subCategoryKey: 'womens', subCategoryName: "Women's" }
+      ],
       notificationHistory: [],
       emailTemplate: {
         channel: NotificationChannel.Email,
@@ -118,20 +208,50 @@ export class MockDataService {
         body: `<p>Hi <strong>{{donor_name}}</strong>,</p>\n<p>As a valued <strong>{{tier}}</strong> member of {{org_name}}, we\'re reaching out to let you know our Winter Jacket Drive is starting soon.</p>\n<p>Your previous clothing donations have made a real difference. We\'d love your help again this year — every jacket counts!</p>\n<p>You currently have <strong>{{points}} points</strong> in your loyalty account. Donate during this campaign to earn bonus points.</p>\n<p>Thank you for your generosity,<br>The {{org_name}} Team</p>`,
         blocks: [
           { id: 's1', type: 'header' as const, content: 'Winter Jacket Drive', align: 'center' as const, level: 1 },
-          { id: 's2', type: 'text' as const, content: 'Hi {{donor_name}},\n\nAs a valued {{tier}} member of {{org_name}}, we\'re reaching out to let you know our Winter Jacket Drive is starting soon.', align: 'left' as const },
-          { id: 's3', type: 'text' as const, content: 'Your previous clothing donations have made a real difference. We\'d love your help again this year — every jacket counts!', align: 'left' as const },
-          { id: 's4', type: 'text' as const, content: 'You currently have {{points}} points in your loyalty account. Donate during this campaign to earn bonus points.', align: 'left' as const },
-          { id: 's5', type: 'button' as const, content: 'Learn More', align: 'center' as const, meta: 'https://example.org/jackets' },
+          {
+            id: 's2',
+            type: 'text' as const,
+            content:
+              "Hi {{donor_name}},\n\nAs a valued {{tier}} member of {{org_name}}, we're reaching out to let you know our Winter Jacket Drive is starting soon.",
+            align: 'left' as const
+          },
+          {
+            id: 's3',
+            type: 'text' as const,
+            content:
+              "Your previous clothing donations have made a real difference. We'd love your help again this year — every jacket counts!",
+            align: 'left' as const
+          },
+          {
+            id: 's4',
+            type: 'text' as const,
+            content:
+              'You currently have {{points}} points in your loyalty account. Donate during this campaign to earn bonus points.',
+            align: 'left' as const
+          },
+          {
+            id: 's5',
+            type: 'button' as const,
+            content: 'Learn More',
+            align: 'center' as const,
+            meta: 'https://example.org/jackets'
+          },
           { id: 's6', type: 'divider' as const, content: '', align: 'center' as const },
-          { id: 's7', type: 'text' as const, content: 'Thank you for your generosity,\nThe {{org_name}} Team', align: 'left' as const },
+          {
+            id: 's7',
+            type: 'text' as const,
+            content: 'Thank you for your generosity,\nThe {{org_name}} Team',
+            align: 'left' as const
+          }
         ],
-        updatedAt: new Date('2026-03-18'),
+        updatedAt: new Date('2026-03-18')
       },
       createdAt: new Date('2026-03-18'),
-      createdByStaffId: 1,
+      createdByStaffId: 1
     },
     {
-      id: 2, referenceNumber: 'CMP-002',
+      id: 2,
+      referenceNumber: 'CMP-002',
       name: 'Electronics Recycling Push',
       description: 'Encourage electronics donors to donate again',
       startDate: new Date('2026-03-20'),
@@ -140,32 +260,73 @@ export class MockDataService {
       channel: NotificationChannel.Both,
       targetCriteria: [{ categoryKey: 'electronics', categoryName: 'Electronics' }],
       notificationHistory: [
-        { donorId: 5, donorName: 'David Chen',       channel: NotificationChannel.Email, sentAt: new Date('2026-03-20'), success: true },
-        { donorId: 10, donorName: 'Lisa Anderson',    channel: NotificationChannel.SMS,   sentAt: new Date('2026-03-20'), success: true },
+        {
+          donorId: 5,
+          donorName: 'David Chen',
+          channel: NotificationChannel.Email,
+          sentAt: new Date('2026-03-20'),
+          success: true
+        },
+        {
+          donorId: 10,
+          donorName: 'Lisa Anderson',
+          channel: NotificationChannel.SMS,
+          sentAt: new Date('2026-03-20'),
+          success: true
+        }
       ],
       emailTemplate: {
         channel: NotificationChannel.Email,
-        subject: 'Got Old Electronics? We\'ll Take Them, {{first_name}}!',
+        subject: "Got Old Electronics? We'll Take Them, {{first_name}}!",
         body: `<p>Hi <strong>{{donor_name}}</strong>,</p>\n<p>{{org_name}} is running an Electronics Recycling Push and we thought of you!</p>\n<p>Whether it\'s old phones, laptops, or cables — we\'ll make sure they\'re recycled responsibly.</p>\n<p>Drop off anytime before March 31. As a <strong>{{tier}}</strong> donor with <strong>{{points}} points</strong>, you\'re making a big impact.</p>\n<p>See you soon!<br>{{org_name}}</p>`,
         blocks: [
-          { id: 'e1', type: 'header' as const, content: 'Electronics Recycling Push', align: 'center' as const, level: 1 },
-          { id: 'e2', type: 'text' as const, content: 'Hi {{donor_name}},\n\n{{org_name}} is running an Electronics Recycling Push and we thought of you!', align: 'left' as const },
-          { id: 'e3', type: 'text' as const, content: 'Whether it\'s old phones, laptops, or cables — we\'ll make sure they\'re recycled responsibly.', align: 'left' as const },
-          { id: 'e4', type: 'text' as const, content: 'Drop off anytime before March 31. As a {{tier}} donor with {{points}} points, you\'re making a big impact.', align: 'left' as const },
-          { id: 'e5', type: 'button' as const, content: 'Find a Drop-off', align: 'center' as const, meta: 'https://example.org/recycle' },
-          { id: 'e6', type: 'text' as const, content: 'See you soon!\n{{org_name}}', align: 'left' as const },
+          {
+            id: 'e1',
+            type: 'header' as const,
+            content: 'Electronics Recycling Push',
+            align: 'center' as const,
+            level: 1
+          },
+          {
+            id: 'e2',
+            type: 'text' as const,
+            content:
+              'Hi {{donor_name}},\n\n{{org_name}} is running an Electronics Recycling Push and we thought of you!',
+            align: 'left' as const
+          },
+          {
+            id: 'e3',
+            type: 'text' as const,
+            content: "Whether it's old phones, laptops, or cables — we'll make sure they're recycled responsibly.",
+            align: 'left' as const
+          },
+          {
+            id: 'e4',
+            type: 'text' as const,
+            content:
+              "Drop off anytime before March 31. As a {{tier}} donor with {{points}} points, you're making a big impact.",
+            align: 'left' as const
+          },
+          {
+            id: 'e5',
+            type: 'button' as const,
+            content: 'Find a Drop-off',
+            align: 'center' as const,
+            meta: 'https://example.org/recycle'
+          },
+          { id: 'e6', type: 'text' as const, content: 'See you soon!\n{{org_name}}', align: 'left' as const }
         ],
-        updatedAt: new Date('2026-03-15'),
+        updatedAt: new Date('2026-03-15')
       },
       smsTemplate: {
         channel: NotificationChannel.SMS,
         subject: '',
         body: `Hi {{first_name}}! {{org_name}} is collecting electronics thru Mar 31. Drop off old devices & earn bonus points! You have {{points}} pts as a {{tier}} member. Details: example.org/recycle`,
-        updatedAt: new Date('2026-03-15'),
+        updatedAt: new Date('2026-03-15')
       },
       createdAt: new Date('2026-03-15'),
-      createdByStaffId: 1,
-    },
+      createdByStaffId: 1
+    }
   ]);
   readonly campaigns = this._campaigns.asReadonly();
 
@@ -346,15 +507,17 @@ export class MockDataService {
       sortOrder: 1,
       categories: [
         {
-          key: 'clothing', name: 'Clothing', estimatedValue: 12,
+          key: 'clothing',
+          name: 'Clothing',
+          estimatedValue: 12,
           subCategories: [
-            { key: 'womens',    name: "Women's",    icon: '👗', estimatedValue: 12 },
-            { key: 'mens',      name: "Men's",      icon: '👔', estimatedValue: 12 },
-            { key: 'childrens', name: "Children's", icon: '🧒', estimatedValue: 8  }
+            { key: 'womens', name: "Women's", icon: '👗', estimatedValue: 12 },
+            { key: 'mens', name: "Men's", icon: '👔', estimatedValue: 12 },
+            { key: 'childrens', name: "Children's", icon: '🧒', estimatedValue: 8 }
           ]
         },
-        { key: 'shoes',       name: 'Shoes',               estimatedValue: 15 },
-        { key: 'accessories', name: 'Accessories/Jewelry',  estimatedValue: 20 }
+        { key: 'shoes', name: 'Shoes', estimatedValue: 15 },
+        { key: 'accessories', name: 'Accessories/Jewelry', estimatedValue: 20 }
       ]
     },
     {
@@ -367,18 +530,22 @@ export class MockDataService {
       sortOrder: 2,
       categories: [
         {
-          key: 'electronics', name: 'Electronics', estimatedValue: 50,
+          key: 'electronics',
+          name: 'Electronics',
+          estimatedValue: 50,
           subCategories: [
-            { key: 'phones',     name: 'Phones/Tablets', icon: '📱', estimatedValue: 80 },
-            { key: 'appliances', name: 'Appliances',      icon: '🔌', estimatedValue: 25 },
-            { key: 'cables',     name: 'Cables',          icon: '🔋', estimatedValue: 5  }
+            { key: 'phones', name: 'Phones/Tablets', icon: '📱', estimatedValue: 80 },
+            { key: 'appliances', name: 'Appliances', icon: '🔌', estimatedValue: 25 },
+            { key: 'cables', name: 'Cables', icon: '🔋', estimatedValue: 5 }
           ]
         },
         {
-          key: 'books', name: 'Books & Media', estimatedValue: 5,
+          key: 'books',
+          name: 'Books & Media',
+          estimatedValue: 5,
           subCategories: [
-            { key: 'books', name: 'Books',       icon: '📖', estimatedValue: 5  },
-            { key: 'dvds',  name: 'DVDs/CDs',    icon: '💿', estimatedValue: 3  },
+            { key: 'books', name: 'Books', icon: '📖', estimatedValue: 5 },
+            { key: 'dvds', name: 'DVDs/CDs', icon: '💿', estimatedValue: 3 },
             { key: 'games', name: 'Video Games', icon: '🎮', estimatedValue: 15 }
           ]
         }
@@ -393,16 +560,18 @@ export class MockDataService {
       active: true,
       sortOrder: 3,
       categories: [
-        { key: 'furniture',  name: 'Furniture',         estimatedValue: 125 },
+        { key: 'furniture', name: 'Furniture', estimatedValue: 125 },
         {
-          key: 'housewares', name: 'Housewares', estimatedValue: 8,
+          key: 'housewares',
+          name: 'Housewares',
+          estimatedValue: 8,
           subCategories: [
-            { key: 'kitchen',   name: 'Kitchen',    icon: '🍳', estimatedValue: 8 },
-            { key: 'glassware', name: 'Glassware',  icon: '🥂', estimatedValue: 6 }
+            { key: 'kitchen', name: 'Kitchen', icon: '🍳', estimatedValue: 8 },
+            { key: 'glassware', name: 'Glassware', icon: '🥂', estimatedValue: 6 }
           ]
         },
-        { key: 'home_decor', name: 'Home Décor',        estimatedValue: 15 },
-        { key: 'linens',     name: 'Linens & Textiles', estimatedValue: 7  }
+        { key: 'home_decor', name: 'Home Décor', estimatedValue: 15 },
+        { key: 'linens', name: 'Linens & Textiles', estimatedValue: 7 }
       ]
     },
     {
@@ -414,8 +583,8 @@ export class MockDataService {
       active: true,
       sortOrder: 4,
       categories: [
-        { key: 'toys',     name: 'Toys & Games',    estimatedValue: 10 },
-        { key: 'sporting', name: 'Sporting Goods',  estimatedValue: 25 },
+        { key: 'toys', name: 'Toys & Games', estimatedValue: 10 },
+        { key: 'sporting', name: 'Sporting Goods', estimatedValue: 25 },
         { key: 'seasonal', name: 'Seasonal/Holiday', estimatedValue: 12 }
       ]
     },
@@ -427,15 +596,14 @@ export class MockDataService {
       estimatedValue: 0,
       active: true,
       sortOrder: 5,
-      categories: [
-        { key: 'salvage', name: 'Salvage/Recycling', estimatedValue: 0 }
-      ]
+      categories: [{ key: 'salvage', name: 'Salvage/Recycling', estimatedValue: 0 }]
     }
   ];
 
   readonly locations: Location[] = [
     {
-      id: 1, referenceNumber: 'LOC-001',
+      id: 1,
+      referenceNumber: 'LOC-001',
       name: 'Downtown Store',
       address: '123 Main Street',
       phone: '(555)100-2000',
@@ -448,7 +616,8 @@ export class MockDataService {
       revenueToday: 2840
     },
     {
-      id: 2, referenceNumber: 'LOC-002',
+      id: 2,
+      referenceNumber: 'LOC-002',
       name: 'Northside Store',
       address: '456 Oak Avenue',
       phone: '(555)200-3000',
@@ -461,7 +630,8 @@ export class MockDataService {
       revenueToday: 1960
     },
     {
-      id: 3, referenceNumber: 'LOC-003',
+      id: 3,
+      referenceNumber: 'LOC-003',
       name: 'Westside Store',
       address: '789 Pine Road',
       phone: '(555)300-4000',
@@ -474,7 +644,8 @@ export class MockDataService {
       revenueToday: 1280
     },
     {
-      id: 4, referenceNumber: 'LOC-004',
+      id: 4,
+      referenceNumber: 'LOC-004',
       name: 'Eastside Store',
       address: '321 Elm Boulevard',
       phone: '(555)400-5000',
@@ -490,7 +661,8 @@ export class MockDataService {
 
   readonly donors: Donor[] = [
     {
-      id: 1, referenceNumber: 'D-001',
+      id: 1,
+      referenceNumber: 'D-001',
       firstName: 'Michael',
       lastName: 'Johnson',
       email: 'm.johnson@email.com',
@@ -504,7 +676,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-01')
     },
     {
-      id: 2, referenceNumber: 'D-002',
+      id: 2,
+      referenceNumber: 'D-002',
       firstName: 'Sarah',
       lastName: 'Williams',
       email: 's.williams@email.com',
@@ -518,7 +691,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-02-28')
     },
     {
-      id: 3, referenceNumber: 'D-003',
+      id: 3,
+      referenceNumber: 'D-003',
       firstName: 'Robert',
       lastName: 'Martinez',
       email: 'r.martinez@email.com',
@@ -532,7 +706,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-02')
     },
     {
-      id: 4, referenceNumber: 'D-004',
+      id: 4,
+      referenceNumber: 'D-004',
       firstName: 'Lisa',
       lastName: 'Park',
       email: 'lisa.p@email.com',
@@ -546,7 +721,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-02-10')
     },
     {
-      id: 5, referenceNumber: 'D-005',
+      id: 5,
+      referenceNumber: 'D-005',
       firstName: 'David',
       lastName: 'Chen',
       email: 'd.chen@email.com',
@@ -560,7 +736,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-10')
     },
     {
-      id: 6, referenceNumber: 'D-006',
+      id: 6,
+      referenceNumber: 'D-006',
       firstName: 'Jennifer',
       lastName: 'Taylor',
       email: 'j.taylor@email.com',
@@ -574,7 +751,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-05')
     },
     {
-      id: 7, referenceNumber: 'D-007',
+      id: 7,
+      referenceNumber: 'D-007',
       firstName: 'James',
       lastName: 'Anderson',
       email: 'j.anderson@email.com',
@@ -588,7 +766,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-08')
     },
     {
-      id: 8, referenceNumber: 'D-008',
+      id: 8,
+      referenceNumber: 'D-008',
       firstName: 'Maria',
       lastName: 'Garcia',
       email: 'm.garcia@email.com',
@@ -602,7 +781,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-02-20')
     },
     {
-      id: 9, referenceNumber: 'D-009',
+      id: 9,
+      referenceNumber: 'D-009',
       firstName: 'Thomas',
       lastName: 'Brown',
       email: 't.brown@email.com',
@@ -616,7 +796,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-12')
     },
     {
-      id: 10, referenceNumber: 'D-010',
+      id: 10,
+      referenceNumber: 'D-010',
       firstName: 'Nancy',
       lastName: 'Wilson',
       email: 'n.wilson@email.com',
@@ -630,7 +811,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-04')
     },
     {
-      id: 11, referenceNumber: 'D-011',
+      id: 11,
+      referenceNumber: 'D-011',
       firstName: 'Daniel',
       lastName: 'Moore',
       email: 'd.moore@email.com',
@@ -644,7 +826,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-02-25')
     },
     {
-      id: 12, referenceNumber: 'D-012',
+      id: 12,
+      referenceNumber: 'D-012',
       firstName: 'Emily',
       lastName: 'Davis',
       email: 'e.davis@email.com',
@@ -658,7 +841,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-11')
     },
     {
-      id: 13, referenceNumber: 'D-013',
+      id: 13,
+      referenceNumber: 'D-013',
       firstName: 'Kevin',
       lastName: 'Miller',
       email: 'k.miller@email.com',
@@ -672,7 +856,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-09')
     },
     {
-      id: 14, referenceNumber: 'D-014',
+      id: 14,
+      referenceNumber: 'D-014',
       firstName: 'Rebecca',
       lastName: 'White',
       email: 'r.white@email.com',
@@ -686,7 +871,8 @@ export class MockDataService {
       lastDonationDate: new Date('2026-03-13')
     },
     {
-      id: 15, referenceNumber: 'D-015',
+      id: 15,
+      referenceNumber: 'D-015',
       firstName: 'Chris',
       lastName: 'Thompson',
       email: 'c.thompson@email.com',
@@ -703,7 +889,8 @@ export class MockDataService {
 
   readonly donations: Donation[] = [
     {
-      id: 1, referenceNumber: 'DON-001',
+      id: 1,
+      referenceNumber: 'DON-001',
       receiptNumber: 'DN-001234',
       donorId: 1,
       donorName: 'Michael Johnson',
@@ -716,7 +903,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 1, referenceNumber: 'ITEM-001',
+          id: 1,
+          referenceNumber: 'ITEM-001',
           donationId: 1,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
@@ -725,7 +913,8 @@ export class MockDataService {
           totalEstimatedValue: 96
         },
         {
-          id: 2, referenceNumber: 'ITEM-002',
+          id: 2,
+          referenceNumber: 'ITEM-002',
           donationId: 1,
           categoryKey: 'books',
           categoryName: 'Books',
@@ -734,7 +923,8 @@ export class MockDataService {
           totalEstimatedValue: 25
         },
         {
-          id: 3, referenceNumber: 'ITEM-003',
+          id: 3,
+          referenceNumber: 'ITEM-003',
           donationId: 1,
           categoryKey: 'housewares',
           categoryName: 'Housewares',
@@ -749,7 +939,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 2, referenceNumber: 'DON-002',
+      id: 2,
+      referenceNumber: 'DON-002',
       receiptNumber: 'DN-001233',
       donorId: 2,
       donorName: 'Sarah Williams',
@@ -762,7 +953,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 4, referenceNumber: 'ITEM-004',
+          id: 4,
+          referenceNumber: 'ITEM-004',
           donationId: 2,
           categoryKey: 'shoes',
           categoryName: 'Shoes',
@@ -771,7 +963,8 @@ export class MockDataService {
           totalEstimatedValue: 60
         },
         {
-          id: 5, referenceNumber: 'ITEM-005',
+          id: 5,
+          referenceNumber: 'ITEM-005',
           donationId: 2,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
@@ -786,7 +979,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 3, referenceNumber: 'DON-003',
+      id: 3,
+      referenceNumber: 'DON-003',
       receiptNumber: 'DN-001232',
       donorId: 3,
       donorName: 'Robert Martinez',
@@ -799,7 +993,8 @@ export class MockDataService {
       status: DonationStatus.CheckedIn,
       items: [
         {
-          id: 6, referenceNumber: 'ITEM-006',
+          id: 6,
+          referenceNumber: 'ITEM-006',
           donationId: 3,
           categoryKey: 'furniture',
           categoryName: 'Furniture',
@@ -808,7 +1003,8 @@ export class MockDataService {
           totalEstimatedValue: 250
         },
         {
-          id: 7, referenceNumber: 'ITEM-007',
+          id: 7,
+          referenceNumber: 'ITEM-007',
           donationId: 3,
           categoryKey: 'home_decor',
           categoryName: 'Home Décor',
@@ -823,7 +1019,8 @@ export class MockDataService {
       presortCompleted: false
     },
     {
-      id: 4, referenceNumber: 'DON-004',
+      id: 4,
+      referenceNumber: 'DON-004',
       receiptNumber: 'DN-001231',
       donorId: 4,
       donorName: 'Lisa Park',
@@ -836,7 +1033,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 8, referenceNumber: 'ITEM-008',
+          id: 8,
+          referenceNumber: 'ITEM-008',
           donationId: 4,
           categoryKey: 'books',
           categoryName: 'Books & Media',
@@ -851,7 +1049,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 5, referenceNumber: 'DON-005',
+      id: 5,
+      referenceNumber: 'DON-005',
       receiptNumber: 'DN-001230',
       donorId: 5,
       donorName: 'David Chen',
@@ -864,7 +1063,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 9, referenceNumber: 'ITEM-009',
+          id: 9,
+          referenceNumber: 'ITEM-009',
           donationId: 5,
           categoryKey: 'electronics',
           categoryName: 'Electronics',
@@ -873,7 +1073,8 @@ export class MockDataService {
           totalEstimatedValue: 150
         },
         {
-          id: 10, referenceNumber: 'ITEM-010',
+          id: 10,
+          referenceNumber: 'ITEM-010',
           donationId: 5,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
@@ -888,7 +1089,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 6, referenceNumber: 'DON-006',
+      id: 6,
+      referenceNumber: 'DON-006',
       receiptNumber: 'DN-001229',
       donorId: 6,
       donorName: 'Jennifer Taylor',
@@ -901,7 +1103,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 11, referenceNumber: 'ITEM-011',
+          id: 11,
+          referenceNumber: 'ITEM-011',
           donationId: 6,
           categoryKey: 'toys',
           categoryName: 'Toys & Games',
@@ -910,7 +1113,8 @@ export class MockDataService {
           totalEstimatedValue: 80
         },
         {
-          id: 12, referenceNumber: 'ITEM-012',
+          id: 12,
+          referenceNumber: 'ITEM-012',
           donationId: 6,
           categoryKey: 'home_decor',
           categoryName: 'Home Décor',
@@ -919,7 +1123,8 @@ export class MockDataService {
           totalEstimatedValue: 75
         },
         {
-          id: 13, referenceNumber: 'ITEM-013',
+          id: 13,
+          referenceNumber: 'ITEM-013',
           donationId: 6,
           categoryKey: 'linens',
           categoryName: 'Linens & Textiles',
@@ -934,7 +1139,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 7, referenceNumber: 'DON-007',
+      id: 7,
+      referenceNumber: 'DON-007',
       receiptNumber: 'DN-001228',
       donorId: 7,
       donorName: 'James Anderson',
@@ -947,7 +1153,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 14, referenceNumber: 'ITEM-014',
+          id: 14,
+          referenceNumber: 'ITEM-014',
           donationId: 7,
           categoryKey: 'sporting',
           categoryName: 'Sporting Goods',
@@ -956,7 +1163,8 @@ export class MockDataService {
           totalEstimatedValue: 150
         },
         {
-          id: 15, referenceNumber: 'ITEM-015',
+          id: 15,
+          referenceNumber: 'ITEM-015',
           donationId: 7,
           categoryKey: 'shoes',
           categoryName: 'Shoes',
@@ -971,7 +1179,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 8, referenceNumber: 'DON-008',
+      id: 8,
+      referenceNumber: 'DON-008',
       receiptNumber: 'DN-001227',
       donorId: 9,
       donorName: 'Thomas Brown',
@@ -984,7 +1193,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 16, referenceNumber: 'ITEM-016',
+          id: 16,
+          referenceNumber: 'ITEM-016',
           donationId: 8,
           categoryKey: 'furniture',
           categoryName: 'Furniture',
@@ -993,7 +1203,8 @@ export class MockDataService {
           totalEstimatedValue: 125
         },
         {
-          id: 17, referenceNumber: 'ITEM-017',
+          id: 17,
+          referenceNumber: 'ITEM-017',
           donationId: 8,
           categoryKey: 'housewares',
           categoryName: 'Housewares',
@@ -1002,7 +1213,8 @@ export class MockDataService {
           totalEstimatedValue: 120
         },
         {
-          id: 18, referenceNumber: 'ITEM-018',
+          id: 18,
+          referenceNumber: 'ITEM-018',
           donationId: 8,
           categoryKey: 'accessories',
           categoryName: 'Accessories',
@@ -1017,7 +1229,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 9, referenceNumber: 'DON-009',
+      id: 9,
+      referenceNumber: 'DON-009',
       receiptNumber: 'DN-001226',
       donorId: 10,
       donorName: 'Nancy Wilson',
@@ -1030,7 +1243,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 19, referenceNumber: 'ITEM-019',
+          id: 19,
+          referenceNumber: 'ITEM-019',
           donationId: 9,
           categoryKey: 'books',
           categoryName: 'Books & Media',
@@ -1039,7 +1253,8 @@ export class MockDataService {
           totalEstimatedValue: 100
         },
         {
-          id: 20, referenceNumber: 'ITEM-020',
+          id: 20,
+          referenceNumber: 'ITEM-020',
           donationId: 9,
           categoryKey: 'seasonal',
           categoryName: 'Seasonal',
@@ -1054,7 +1269,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 10, referenceNumber: 'DON-010',
+      id: 10,
+      referenceNumber: 'DON-010',
       receiptNumber: 'DN-001225',
       donorId: 11,
       donorName: 'Daniel Moore',
@@ -1067,7 +1283,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 21, referenceNumber: 'ITEM-021',
+          id: 21,
+          referenceNumber: 'ITEM-021',
           donationId: 10,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
@@ -1076,7 +1293,8 @@ export class MockDataService {
           totalEstimatedValue: 180
         },
         {
-          id: 22, referenceNumber: 'ITEM-022',
+          id: 22,
+          referenceNumber: 'ITEM-022',
           donationId: 10,
           categoryKey: 'electronics',
           categoryName: 'Electronics',
@@ -1091,7 +1309,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 11, referenceNumber: 'DON-011',
+      id: 11,
+      referenceNumber: 'DON-011',
       receiptNumber: 'DN-001224',
       donorId: 1,
       donorName: 'Michael Johnson',
@@ -1104,7 +1323,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 23, referenceNumber: 'ITEM-023',
+          id: 23,
+          referenceNumber: 'ITEM-023',
           donationId: 11,
           categoryKey: 'books',
           categoryName: 'Books & Media',
@@ -1113,7 +1333,8 @@ export class MockDataService {
           totalEstimatedValue: 40
         },
         {
-          id: 24, referenceNumber: 'ITEM-024',
+          id: 24,
+          referenceNumber: 'ITEM-024',
           donationId: 11,
           categoryKey: 'housewares',
           categoryName: 'Housewares',
@@ -1122,7 +1343,8 @@ export class MockDataService {
           totalEstimatedValue: 48
         },
         {
-          id: 25, referenceNumber: 'ITEM-025',
+          id: 25,
+          referenceNumber: 'ITEM-025',
           donationId: 11,
           categoryKey: 'linens',
           categoryName: 'Linens',
@@ -1137,7 +1359,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 12, referenceNumber: 'DON-012',
+      id: 12,
+      referenceNumber: 'DON-012',
       receiptNumber: 'DN-001223',
       donorId: 2,
       donorName: 'Sarah Williams',
@@ -1150,7 +1373,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 26, referenceNumber: 'ITEM-026',
+          id: 26,
+          referenceNumber: 'ITEM-026',
           donationId: 12,
           categoryKey: 'clothing',
           categoryName: 'Clothing',
@@ -1165,7 +1389,8 @@ export class MockDataService {
       presortCompleted: true
     },
     {
-      id: 13, referenceNumber: 'DON-013',
+      id: 13,
+      referenceNumber: 'DON-013',
       receiptNumber: 'DN-001222',
       donorId: 14,
       donorName: 'Rebecca White',
@@ -1178,7 +1403,8 @@ export class MockDataService {
       status: DonationStatus.Completed,
       items: [
         {
-          id: 27, referenceNumber: 'ITEM-027',
+          id: 27,
+          referenceNumber: 'ITEM-027',
           donationId: 13,
           categoryKey: 'furniture',
           categoryName: 'Furniture',
@@ -1187,7 +1413,8 @@ export class MockDataService {
           totalEstimatedValue: 250
         },
         {
-          id: 28, referenceNumber: 'ITEM-028',
+          id: 28,
+          referenceNumber: 'ITEM-028',
           donationId: 13,
           categoryKey: 'electronics',
           categoryName: 'Electronics',
@@ -1196,7 +1423,8 @@ export class MockDataService {
           totalEstimatedValue: 200
         },
         {
-          id: 29, referenceNumber: 'ITEM-029',
+          id: 29,
+          referenceNumber: 'ITEM-029',
           donationId: 13,
           categoryKey: 'home_decor',
           categoryName: 'Home Décor',
@@ -1214,7 +1442,8 @@ export class MockDataService {
 
   readonly containers: Container[] = [
     {
-      id: 1, referenceNumber: 'C-001',
+      id: 1,
+      referenceNumber: 'C-001',
       barcode: 'BRJ-2026-001234',
       donationId: 1,
       donationReceiptNumber: 'DN-001234',
@@ -1222,137 +1451,181 @@ export class MockDataService {
       containerType: ContainerType.Gaylord,
       presortMethod: PresortMethod.Batch,
       presortWorkerName: 'Tom Wilson',
-      deptKey: 'clothes', deptName: 'Clothing & Accessories',
-      catKey: 'clothing', catName: 'Clothing',
+      deptKey: 'clothes',
+      deptName: 'Clothing & Accessories',
+      catKey: 'clothing',
+      catName: 'Clothing',
       contents: [
         { categoryKey: 'clothing', categoryName: 'Clothing', quantity: 28, condition: ItemCondition.Sellable },
         { categoryKey: 'shoes', categoryName: 'Shoes', quantity: 12, condition: ItemCondition.Sellable }
       ],
       destination: ContainerDest.Production,
       status: ContainerStatus.Sorting,
-      locationId: 1, locationName: 'Downtown Store',
+      locationId: 1,
+      locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T07:10:00'),
       updatedAt: new Date('2026-03-16T08:30:00'),
       presortedAt: new Date('2026-03-16T08:30:00'),
-      totalItems: 40, totalEstimatedValue: 516
+      totalItems: 40,
+      totalEstimatedValue: 516
     },
     {
-      id: 2, referenceNumber: 'C-002',
+      id: 2,
+      referenceNumber: 'C-002',
       barcode: 'BRJ-2026-001235',
       donationId: 2,
       donationReceiptNumber: 'DN-001233',
       donorVisitLabel: 'Sarah Williams',
       containerType: ContainerType.CartRack,
       presortMethod: PresortMethod.Batch,
-      deptKey: 'media', deptName: 'Electronics & Media',
-      catKey: 'books', catName: 'Books & Media',
+      deptKey: 'media',
+      deptName: 'Electronics & Media',
+      catKey: 'books',
+      catName: 'Books & Media',
       contents: [
         { categoryKey: 'books', categoryName: 'Books & Media', quantity: 45, condition: ItemCondition.Sellable },
         { categoryKey: 'toys', categoryName: 'Toys & Games', quantity: 18, condition: ItemCondition.Sellable }
       ],
       destination: ContainerDest.Production,
       status: ContainerStatus.InUse,
-      locationId: 1, locationName: 'Downtown Store',
+      locationId: 1,
+      locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T06:00:00'),
       updatedAt: new Date('2026-03-16T10:00:00'),
       presortedAt: new Date('2026-03-16T09:00:00'),
-      totalItems: 63, totalEstimatedValue: 405
+      totalItems: 63,
+      totalEstimatedValue: 405
     },
     {
-      id: 3, referenceNumber: 'C-003',
+      id: 3,
+      referenceNumber: 'C-003',
       barcode: 'BRJ-2026-001236',
       donationId: 3,
       donationReceiptNumber: 'DN-001232',
       donorVisitLabel: 'Walk-in Drop',
       containerType: ContainerType.Gaylord,
       presortMethod: PresortMethod.DockSide,
-      deptKey: 'clothes', deptName: 'Clothing & Accessories',
-      contents: [{ categoryKey: 'clothing', categoryName: 'Clothing', quantity: 50, condition: ItemCondition.Sellable }],
+      deptKey: 'clothes',
+      deptName: 'Clothing & Accessories',
+      contents: [
+        { categoryKey: 'clothing', categoryName: 'Clothing', quantity: 50, condition: ItemCondition.Sellable }
+      ],
       destination: ContainerDest.Warehouse,
       status: ContainerStatus.Available,
-      locationId: 1, locationName: 'Downtown Store',
+      locationId: 1,
+      locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T11:00:00'),
       updatedAt: new Date('2026-03-16T11:00:00'),
-      totalItems: 50, totalEstimatedValue: 600
+      totalItems: 50,
+      totalEstimatedValue: 600
     },
     {
-      id: 4, referenceNumber: 'C-004',
+      id: 4,
+      referenceNumber: 'C-004',
       barcode: 'BRJ-2026-001237',
       donationId: 5,
       donationReceiptNumber: 'DN-001230',
       donorVisitLabel: 'David Chen',
       containerType: ContainerType.Tote,
       presortMethod: PresortMethod.DockSide,
-      deptKey: 'media', deptName: 'Electronics & Media',
-      catKey: 'electronics', catName: 'Electronics',
+      deptKey: 'media',
+      deptName: 'Electronics & Media',
+      catKey: 'electronics',
+      catName: 'Electronics',
       contents: [
-        { categoryKey: 'electronics', categoryName: 'Electronics', quantity: 8, condition: ItemCondition.NeedsRefurbishment, ecommerceQty: 3 }
+        {
+          categoryKey: 'electronics',
+          categoryName: 'Electronics',
+          quantity: 8,
+          condition: ItemCondition.NeedsRefurbishment,
+          ecommerceQty: 3
+        }
       ],
       destination: ContainerDest.Ecommerce,
       status: ContainerStatus.Sorting,
-      locationId: 2, locationName: 'Northside Store',
+      locationId: 2,
+      locationName: 'Northside Store',
       createdAt: new Date('2026-03-15T16:00:00'),
       updatedAt: new Date('2026-03-15T17:00:00'),
       presortedAt: new Date('2026-03-15T17:00:00'),
-      totalItems: 8, totalEstimatedValue: 400
+      totalItems: 8,
+      totalEstimatedValue: 400
     },
     {
-      id: 5, referenceNumber: 'C-005',
+      id: 5,
+      referenceNumber: 'C-005',
       barcode: 'BRJ-2026-001238',
       containerType: ContainerType.Pallet,
-      deptKey: 'home', deptName: 'Home & Living',
-      catKey: 'furniture', catName: 'Furniture',
+      deptKey: 'home',
+      deptName: 'Home & Living',
+      catKey: 'furniture',
+      catName: 'Furniture',
       contents: [],
       status: ContainerStatus.Available,
-      locationId: 1, locationName: 'Downtown Store',
+      locationId: 1,
+      locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T13:30:00'),
       updatedAt: new Date('2026-03-16T13:30:00'),
-      totalItems: 0, totalEstimatedValue: 0
+      totalItems: 0,
+      totalEstimatedValue: 0
     },
     {
-      id: 6, referenceNumber: 'C-006',
+      id: 6,
+      referenceNumber: 'C-006',
       barcode: 'BRJ-2026-001239',
       containerType: ContainerType.Baler,
-      deptKey: 'salvage', deptName: 'Salvage & Recycling',
-      catKey: 'salvage', catName: 'Salvage/Recycling',
+      deptKey: 'salvage',
+      deptName: 'Salvage & Recycling',
+      catKey: 'salvage',
+      catName: 'Salvage/Recycling',
       contents: [],
       destination: ContainerDest.Salvage,
       status: ContainerStatus.Available,
       salvageWeightLbs: 120,
-      locationId: 1, locationName: 'Downtown Store',
+      locationId: 1,
+      locationName: 'Downtown Store',
       createdAt: new Date('2026-03-16T09:00:00'),
       updatedAt: new Date('2026-03-16T09:00:00'),
-      totalItems: 0, totalEstimatedValue: 0,
+      totalItems: 0,
+      totalEstimatedValue: 0,
       notes: 'Textile bale — scheduled for pickup'
     },
     {
-      id: 7, referenceNumber: 'C-007',
+      id: 7,
+      referenceNumber: 'C-007',
       barcode: 'BRJ-2026-001240',
       donorVisitLabel: 'Walk-in Drop (Anonymous)',
       containerType: ContainerType.Gaylord,
       presortMethod: PresortMethod.Batch,
-      deptKey: 'clothes', deptName: 'Clothing & Accessories',
+      deptKey: 'clothes',
+      deptName: 'Clothing & Accessories',
       contents: [],
       status: ContainerStatus.Available,
-      locationId: 1, locationName: 'Downtown Store',
+      locationId: 1,
+      locationName: 'Downtown Store',
       createdAt: new Date(Date.now() - 78 * 60 * 1000),
       updatedAt: new Date(Date.now() - 78 * 60 * 1000),
-      totalItems: 65, totalEstimatedValue: 0
+      totalItems: 65,
+      totalEstimatedValue: 0
     },
     {
-      id: 8, referenceNumber: 'C-008',
+      id: 8,
+      referenceNumber: 'C-008',
       barcode: 'BRJ-2026-001241',
       donationReceiptNumber: 'DN-001237',
       donorVisitLabel: 'Robert Martinez · DN-001237',
       containerType: ContainerType.Pallet,
       presortMethod: PresortMethod.Batch,
-      deptKey: 'home', deptName: 'Home & Living',
+      deptKey: 'home',
+      deptName: 'Home & Living',
       contents: [],
       status: ContainerStatus.Available,
-      locationId: 1, locationName: 'Downtown Store',
+      locationId: 1,
+      locationName: 'Downtown Store',
       createdAt: new Date(Date.now() - 95 * 60 * 1000),
       updatedAt: new Date(Date.now() - 95 * 60 * 1000),
-      totalItems: 110, totalEstimatedValue: 0
+      totalItems: 110,
+      totalEstimatedValue: 0
     }
   ];
 
@@ -1395,7 +1668,7 @@ export class MockDataService {
   };
 
   /** Live presort queue — derived from containers with status 'ready_for_sorting' */
-  get presortQueue(): PresortQueueItem[] {
+  get presortQueue(): PresortQueueResponse[] {
     return this.containers
       .filter(c => c.status === ContainerStatus.ReadyForSorting)
       .map(c => ({
@@ -1423,30 +1696,37 @@ export class MockDataService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const sorted = this.containers.filter(
-      c => c.status !== ContainerStatus.Available && c.status !== ContainerStatus.ReadyForSorting && c.presortedAt && c.presortedAt >= today
+      c =>
+        c.status !== ContainerStatus.Available &&
+        c.status !== ContainerStatus.ReadyForSorting &&
+        c.presortedAt &&
+        c.presortedAt >= today
     );
     const itemsProcessed = sorted.reduce((s, c) => s + c.totalItems, 0);
     const avgSortMinutes =
       sorted.length > 0
         ? sorted.reduce((s, c) => {
-            const mins = c.presortedAt
-              ? Math.round((c.presortedAt.getTime() - c.createdAt.getTime()) / 60000)
-              : 10;
+            const mins = c.presortedAt ? Math.round((c.presortedAt.getTime() - c.createdAt.getTime()) / 60000) : 10;
             return s + mins;
           }, 0) / sorted.length
         : 0;
     const totalItems = this.containers.reduce((s, c) => s + c.totalItems, 0);
     const salvageItems = this.containers.reduce(
-      (s, c) => s + c.contents.filter(x => x.condition === ItemCondition.Salvage || x.condition === ItemCondition.Dispose).reduce((a, x) => a + x.quantity, 0),
+      (s, c) =>
+        s +
+        c.contents
+          .filter(x => x.condition === ItemCondition.Salvage || x.condition === ItemCondition.Dispose)
+          .reduce((a, x) => a + x.quantity, 0),
       0
     );
     const ecommerceItems = this.containers.reduce(
       (s, c) => s + c.contents.reduce((a, x) => a + (x.ecommerceQty ?? 0), 0),
       0
     );
-    const oldestQueuedMins = this.presortQueue.length > 0
-      ? Math.max(...this.presortQueue.map(q => Math.floor((Date.now() - q.receivedAt.getTime()) / 60000)))
-      : 0;
+    const oldestQueuedMins =
+      this.presortQueue.length > 0
+        ? Math.max(...this.presortQueue.map(q => Math.floor((Date.now() - q.receivedAt.getTime()) / 60000)))
+        : 0;
 
     // dept volume from containers contents
     const deptMap = new Map<string, { name: string; qty: number; color: string }>();
@@ -1615,7 +1895,12 @@ export class MockDataService {
     }
   }
 
-  addDonor(donor: Omit<Donor, 'id' | 'referenceNumber' | 'joinDate' | 'totalDonations' | 'lifetimeValue' | 'loyaltyPoints' | 'loyaltyTier'>): Donor {
+  addDonor(
+    donor: Omit<
+      Donor,
+      'id' | 'referenceNumber' | 'joinDate' | 'totalDonations' | 'lifetimeValue' | 'loyaltyPoints' | 'loyaltyTier'
+    >
+  ): Donor {
     const newDonor: Donor = {
       ...donor,
       id: Date.now(),
@@ -1624,7 +1909,7 @@ export class MockDataService {
       totalDonations: 0,
       lifetimeValue: 0,
       loyaltyPoints: 0,
-      loyaltyTier: DonorTier.Bronze,
+      loyaltyTier: DonorTier.Bronze
     };
     (this.donors as Donor[]).unshift(newDonor);
     return newDonor;
@@ -1634,13 +1919,55 @@ export class MockDataService {
   getAvailableRewards() {
     return [
       { id: 1, referenceNumber: 'R-001', name: '$5 Gift Card', pointsRequired: 500, icon: '💳', category: 'gift-card' },
-      { id: 2, referenceNumber: 'R-002', name: '$10 Gift Card', pointsRequired: 1000, icon: '💳', category: 'gift-card' },
-      { id: 3, referenceNumber: 'R-003', name: '$25 Gift Card', pointsRequired: 2500, icon: '💳', category: 'gift-card' },
-      { id: 4, referenceNumber: 'R-004', name: 'Free Pickup Service', pointsRequired: 300, icon: '🚚', category: 'service' },
-      { id: 5, referenceNumber: 'R-005', name: 'Priority Processing', pointsRequired: 150, icon: '⚡', category: 'service' },
-      { id: 6, referenceNumber: 'R-006', name: 'Thank You Mug', pointsRequired: 800, icon: '☕', category: 'merchandise' },
+      {
+        id: 2,
+        referenceNumber: 'R-002',
+        name: '$10 Gift Card',
+        pointsRequired: 1000,
+        icon: '💳',
+        category: 'gift-card'
+      },
+      {
+        id: 3,
+        referenceNumber: 'R-003',
+        name: '$25 Gift Card',
+        pointsRequired: 2500,
+        icon: '💳',
+        category: 'gift-card'
+      },
+      {
+        id: 4,
+        referenceNumber: 'R-004',
+        name: 'Free Pickup Service',
+        pointsRequired: 300,
+        icon: '🚚',
+        category: 'service'
+      },
+      {
+        id: 5,
+        referenceNumber: 'R-005',
+        name: 'Priority Processing',
+        pointsRequired: 150,
+        icon: '⚡',
+        category: 'service'
+      },
+      {
+        id: 6,
+        referenceNumber: 'R-006',
+        name: 'Thank You Mug',
+        pointsRequired: 800,
+        icon: '☕',
+        category: 'merchandise'
+      },
       { id: 7, referenceNumber: 'R-007', name: 'Tote Bag', pointsRequired: 600, icon: '👜', category: 'merchandise' },
-      { id: 8, referenceNumber: 'R-008', name: 'Branded T-Shirt', pointsRequired: 1200, icon: '👕', category: 'merchandise' }
+      {
+        id: 8,
+        referenceNumber: 'R-008',
+        name: 'Branded T-Shirt',
+        pointsRequired: 1200,
+        icon: '👕',
+        category: 'merchandise'
+      }
     ];
   }
 
@@ -1816,9 +2143,9 @@ export class MockDataService {
    */
   canAssociateDonor(donation: Donation): boolean {
     if (donation.status !== DonationStatus.Completed) return false;
-    if (donation.donorId || donation.associatedDonorId)  return false;
+    if (donation.donorId || donation.associatedDonorId) return false;
     const windowMs = this.appConfig().associationWindowHours * 60 * 60 * 1000;
-    return (Date.now() - donation.timestamp.getTime()) <= windowMs;
+    return Date.now() - donation.timestamp.getTime() <= windowMs;
   }
 
   /**
@@ -1837,26 +2164,32 @@ export class MockDataService {
     const recalcPoints = this.calculatePoints(target.totalItems);
     const updated: Donation = {
       ...target,
-      associatedDonorId:   donorId,
+      associatedDonorId: donorId,
       associatedDonorName: `${donor.firstName} ${donor.lastName}`,
-      associatedAt:        new Date(),
-      loyaltyPointsEarned: recalcPoints,
+      associatedAt: new Date(),
+      loyaltyPointsEarned: recalcPoints
     };
     return updated;
   }
 
   // ── Phase 1: Reward definitions management (Req 5) ────────────────────────
 
-  addRewardDefinition(def: Omit<RewardDefinition, 'id' | 'referenceNumber' | 'totalRedemptions' | 'createdAt'>): RewardDefinition {
-    const newDef: RewardDefinition = { ...def, id: Date.now(), referenceNumber: `RD-${Date.now()}`, totalRedemptions: 0, createdAt: new Date() };
+  addRewardDefinition(
+    def: Omit<RewardDefinition, 'id' | 'referenceNumber' | 'totalRedemptions' | 'createdAt'>
+  ): RewardDefinition {
+    const newDef: RewardDefinition = {
+      ...def,
+      id: Date.now(),
+      referenceNumber: `RD-${Date.now()}`,
+      totalRedemptions: 0,
+      createdAt: new Date()
+    };
     this._rewardDefs.update(list => [...list, newDef]);
     return newDef;
   }
 
   updateRewardDefinition(id: number, patch: Partial<RewardDefinition>): void {
-    this._rewardDefs.update(list =>
-      list.map(d => d.id === id ? { ...d, ...patch } : d)
-    );
+    this._rewardDefs.update(list => list.map(d => (d.id === id ? { ...d, ...patch } : d)));
   }
 
   removeRewardDefinition(id: number): void {
@@ -1872,20 +2205,26 @@ export class MockDataService {
    */
   redeemReward(donorId: number, rewardId: number): RewardTransaction | null {
     const donor = this.donors.find(d => d.id === donorId);
-    const def   = this._rewardDefs().find(d => d.id === rewardId);
+    const def = this._rewardDefs().find(d => d.id === rewardId);
     if (!donor || !def || !def.isActive) return null;
 
     // Validity window check
     const now = new Date();
     if (def.validFrom && now < def.validFrom) return null;
-    if (def.validTo   && now > def.validTo)   return null;
+    if (def.validTo && now > def.validTo) return null;
 
     // Points check
     if (donor.loyaltyPoints < def.pointsRequired) return null;
 
     // Per-user limit
     if (def.maxRedemptionsPerUser != null) {
-      const userCount = this._rewardTxns().filter(t => t.donorId === donorId && t.rewardId === rewardId && t.status !== RedemptionStatus.Cancelled && t.status !== RedemptionStatus.Rejected).length;
+      const userCount = this._rewardTxns().filter(
+        t =>
+          t.donorId === donorId &&
+          t.rewardId === rewardId &&
+          t.status !== RedemptionStatus.Cancelled &&
+          t.status !== RedemptionStatus.Rejected
+      ).length;
       if (userCount >= def.maxRedemptionsPerUser) return null;
     }
 
@@ -1896,23 +2235,25 @@ export class MockDataService {
     (donor as any).loyaltyPoints -= def.pointsRequired;
 
     // Increment totalRedemptions
-    this._rewardDefs.update(list => list.map(d => d.id === rewardId ? { ...d, totalRedemptions: d.totalRedemptions + 1 } : d));
+    this._rewardDefs.update(list =>
+      list.map(d => (d.id === rewardId ? { ...d, totalRedemptions: d.totalRedemptions + 1 } : d))
+    );
 
     const autoApprove = !this.appConfig().requireApproval;
     const txn: RewardTransaction = {
-      id:             Date.now(),
+      id: Date.now(),
       referenceNumber: `RTX-${Date.now()}`,
       donorId,
-      donorName:      `${donor.firstName} ${donor.lastName}`,
+      donorName: `${donor.firstName} ${donor.lastName}`,
       rewardId,
-      rewardName:     def.name,
-      rewardType:     def.rewardType,
-      rewardValue:    def.value,
-      pointsUsed:     def.pointsRequired,
-      status:         autoApprove ? RedemptionStatus.Approved : RedemptionStatus.Pending,
-      createdAt:      now,
-      approvedAt:     autoApprove ? now : undefined,
-      voucherCode:    def.rewardType === RewardType.Voucher ? `VCH-${Date.now().toString(36).toUpperCase()}` : undefined,
+      rewardName: def.name,
+      rewardType: def.rewardType,
+      rewardValue: def.value,
+      pointsUsed: def.pointsRequired,
+      status: autoApprove ? RedemptionStatus.Approved : RedemptionStatus.Pending,
+      createdAt: now,
+      approvedAt: autoApprove ? now : undefined,
+      voucherCode: def.rewardType === RewardType.Voucher ? `VCH-${Date.now().toString(36).toUpperCase()}` : undefined
     };
     this._rewardTxns.update(list => [txn, ...list]);
     return txn;
@@ -1925,39 +2266,63 @@ export class MockDataService {
    */
   giftReward(fromDonorId: number, toDonorId: number, rewardId: number): RewardTransaction | null {
     const fromDonor = this.donors.find(d => d.id === fromDonorId);
-    const toDonor   = this.donors.find(d => d.id === toDonorId);
-    const def       = this._rewardDefs().find(d => d.id === rewardId);
+    const toDonor = this.donors.find(d => d.id === toDonorId);
+    const def = this._rewardDefs().find(d => d.id === rewardId);
     if (!fromDonor || !toDonor || !def || !def.isActive || !def.isGiftable) return null;
     if (fromDonorId === toDonorId) return null;
 
     const now = new Date();
     if (def.validFrom && now < def.validFrom) return null;
-    if (def.validTo   && now > def.validTo)   return null;
+    if (def.validTo && now > def.validTo) return null;
     if (fromDonor.loyaltyPoints < def.pointsRequired) return null;
     if (def.totalRedemptionLimit != null && def.totalRedemptions >= def.totalRedemptionLimit) return null;
 
     (fromDonor as any).loyaltyPoints -= def.pointsRequired;
-    this._rewardDefs.update(list => list.map(d => d.id === rewardId ? { ...d, totalRedemptions: d.totalRedemptions + 1 } : d));
+    this._rewardDefs.update(list =>
+      list.map(d => (d.id === rewardId ? { ...d, totalRedemptions: d.totalRedemptions + 1 } : d))
+    );
 
-    const voucherCode = def.rewardType === RewardType.Voucher ? `VCH-${Date.now().toString(36).toUpperCase()}` : undefined;
+    const voucherCode =
+      def.rewardType === RewardType.Voucher ? `VCH-${Date.now().toString(36).toUpperCase()}` : undefined;
     const fromName = `${fromDonor.firstName} ${fromDonor.lastName}`;
-    const toName   = `${toDonor.firstName} ${toDonor.lastName}`;
+    const toName = `${toDonor.firstName} ${toDonor.lastName}`;
 
     const gifterTxn: RewardTransaction = {
-      id: Date.now(), referenceNumber: `RTX-${Date.now()}`,
-      donorId: fromDonorId, donorName: fromName,
-      rewardId, rewardName: def.name, rewardType: def.rewardType, rewardValue: def.value,
-      pointsUsed: def.pointsRequired, status: RedemptionStatus.Fulfilled,
-      isGift: true, giftedToId: toDonorId, giftedToName: toName,
-      createdAt: now, approvedAt: now, fulfilledAt: now, voucherCode,
+      id: Date.now(),
+      referenceNumber: `RTX-${Date.now()}`,
+      donorId: fromDonorId,
+      donorName: fromName,
+      rewardId,
+      rewardName: def.name,
+      rewardType: def.rewardType,
+      rewardValue: def.value,
+      pointsUsed: def.pointsRequired,
+      status: RedemptionStatus.Fulfilled,
+      isGift: true,
+      giftedToId: toDonorId,
+      giftedToName: toName,
+      createdAt: now,
+      approvedAt: now,
+      fulfilledAt: now,
+      voucherCode
     };
     const recipientTxn: RewardTransaction = {
-      id: Date.now() + 1, referenceNumber: `RTX-${Date.now() + 1}`,
-      donorId: toDonorId, donorName: toName,
-      rewardId, rewardName: def.name, rewardType: def.rewardType, rewardValue: def.value,
-      pointsUsed: 0, status: RedemptionStatus.Approved,
-      isGift: true, giftedFromId: fromDonorId, giftedFromName: fromName,
-      createdAt: now, approvedAt: now, voucherCode,
+      id: Date.now() + 1,
+      referenceNumber: `RTX-${Date.now() + 1}`,
+      donorId: toDonorId,
+      donorName: toName,
+      rewardId,
+      rewardName: def.name,
+      rewardType: def.rewardType,
+      rewardValue: def.value,
+      pointsUsed: 0,
+      status: RedemptionStatus.Approved,
+      isGift: true,
+      giftedFromId: fromDonorId,
+      giftedFromName: fromName,
+      createdAt: now,
+      approvedAt: now,
+      voucherCode
     };
     this._rewardTxns.update(list => [gifterTxn, recipientTxn, ...list]);
     return gifterTxn;
@@ -1967,48 +2332,62 @@ export class MockDataService {
 
   approveRedemption(txnId: number): boolean {
     let ok = false;
-    this._rewardTxns.update(list => list.map(t => {
-      if (t.id === txnId && t.status === RedemptionStatus.Pending) { ok = true; return { ...t, status: RedemptionStatus.Approved, approvedAt: new Date() }; }
-      return t;
-    }));
+    this._rewardTxns.update(list =>
+      list.map(t => {
+        if (t.id === txnId && t.status === RedemptionStatus.Pending) {
+          ok = true;
+          return { ...t, status: RedemptionStatus.Approved, approvedAt: new Date() };
+        }
+        return t;
+      })
+    );
     return ok;
   }
 
   rejectRedemption(txnId: number, reason?: string): boolean {
     let ok = false;
-    this._rewardTxns.update(list => list.map(t => {
-      if (t.id === txnId && t.status === RedemptionStatus.Pending) {
-        ok = true;
-        // Refund points
-        const donor = this.donors.find(d => d.id === t.donorId);
-        if (donor) (donor as any).loyaltyPoints += t.pointsUsed;
-        return { ...t, status: RedemptionStatus.Rejected, rejectedAt: new Date(), rejectionReason: reason };
-      }
-      return t;
-    }));
+    this._rewardTxns.update(list =>
+      list.map(t => {
+        if (t.id === txnId && t.status === RedemptionStatus.Pending) {
+          ok = true;
+          // Refund points
+          const donor = this.donors.find(d => d.id === t.donorId);
+          if (donor) (donor as any).loyaltyPoints += t.pointsUsed;
+          return { ...t, status: RedemptionStatus.Rejected, rejectedAt: new Date(), rejectionReason: reason };
+        }
+        return t;
+      })
+    );
     return ok;
   }
 
   fulfillRedemption(txnId: number): boolean {
     let ok = false;
-    this._rewardTxns.update(list => list.map(t => {
-      if (t.id === txnId && t.status === RedemptionStatus.Approved) { ok = true; return { ...t, status: RedemptionStatus.Fulfilled, fulfilledAt: new Date() }; }
-      return t;
-    }));
+    this._rewardTxns.update(list =>
+      list.map(t => {
+        if (t.id === txnId && t.status === RedemptionStatus.Approved) {
+          ok = true;
+          return { ...t, status: RedemptionStatus.Fulfilled, fulfilledAt: new Date() };
+        }
+        return t;
+      })
+    );
     return ok;
   }
 
   cancelRedemption(txnId: number): boolean {
     let ok = false;
-    this._rewardTxns.update(list => list.map(t => {
-      if (t.id === txnId && (t.status === RedemptionStatus.Pending || t.status === RedemptionStatus.Approved)) {
-        ok = true;
-        const donor = this.donors.find(d => d.id === t.donorId);
-        if (donor) (donor as any).loyaltyPoints += t.pointsUsed;
-        return { ...t, status: RedemptionStatus.Cancelled, cancelledAt: new Date() };
-      }
-      return t;
-    }));
+    this._rewardTxns.update(list =>
+      list.map(t => {
+        if (t.id === txnId && (t.status === RedemptionStatus.Pending || t.status === RedemptionStatus.Approved)) {
+          ok = true;
+          const donor = this.donors.find(d => d.id === t.donorId);
+          if (donor) (donor as any).loyaltyPoints += t.pointsUsed;
+          return { ...t, status: RedemptionStatus.Cancelled, cancelledAt: new Date() };
+        }
+        return t;
+      })
+    );
     return ok;
   }
 
@@ -2020,10 +2399,16 @@ export class MockDataService {
     return this._rewardDefs().filter(def => {
       if (!def.isActive) return false;
       if (def.validFrom && now < def.validFrom) return false;
-      if (def.validTo   && now > def.validTo)   return false;
+      if (def.validTo && now > def.validTo) return false;
       if (def.totalRedemptionLimit != null && def.totalRedemptions >= def.totalRedemptionLimit) return false;
       if (def.maxRedemptionsPerUser != null) {
-        const userCount = this._rewardTxns().filter(t => t.donorId === donorId && t.rewardId === def.id && t.status !== RedemptionStatus.Cancelled && t.status !== RedemptionStatus.Rejected).length;
+        const userCount = this._rewardTxns().filter(
+          t =>
+            t.donorId === donorId &&
+            t.rewardId === def.id &&
+            t.status !== RedemptionStatus.Cancelled &&
+            t.status !== RedemptionStatus.Rejected
+        ).length;
         if (userCount >= def.maxRedemptionsPerUser) return false;
       }
       return true;
@@ -2039,25 +2424,23 @@ export class MockDataService {
   createCampaign(campaign: Omit<Campaign, 'id' | 'referenceNumber' | 'notificationHistory' | 'createdAt'>): Campaign {
     const newCampaign: Campaign = {
       ...campaign,
-      id:                  Date.now(),
-      referenceNumber:     `CMP-${Date.now()}`,
+      id: Date.now(),
+      referenceNumber: `CMP-${Date.now()}`,
       notificationHistory: [],
-      createdAt:           new Date(),
+      createdAt: new Date()
     };
     this._campaigns.update(list => [newCampaign, ...list]);
     return newCampaign;
   }
 
   updateCampaign(id: number, patch: Partial<Campaign>): void {
-    this._campaigns.update(list =>
-      list.map(c => c.id === id ? { ...c, ...patch } : c)
-    );
+    this._campaigns.update(list => list.map(c => (c.id === id ? { ...c, ...patch } : c)));
   }
 
   saveCampaignTemplate(campaignId: number, template: NotificationTemplate): void {
     const field = template.channel === NotificationChannel.Email ? 'emailTemplate' : 'smsTemplate';
     this._campaigns.update(list =>
-      list.map(c => c.id === campaignId ? { ...c, [field]: { ...template, updatedAt: new Date() } } : c)
+      list.map(c => (c.id === campaignId ? { ...c, [field]: { ...template, updatedAt: new Date() } } : c))
     );
   }
 
@@ -2092,21 +2475,24 @@ export class MockDataService {
 
     const now = new Date();
     const newNotifications: CampaignNotification[] = eligibleDonors.map(donor => ({
-      donorId:   donor.id,
+      donorId: donor.id,
       donorName: `${donor.firstName} ${donor.lastName}`,
-      channel:   campaign.channel,
-      sentAt:    now,
-      success:   Math.random() > 0.05, // 95% success rate simulation
+      channel: campaign.channel,
+      sentAt: now,
+      success: Math.random() > 0.05 // 95% success rate simulation
     }));
 
     this._campaigns.update(list =>
-      list.map(c => c.id === campaignId
-        ? { ...c, status: CampaignStatus.Active, notificationHistory: [...c.notificationHistory, ...newNotifications] }
-        : c
+      list.map(c =>
+        c.id === campaignId
+          ? {
+              ...c,
+              status: CampaignStatus.Active,
+              notificationHistory: [...c.notificationHistory, ...newNotifications]
+            }
+          : c
       )
     );
     return newNotifications;
   }
 }
-
-

@@ -1,0 +1,134 @@
+// ── Detail modal layout ────────────────────────────────────────────────────
+.detail-layout {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.detail-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+}
+.apt-id-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 3px 8px;
+  border-radius: 999px;
+  word-break: break-all;
+  text-align: center;
+}
+.qr-frame {
+  padding: 10px;
+  background: var(--white);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  margin: 4px 0;
+}
+.qr-hint {
+  font-size: 10px;
+  color: var(--gray-400);
+}
+
+// ── Detail modal status badge ──────────────────────────────────────────────
+.detail-status-badge {
+  margin-top: 8px;
+}
+
+// ── Detail modal mark-complete button ─────────────────────────────────────
+.detail-complete-btn {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.detail-right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.detail-section-hdr {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray-500);
+  margin: 12px 0 6px;
+  &:first-child {
+    margin-top: 0;
+  }
+}
+.detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dg-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  &.dg-wrap {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+}
+.dg-key {
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+.dg-val {
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+.dg-val--qty {
+  font-weight: 800;
+  font-size: 15px;
+}
+.detail-notes {
+  margin-top: 4px;
+}
+.notes-body {
+  font-size: 13px;
+  color: var(--gray-700);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  line-height: 1.5;
+}
+.badge--sm {
+  font-size: 11px;
+}
+.badge--sm-pad {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+.btn-sm {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 12px;
+}
+.cat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+@media (max-width: 700px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .detail-left {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

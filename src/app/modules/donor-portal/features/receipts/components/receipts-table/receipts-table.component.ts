@@ -9,7 +9,7 @@ import { ReceiptListItemState } from '../../models/receipts.state';
   imports: [DatePipe, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './receipts-table.component.html',
-  styleUrl: './receipts-table.component.scss',
+  styleUrl: './receipts-table.component.scss'
 })
 export class ReceiptsTableComponent {
   receipts = input.required<ReceiptListItemState[]>();

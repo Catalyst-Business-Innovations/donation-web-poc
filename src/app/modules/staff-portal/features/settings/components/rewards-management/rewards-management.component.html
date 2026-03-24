@@ -1,0 +1,187 @@
+<!-- Reward Definitions -->
+<div class="settings-card">
+  <div class="settings-card-header">
+    <div class="settings-card-icon"><app-icon name="gift" [size]="20"></app-icon></div>
+    <div class="settings-card-header-body">
+      <div class="settings-card-title">Reward Definitions</div>
+      <div class="settings-card-desc">Create and manage rewards that donors can redeem with their points</div>
+    </div>
+    <button class="btn btn-primary btn-sm" (click)="addReward.emit()">
+      <app-icon name="plus" [size]="14"></app-icon>
+      Add Reward
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="reward-filters">
+    <div class="filter-group">
+      <button class="filter-btn" [class.active]="statusFilter() === 'all'" (click)="statusFilterChanged.emit('all')">
+        All
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="statusFilter() === 'active'"
+        (click)="statusFilterChanged.emit('active')"
+      >
+        Active
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="statusFilter() === 'inactive'"
+        (click)="statusFilterChanged.emit('inactive')"
+      >
+        Inactive
+      </button>
+    </div>
+    <select class="form-input filter-select" [ngModel]="typeFilter()" (ngModelChange)="onTypeFilterChange($event)">
+      <option [value]="0">All Types</option>
+      @for (rt of rewardTypes(); track rt.value) {
+        <option [value]="rt.value">{{ rt.label }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="settings-card-body no-padding">
+    <table class="reward-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Points</th>
+          <th>Limits</th>
+          <th>Redeemed</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of rewards(); track r.id) {
+          <tr>
+            <td>
+              <div class="reward-name-cell">
+                {{ r.name }}
+                @if (r.isGiftable) {
+                  <span class="badge badge-info">Giftable</span>
+                }
+              </div>
+              <div class="reward-desc-cell">{{ r.description }}</div>
+            </td>
+            <td>
+              <span class="type-badge">{{ r.rewardTypeLabel }}</span>
+            </td>
+            <td class="td-value">${{ r.value | number }}</td>
+            <td class="td-points-required">{{ r.pointsRequired | number }}</td>
+            <td class="td-limits">
+              @if (r.maxRedemptionsPerUser) {
+                <div>{{ r.maxRedemptionsPerUser }}/user</div>
+              }
+              @if (r.totalRedemptionLimit) {
+                <div>{{ r.totalRedemptions }}/{{ r.totalRedemptionLimit }} total</div>
+              }
+              @if (!r.maxRedemptionsPerUser && !r.totalRedemptionLimit) {
+                <span class="td-empty">&mdash;</span>
+              }
+            </td>
+            <td class="td-value">{{ r.totalRedemptions }}</td>
+            <td>
+              <span class="badge" [class.badge-success]="r.isActive" [class.badge-gray]="!r.isActive">
+                {{ r.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <div class="row-actions">
+                <button class="btn-icon" title="Edit" (click)="editReward.emit(r)">
+                  <app-icon name="edit" [size]="15"></app-icon>
+                </button>
+                <button class="btn-icon" title="Toggle active" (click)="toggleActive.emit(r)">
+                  <app-icon [name]="r.isActive ? 'x-circle' : 'check-circle'" [size]="15"></app-icon>
+                </button>
+                <button class="btn-icon btn-icon-danger" title="Delete" (click)="deleteReward.emit(r)">
+                  <app-icon name="delete" [size]="15"></app-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+        @if (rewards().length === 0) {
+          <tr>
+            <td colspan="8" class="td-empty-state">No rewards match the current filters.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Redemption Queue -->
+<div class="settings-card">
+  <div class="settings-card-header">
+    <div class="settings-card-icon"><app-icon name="list" [size]="20"></app-icon></div>
+    <div>
+      <div class="settings-card-title">Redemption History</div>
+      <div class="settings-card-desc">View and manage all reward redemption requests</div>
+    </div>
+  </div>
+  <div class="settings-card-body no-padding">
+    <table class="reward-table">
+      <thead>
+        <tr>
+          <th>Donor</th>
+          <th>Reward</th>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Points</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (txn of transactions(); track txn.id) {
+          <tr>
+            <td class="td-donor-name">{{ txn.donorName }}</td>
+            <td>
+              <div>{{ txn.rewardName }}</div>
+              @if (txn.voucherCode) {
+                <div class="td-voucher-code">Code: {{ txn.voucherCode }}</div>
+              }
+            </td>
+            <td>
+              <span class="type-badge">{{ txn.rewardTypeLabel }}</span>
+            </td>
+            <td class="td-value">${{ txn.rewardValue | number }}</td>
+            <td class="td-points-used">{{ txn.pointsUsed | number }}</td>
+            <td class="td-date">{{ txn.createdAt | date: 'MMM d, yyyy' }}</td>
+            <td>
+              <span class="badge {{ txn.statusBadgeClass }}">{{ txn.statusLabel }}</span>
+            </td>
+            <td>
+              <div class="row-actions">
+                @if (txn.isPending) {
+                  <button class="btn-icon btn-icon-approve" title="Approve" (click)="approveRedemption.emit(txn.id)">
+                    <app-icon name="check-circle" [size]="15"></app-icon>
+                  </button>
+                  <button class="btn-icon btn-icon-reject" title="Reject" (click)="rejectRedemption.emit(txn.id)">
+                    <app-icon name="x-circle" [size]="15"></app-icon>
+                  </button>
+                }
+                @if (txn.isApproved) {
+                  <button class="btn btn-sm btn-success" (click)="fulfillRedemption.emit(txn.id)">Fulfill</button>
+                  <button class="btn-icon btn-icon-muted" title="Cancel" (click)="cancelRedemption.emit(txn.id)">
+                    <app-icon name="close" [size]="15"></app-icon>
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+        @if (transactions().length === 0) {
+          <tr>
+            <td colspan="8" class="td-empty-state">No redemption records yet.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -14,8 +14,11 @@
   </div>
   @if (progress().nextTierLabel) {
     <div class="tier-hint">
-      You have <strong>{{ progress().totalDonations }} visits</strong>.
-      <strong>{{ progress().donationsToNext }}</strong> more to reach
+      You have
+      <strong>{{ progress().totalDonations }} visits</strong>
+      .
+      <strong>{{ progress().donationsToNext }}</strong>
+      more to reach
       <app-icon [name]="progress().nextTierIcon!" [size]="14" class="tier-hint__icon"></app-icon>
       {{ progress().nextTierLabel }}.
     </div>

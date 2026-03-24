@@ -1,0 +1,16 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Campaigns</div>
+    <div class="topbar-subtitle">Donor notification campaigns by category interest</div>
+  </div>
+  <div class="topbar-actions">
+    <div class="search-bar search-bar--campaigns">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input [ngModel]="query()" (ngModelChange)="queryChanged.emit($event)" placeholder="Search campaigns..." />
+    </div>
+    <button class="btn btn-primary" (click)="createClicked.emit()">
+      <app-icon name="plus" size="15" />
+      New Campaign
+    </button>
+  </div>
+</div>

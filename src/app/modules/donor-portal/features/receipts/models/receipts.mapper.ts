@@ -6,7 +6,7 @@ export const mapDonationToReceiptListItem = (d: Donation): ReceiptListItemState 
   receiptNumber: d.receiptNumber,
   timestamp: d.timestamp,
   locationName: d.locationName,
-  totalItems: d.totalItems,
+  totalItems: d.totalItems
 });
 
 export const mapDonationToReceiptDetail = (d: Donation, donor: Donor): ReceiptDetailState => ({
@@ -17,5 +17,5 @@ export const mapDonationToReceiptDetail = (d: Donation, donor: Donor): ReceiptDe
   donorFirstName: donor.firstName,
   donorLastName: donor.lastName,
   donorEmail: donor.email,
-  donorPhone: donor.phone,
+  donorPhone: donor.phone
 });

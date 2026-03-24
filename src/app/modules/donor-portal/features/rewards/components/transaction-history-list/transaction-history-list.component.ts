@@ -9,7 +9,7 @@ import { RewardTransactionState } from '../../models/rewards.state';
   imports: [DecimalPipe, DatePipe, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './transaction-history-list.component.html',
-  styleUrl: './transaction-history-list.component.scss',
+  styleUrl: './transaction-history-list.component.scss'
 })
 export class TransactionHistoryListComponent {
   transactions = input.required<RewardTransactionState[]>();

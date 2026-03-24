@@ -1,0 +1,135 @@
+<app-modal
+  [open]="!!detail()"
+  [title]="(detail()?.barcode ?? '') + '  Detail'"
+  confirmLabel="Edit Container"
+  cancelLabel="Close"
+  [showCancel]="true"
+  size="lg"
+  (closed)="closed.emit()"
+  (confirmed)="editRequested.emit(detail()!.id)"
+>
+  @if (detail(); as d) {
+    <!-- Timeline -->
+    <div class="timeline">
+      @for (step of d.timeline; track step.label) {
+        <div class="tl-step" [class.tl-done]="step.done">
+          <div class="tl-dot">
+            <app-icon [name]="step.icon" size="14" />
+          </div>
+          <div class="tl-body">
+            <div class="tl-label">{{ step.label }}</div>
+            @if (step.time) {
+              <div class="tl-time">{{ step.time | date: 'M/d h:mm a' }}</div>
+            }
+          </div>
+        </div>
+        @if (!$last) {
+          <div class="tl-connector"></div>
+        }
+      }
+    </div>
+
+    <!-- Info grid -->
+    <div class="edit-info-grid edit-info-grid--spaced">
+      <div class="ei-cell">
+        <div class="form-label">Type</div>
+        <span class="type-badge">{{ d.typeLabel }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Department</div>
+        <span>{{ d.deptName ?? '' }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Category</div>
+        <span>{{ d.catName ?? 'Any' }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Status</div>
+        <span class="badge {{ d.statusBadgeClass }}">{{ d.statusLabel }}</span>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Destination</div>
+        @if (d.destination) {
+          <span class="badge {{ d.destBadgeClass }}">{{ d.destLabel }}</span>
+        } @else {
+          <span class="text-muted">TBD</span>
+        }
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Total Items</div>
+        <strong>{{ d.totalItems || '' }}</strong>
+      </div>
+      <div class="ei-cell">
+        <div class="form-label">Store</div>
+        <span>{{ d.locationName }}</span>
+      </div>
+      @if (d.salvageWeightLbs) {
+        <div class="ei-cell">
+          <div class="form-label">Salvage Weight</div>
+          <span>{{ d.salvageWeightLbs }} lbs</span>
+        </div>
+      }
+      @if (d.presortWorkerName) {
+        <div class="ei-cell">
+          <div class="form-label">Presort Worker</div>
+          <span>{{ d.presortWorkerName }}</span>
+        </div>
+      }
+      @if (d.transferToLocationName) {
+        <div class="ei-cell">
+          <div class="form-label">Transfer To</div>
+          <span>{{ d.transferToLocationName }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Fill bar -->
+    @if (d.fillPct > 0) {
+      <div class="form-section-hdr form-section-hdr--spaced">
+        Fill Level
+        <span class="section-count">{{ d.fillPct }}%</span>
+      </div>
+      <div class="fill-bar-lg">
+        <div class="fill-bar-inner" [style.width.%]="d.fillPct" [class.fill-full]="d.fillPct >= 90"></div>
+      </div>
+      <div class="fill-label fill-label--spaced">{{ d.totalItems }} of {{ d.capacity }} items</div>
+    }
+
+    <!-- Contents -->
+    @if (d.contents.length > 0) {
+      <div class="form-section-hdr form-section-hdr--spaced">
+        Contents
+        <span class="section-count">{{ d.contents.length }}</span>
+      </div>
+      <div class="contents-breakdown">
+        @for (item of d.contents; track item.categoryKey) {
+          <div class="cb-row">
+            <span class="cb-name">{{ item.categoryName }}</span>
+            <span class="cb-qty">{{ item.quantity }}</span>
+            <span class="badge badge--xs {{ item.conditionBadgeClass }}">{{ item.conditionLabel }}</span>
+            @if (item.ecommerceQty) {
+              <span class="badge badge--xs badge-warning">{{ item.ecommerceQty }} e-com</span>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Notes -->
+    @if (d.notes) {
+      <div class="detail-notes">{{ d.notes }}</div>
+    }
+
+    <!-- Quick actions -->
+    <div class="detail-actions">
+      @if (d.nextStatus) {
+        <button class="btn btn-primary btn-sm" (click)="advanceRequested.emit(d.id)">
+          {{ d.nextStatusLabel }}
+        </button>
+      }
+      @if (d.canReset) {
+        <button class="btn btn-sm btn-danger-outline" (click)="resetRequested.emit(d.id)">Reset to Available</button>
+      }
+    </div>
+  }
+</app-modal>

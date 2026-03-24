@@ -1,0 +1,24 @@
+.pending-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--accent-light);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-dark);
+
+  &.pending-warn {
+    background: var(--warning-50);
+    border-color: var(--warning-500);
+    color: var(--warning-500);
+  }
+
+  &.pending-danger {
+    background: var(--danger-light);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+}

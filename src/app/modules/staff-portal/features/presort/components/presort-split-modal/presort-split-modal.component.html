@@ -1,0 +1,33 @@
+<app-modal
+  [open]="open()"
+  title="Split into Separate Containers"
+  [confirmLabel]="'Create ' + items().length + ' Containers'"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  confirmVariant="primary"
+  (closed)="closed.emit()"
+  (confirmed)="confirmed.emit()"
+>
+  <div class="confirm-body">
+    <div class="confirm-hero">
+      <app-icon name="layers" [size]="28"></app-icon>
+      <div>
+        <div class="confirm-hero-title">{{ items().length }} new containers will be created</div>
+        <div class="confirm-hero-sub">One barcode per department &mdash; all route to {{ destinationLabel() }}</div>
+      </div>
+    </div>
+    <div class="split-list">
+      @for (item of items(); track item.categoryKey; let i = $index) {
+        <div class="split-row">
+          <span class="split-index">{{ i + 1 }}</span>
+          <span class="split-icon">{{ item.icon }}</span>
+          <span class="split-name">{{ item.categoryName }}</span>
+          <span class="split-qty">{{ item.quantity }} items</span>
+          <span class="badge" [class]="item.conditionBadgeClass">
+            {{ condLabel(item.condition) }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+</app-modal>

@@ -1,0 +1,115 @@
+<div class="page-content anim-in">
+  <div class="add-money-host">
+    <!-- Amount -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Donation Amount</div>
+        <div class="card-subtitle">Select a preset or enter a custom amount</div>
+      </div>
+      <div class="preset-row">
+        @for (amt of presets; track amt) {
+          <button class="preset-btn" [class.active]="monetary() === amt && !customMon()" (click)="setMonetary(amt)">
+            ${{ amt }}
+          </button>
+        }
+        <button class="preset-btn" [class.active]="customMon()" (click)="customMon.set(true)">Custom</button>
+      </div>
+      @if (customMon()) {
+        <div class="input-prefix-wrap input-prefix-wrap--mt">
+          <span class="input-prefix">$</span>
+          <input
+            class="form-input input-with-prefix"
+            type="number"
+            placeholder="0.00"
+            min="1"
+            step="1"
+            (input)="onCustomAmountInput($any($event.target).valueAsNumber || null)"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- Payment Method -->
+    @if ((monetary() ?? 0) > 0) {
+      <div class="card">
+        <div class="card-header"><div class="card-title">Payment Method</div></div>
+        <div class="pay-method-grid">
+          @if (isCashAccepted()) {
+            <button
+              class="pay-method-btn"
+              [class.active]="paymentMethod() === 'cash'"
+              (click)="onSelectPaymentMethod('cash')"
+            >
+              <span class="pm-icon"><app-icon name="dollar" [size]="28"></app-icon></span>
+              <span class="pm-label">Cash</span>
+            </button>
+          }
+          <button
+            class="pay-method-btn"
+            [class.active]="paymentMethod() === 'card'"
+            (click)="onSelectPaymentMethod('card')"
+          >
+            <span class="pm-icon"><app-icon name="credit-card" [size]="28"></app-icon></span>
+            <span class="pm-label">Card</span>
+          </button>
+        </div>
+
+        @if (paymentMethod() === 'cash') {
+          <div class="cash-flow">
+            <div class="form-group">
+              <label class="form-label">Cash Tendered</label>
+              <input
+                class="form-input"
+                type="number"
+                placeholder="0.00"
+                [value]="cashTendered() ?? ''"
+                (input)="onCashTenderedInput($any($event.target).valueAsNumber || null)"
+              />
+            </div>
+            @if ((cashTendered() ?? 0) > 0) {
+              @if (cashTendered()! >= monetary()!) {
+                <div class="change-display">
+                  Change Due:
+                  <strong>${{ (cashTendered()! - monetary()!).toFixed(2) }}</strong>
+                </div>
+              } @else {
+                <div class="change-insufficient">
+                  <app-icon name="alert-circle" [size]="14"></app-icon>
+                  Insufficient — need ${{ monetary()!.toFixed(2) }}
+                </div>
+              }
+            }
+          </div>
+        }
+
+        @if (paymentMethod() === 'card') {
+          @if (!cardApproved() && !cardDeclined()) {
+            <div class="card-terminal">
+              <div class="terminal-icon"><app-icon name="credit-card" [size]="40"></app-icon></div>
+              <div class="terminal-msg">Tap or insert card on the terminal</div>
+              <div class="terminal-sub">Waiting for customer to tap or swipe...</div>
+              <div class="terminal-pulse"></div>
+            </div>
+          } @else if (cardApproved()) {
+            <div class="card-approved">
+              <app-icon name="check-circle" [size]="32"></app-icon>
+              <div class="ca-body">
+                <div class="ca-title">Card Approved</div>
+                <div class="ca-sub">Payment authorised successfully</div>
+              </div>
+            </div>
+          } @else if (cardDeclined()) {
+            <div class="card-declined">
+              <app-icon name="x-circle" [size]="32"></app-icon>
+              <div class="ca-body">
+                <div class="ca-title">Card Declined</div>
+                <div class="ca-sub">{{ cardDeclineReason() }}</div>
+              </div>
+              <button class="btn btn-secondary ca-retry" (click)="onCardRetry()">Retry</button>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+</div>

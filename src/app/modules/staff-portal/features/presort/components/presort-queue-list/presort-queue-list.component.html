@@ -1,0 +1,45 @@
+<div class="card">
+  <div class="queue-header">
+    <span class="card-title">Queue</span>
+    <span
+      class="queue-count"
+      [class.warn]="backlogSeverity() === 'warn'"
+      [class.danger]="backlogSeverity() === 'danger'"
+    >
+      {{ queue().length }}
+    </span>
+  </div>
+
+  @for (q of queue(); track q.id) {
+    <div class="queue-item" [class.active]="activeId() === q.id" (click)="onSelect(q)">
+      <div class="qi-top-row">
+        <span class="qi-type-badge">
+          <app-icon [name]="q.containerTypeIcon" [size]="11"></app-icon>
+          {{ q.containerTypeLabel }}
+        </span>
+        <span class="qi-age" [class]="'age-' + q.ageColor">{{ q.ageLabel }}</span>
+      </div>
+      <div class="qi-barcode">{{ q.barcode }}</div>
+      <div class="qi-source">{{ q.donorVisitLabel }}</div>
+      <div class="qi-meta">
+        {{ q.itemCount }} est. items &nbsp;&middot;&nbsp;
+        <span class="qi-method" [class.dock]="q.isDockSide">
+          {{ q.presortMethodLabel }}
+        </span>
+      </div>
+      @if (q.isDockSide) {
+        <button class="qi-quick-btn" (click)="onQuickComplete(q, $event)">
+          <app-icon name="check-circle" [size]="11"></app-icon>
+          Quick Complete
+        </button>
+      }
+    </div>
+  }
+
+  @if (!queue().length) {
+    <div class="queue-empty">
+      <app-icon name="check-circle" [size]="28"></app-icon>
+      <p>Queue clear</p>
+    </div>
+  }
+</div>

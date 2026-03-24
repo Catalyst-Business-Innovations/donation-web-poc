@@ -1,0 +1,8 @@
+<div class="metrics-grid">
+  @for (metric of metrics(); track metric.label) {
+    <div class="metric-card">
+      <div class="metric-val">{{ metric.value }}</div>
+      <div class="metric-lbl">{{ metric.label }}</div>
+    </div>
+  }
+</div>

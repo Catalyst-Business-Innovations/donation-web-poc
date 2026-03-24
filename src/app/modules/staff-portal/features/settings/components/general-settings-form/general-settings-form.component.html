@@ -1,0 +1,101 @@
+@if (localRules) {
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon"><app-icon name="sliders" [size]="20"></app-icon></div>
+      <div>
+        <div class="settings-card-title">System Rules</div>
+        <div class="settings-card-desc">Payment options, association windows, points, and email requirements</div>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div class="rules-section-label">Payment</div>
+      <div class="rule-row" (click)="localRules.isCashAccepted = !localRules.isCashAccepted">
+        <div>
+          <div class="rule-label">Accept Cash Donations</div>
+          <div class="rule-desc">Show cash as a payment option at the donation terminal</div>
+        </div>
+        <label class="toggle" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="localRules.isCashAccepted" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+
+      <div class="rules-section-label">Donor Association</div>
+      <div class="rule-row">
+        <div>
+          <div class="rule-label">Association Window</div>
+          <div class="rule-desc">Hours staff can link an anonymous donation to a donor</div>
+        </div>
+        <div class="mini-field">
+          <input
+            type="number"
+            class="form-input mini-in"
+            [(ngModel)]="localRules.associationWindowHours"
+            min="1"
+            max="168"
+          />
+          <label>hrs</label>
+        </div>
+      </div>
+
+      <div class="rules-section-label">Loyalty Points</div>
+      <div class="rule-row">
+        <div>
+          <div class="rule-label">Points per Item</div>
+          <div class="rule-desc">Loyalty points awarded per donated item</div>
+        </div>
+        <div class="mini-field">
+          <input type="number" class="form-input mini-in" [(ngModel)]="localRules.pointsPerItem" min="1" />
+          <label>pts</label>
+        </div>
+      </div>
+
+      <div class="rules-section-label">Reward Approval</div>
+      <div class="rule-row" (click)="localRules.requireApproval = !localRules.requireApproval">
+        <div>
+          <div class="rule-label">Manual Approval Required</div>
+          <div class="rule-desc">If enabled, reward redemptions require admin approval before fulfillment</div>
+        </div>
+        <label class="toggle" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="localRules.requireApproval" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+
+      <div class="rules-section-label">Email Requirements</div>
+      <div class="rule-row" (click)="localRules.emailForReceipt = !localRules.emailForReceipt">
+        <div>
+          <div class="rule-label">Required for Receipt</div>
+          <div class="rule-desc">Donor must have email to receive e-receipts</div>
+        </div>
+        <label class="toggle" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="localRules.emailForReceipt" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+      <div class="rule-row" (click)="localRules.emailForLogin = !localRules.emailForLogin">
+        <div>
+          <div class="rule-label">Required for Portal Login</div>
+          <div class="rule-desc">Donor must have email to access the donor portal</div>
+        </div>
+        <label class="toggle" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="localRules.emailForLogin" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+      <div class="rule-row" (click)="localRules.emailForCampaigns = !localRules.emailForCampaigns">
+        <div>
+          <div class="rule-label">Required for Campaigns</div>
+          <div class="rule-desc">Exclude donors without email from campaign notifications</div>
+        </div>
+        <label class="toggle" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="localRules.emailForCampaigns" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+    </div>
+    <div class="settings-card-footer">
+      <button class="btn btn-success" (click)="save()">Save System Rules</button>
+    </div>
+  </div>
+}

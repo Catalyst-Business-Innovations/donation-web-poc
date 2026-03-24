@@ -1,0 +1,17 @@
+<div class="stepper">
+  @for (s of steps(); track s.n) {
+    <div class="step" [class.active]="currentStep() === s.n" [class.done]="currentStep() > s.n">
+      <div class="step-num">
+        @if (currentStep() > s.n) {
+          <app-icon name="checkmark" [size]="14"></app-icon>
+        } @else {
+          {{ s.n }}
+        }
+      </div>
+      <span>{{ s.label }}</span>
+    </div>
+    @if (!$last) {
+      <div class="step-arrow"><app-icon name="arrow-right" [size]="12"></app-icon></div>
+    }
+  }
+</div>

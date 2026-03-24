@@ -1,0 +1,99 @@
+<div class="card">
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Campaign</th>
+          <th>Channel</th>
+          <th>Templates</th>
+          <th>Effective Dates</th>
+          <th>Status</th>
+          <th>Sent</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of campaigns(); track c.id) {
+          <tr (click)="viewClicked.emit(c)" class="clickable-row">
+            <td>
+              <div class="table-campaign-name">{{ c.name }}</div>
+              <div class="table-campaign-desc">{{ c.description }}</div>
+              @if (c.targetCriteria.length) {
+                <div class="table-criteria">
+                  @for (tc of c.targetCriteria; track $index) {
+                    <span class="badge badge-info badge--xs">{{ getCriterionLabel(tc) }}</span>
+                  }
+                </div>
+              }
+            </td>
+            <td>
+              <span class="badge badge-info badge--sm">{{ c.channelLabel }}</span>
+            </td>
+            <td>
+              @if (c.templateStatus === 'ready') {
+                <span class="tpl-status tpl-ready">
+                  <app-icon name="check-circle" size="13" />
+                  Ready
+                </span>
+              } @else if (c.templateStatus === 'partial') {
+                <span class="tpl-status tpl-partial">
+                  <app-icon name="alert-circle" size="13" />
+                  Partial
+                </span>
+              } @else {
+                <span class="tpl-status tpl-none">
+                  <app-icon name="file-text" size="13" />
+                  None
+                </span>
+              }
+            </td>
+            <td class="table-cell--date">{{ c.startDate | date: 'MMM d' }} – {{ c.endDate | date: 'MMM d, yyyy' }}</td>
+            <td>
+              <span class="badge {{ c.statusBadgeClass }}">{{ c.statusLabel }}</span>
+            </td>
+            <td class="table-cell--bold">
+              @if (c.notificationCount > 0) {
+                {{ c.notificationCount }}
+              } @else {
+                —
+              }
+            </td>
+            <td>
+              <div class="table-actions" (click)="$event.stopPropagation()">
+                @if (c.isDraft) {
+                  <button class="btn-icon" title="Activate" (click)="activateClicked.emit(c)">
+                    <app-icon name="check-circle" size="14" />
+                  </button>
+                }
+                @if (c.isActive) {
+                  <button class="btn btn-success btn-sm" (click)="executeClicked.emit(c)">
+                    <app-icon name="send" size="13" />
+                    Run
+                  </button>
+                  <button class="btn-icon" title="Pause" (click)="pauseClicked.emit(c)">
+                    <app-icon name="alert-circle" size="14" />
+                  </button>
+                }
+                @if (c.isPaused) {
+                  <button class="btn-icon" title="Activate" (click)="activateClicked.emit(c)">
+                    <app-icon name="check-circle" size="14" />
+                  </button>
+                }
+                <button class="btn-icon" title="Edit" (click)="editClicked.emit(c)">
+                  <app-icon name="edit" size="14" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (campaigns().length === 0) {
+      <div class="empty-state">
+        <div class="empty-state-icon"><app-icon name="send" [size]="40"></app-icon></div>
+        <div class="empty-state-title">No campaigns yet</div>
+        <div class="empty-state-text">Create a campaign to notify donors by category interest.</div>
+      </div>
+    }
+  </div>
+</div>

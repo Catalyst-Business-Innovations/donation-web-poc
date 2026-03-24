@@ -19,7 +19,8 @@
         <div class="loc-preview__name">{{ loc.name }}</div>
         <div class="loc-preview__meta">{{ loc.address }}</div>
         <div class="loc-preview__meta loc-preview__meta--hours">
-          <app-icon name="clock" [size]="13"></app-icon> {{ loc.hours }}
+          <app-icon name="clock" [size]="13"></app-icon>
+          {{ loc.hours }}
         </div>
       </div>
       <span class="badge {{ loc.statusBadgeClass }}">{{ loc.statusLabel }}</span>

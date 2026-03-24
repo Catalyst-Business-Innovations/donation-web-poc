@@ -8,7 +8,7 @@ import { TierProgressState } from '../../models/rewards.state';
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tier-progress-card.component.html',
-  styleUrl: './tier-progress-card.component.scss',
+  styleUrl: './tier-progress-card.component.scss'
 })
 export class TierProgressCardComponent {
   progress = input.required<TierProgressState>();

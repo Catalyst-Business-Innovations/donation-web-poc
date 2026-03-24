@@ -9,7 +9,13 @@
       "Bash(while read:*)",
       "Bash(do sed:*)",
       "Bash(do echo:*)",
-      "Read(//d/Projects/RCS/repos/donation/Donation.Web/$feature/**)"
+      "Read(//d/Projects/RCS/repos/donation/Donation.Web/$feature/**)",
+      "Bash(npx ng:*)",
+      "Bash(npx prettier:*)",
+      "Bash(ls \"D:\\\\Projects\\\\RCS\\\\repos\\\\donation\\\\Donation.Web\\\\src\\\\app\\\\modules\\\\staff-portal\\\\features\\\\campaigns\\\\components\\\\campaigns.component\"*)",
+      "Bash(mv donor-management-page.component.ts donors-page.component.ts)",
+      "Bash(mv donor-management-page.component.html donors-page.component.html)",
+      "Bash(mv donor-management-page.component.scss donors-page.component.scss)"
     ]
   }
 }

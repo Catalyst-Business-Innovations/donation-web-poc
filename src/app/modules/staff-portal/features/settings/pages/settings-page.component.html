@@ -1,0 +1,55 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Settings</div>
+    <div class="topbar-subtitle">Configure system rules, loyalty tiers, and rewards</div>
+  </div>
+</div>
+
+<div class="page-content">
+  <app-settings-tab-bar [activeTab]="activeTab()" (tabChanged)="activeTab.set($event)"></app-settings-tab-bar>
+
+  @if (activeTab() === 'general') {
+    <div class="tab-panel">
+      <app-general-settings-form
+        [rules]="systemRules()"
+        (saved)="onSaveSystemRules($event)"
+      ></app-general-settings-form>
+    </div>
+  }
+
+  @if (activeTab() === 'loyalty') {
+    <div class="tab-panel">
+      <app-loyalty-tier-editor [tiers]="loyaltyTiers()" (saved)="onSaveTiers($event)"></app-loyalty-tier-editor>
+    </div>
+  }
+
+  @if (activeTab() === 'rewards') {
+    <div class="tab-panel">
+      <app-rewards-management
+        [rewards]="filteredRewards()"
+        [transactions]="transactions()"
+        [rewardTypes]="rewardTypes"
+        [statusFilter]="rewardFilter()"
+        [typeFilter]="typeFilter()"
+        (addReward)="onAddReward()"
+        (editReward)="onEditReward($event)"
+        (toggleActive)="onToggleActive($event)"
+        (deleteReward)="onDeleteReward($event)"
+        (statusFilterChanged)="rewardFilter.set($event)"
+        (typeFilterChanged)="typeFilter.set($event)"
+        (approveRedemption)="onApproveRedemption($event)"
+        (rejectRedemption)="onRejectRedemption($event)"
+        (fulfillRedemption)="onFulfillRedemption($event)"
+        (cancelRedemption)="onCancelRedemption($event)"
+      ></app-rewards-management>
+    </div>
+  }
+</div>
+
+<app-reward-form-modal
+  [modalMode]="modalMode()"
+  [form]="rewardForm()"
+  [rewardTypes]="rewardTypes"
+  (closed)="onModalClosed()"
+  (confirmed)="onModalConfirmed($event)"
+></app-reward-form-modal>

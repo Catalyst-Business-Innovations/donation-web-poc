@@ -9,7 +9,7 @@ import { CartItemState, NewCartItemState } from '../../models/schedule.state';
   imports: [FormsModule, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './cart-editor.component.html',
-  styleUrl: './cart-editor.component.scss',
+  styleUrl: './cart-editor.component.scss'
 })
 export class CartEditorComponent {
   items = input.required<CartItemState[]>();

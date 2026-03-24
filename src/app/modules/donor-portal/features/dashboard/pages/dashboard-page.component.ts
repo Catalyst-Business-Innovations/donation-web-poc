@@ -17,11 +17,11 @@ import { QuickActionsCardComponent } from '../components/quick-actions-card/quic
     ActiveCampaignsListComponent,
     RecentDonationsCardComponent,
     ImpactSummaryComponent,
-    QuickActionsCardComponent,
+    QuickActionsCardComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dashboard-page.component.html',
-  styleUrl: './dashboard-page.component.scss',
+  styleUrl: './dashboard-page.component.scss'
 })
 export class DashboardPageComponent {
   private readonly dashboardService = inject(DonorDashboardService);

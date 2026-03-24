@@ -1,0 +1,31 @@
+<app-modal
+  [open]="open()"
+  [title]="modalTitle"
+  [confirmLabel]="confirmLabel"
+  [confirmDisabled]="!canSave"
+  (closed)="closed.emit()"
+  (confirmed)="onConfirm()"
+>
+  <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label">First Name *</label>
+      <input class="form-input" [(ngModel)]="formData.firstName" placeholder="First name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Last Name *</label>
+      <input class="form-input" [(ngModel)]="formData.lastName" placeholder="Last name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" [(ngModel)]="formData.email" placeholder="email@example.com" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Phone *</label>
+      <input class="form-input" [(ngModel)]="formData.phone" placeholder="(555) 000-0000" />
+    </div>
+    <div class="form-group form-group--full">
+      <label class="form-label">Address</label>
+      <input class="form-input" [(ngModel)]="formData.address" placeholder="Full address" />
+    </div>
+  </div>
+</app-modal>

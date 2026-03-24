@@ -16,11 +16,11 @@ import { CartItemState, NewCartItemState, ScheduledVisitState, ConfirmationState
     CartEditorComponent,
     UpcomingVisitsListComponent,
     VisitDetailModalComponent,
-    ScheduleConfirmationModalComponent,
+    ScheduleConfirmationModalComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './schedule-page.component.html',
-  styleUrl: './schedule-page.component.scss',
+  styleUrl: './schedule-page.component.scss'
 })
 export class SchedulePageComponent {
   private readonly scheduleService = inject(ScheduleService);
@@ -30,14 +30,21 @@ export class SchedulePageComponent {
   protected readonly categories = this.scheduleService.getCategoryNames();
   protected readonly today = new Date().toISOString().split('T')[0];
   protected readonly timeSlots = [
-    '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
-    '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM',
+    '9:00 AM',
+    '10:00 AM',
+    '11:00 AM',
+    '12:00 PM',
+    '1:00 PM',
+    '2:00 PM',
+    '3:00 PM',
+    '4:00 PM',
+    '5:00 PM'
   ];
   protected readonly recurringOpts = [
     { value: 'none', label: 'One-time' },
     { value: 'weekly', label: 'Weekly' },
     { value: 'biweekly', label: 'Every 2 Weeks' },
-    { value: 'monthly', label: 'Monthly' },
+    { value: 'monthly', label: 'Monthly' }
   ];
 
   protected selectedLocation = signal<number | null>(null);
@@ -48,12 +55,35 @@ export class SchedulePageComponent {
   protected selectedVisit = signal<ScheduledVisitState | null>(null);
   protected showConfirmation = signal(false);
   protected confirmation = signal<ConfirmationState>({
-    id: '', location: '', date: '', time: '', recurring: '', items: 0,
+    id: '',
+    location: '',
+    date: '',
+    time: '',
+    recurring: '',
+    items: 0
   });
 
   readonly upcoming: ScheduledVisitState[] = [
-    { referenceNumber: 'APT-20260322-001', date: '2026-03-22', day: '22', month: 'MAR', location: 'Downtown Store', time: '10:00 AM', items: 8, recurring: 'One-time' },
-    { referenceNumber: 'APT-20260405-002', date: '2026-04-05', day: '5', month: 'APR', location: 'Downtown Store', time: '2:00 PM', items: 3, recurring: 'Monthly' },
+    {
+      referenceNumber: 'APT-20260322-001',
+      date: '2026-03-22',
+      day: '22',
+      month: 'MAR',
+      location: 'Downtown Store',
+      time: '10:00 AM',
+      items: 8,
+      recurring: 'One-time'
+    },
+    {
+      referenceNumber: 'APT-20260405-002',
+      date: '2026-04-05',
+      day: '5',
+      month: 'APR',
+      location: 'Downtown Store',
+      time: '2:00 PM',
+      items: 3,
+      recurring: 'Monthly'
+    }
   ];
 
   get totalCartItems(): number {
@@ -63,7 +93,7 @@ export class SchedulePageComponent {
   onAddCartItem(item: NewCartItemState): void {
     this.cart.update(items => [
       ...items,
-      { id: String(Date.now()), category: item.category, description: item.description, qty: item.qty },
+      { id: String(Date.now()), category: item.category, description: item.description, qty: item.qty }
     ]);
   }
 
@@ -82,7 +112,7 @@ export class SchedulePageComponent {
       date: this.selectedDate(),
       time: this.selectedTime() || 'Not specified',
       recurring: this.recurringOpts.find(r => r.value === 'none')?.label || 'One-time',
-      items: this.totalCartItems,
+      items: this.totalCartItems
     });
     this.showConfirmation.set(true);
   }

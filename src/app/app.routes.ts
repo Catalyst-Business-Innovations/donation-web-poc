@@ -35,7 +35,9 @@ export const routes: Routes = [
   {
     path: 'terminal-simulator',
     loadComponent: () =>
-      import('./modules/staff-portal/features/new-donation/components/terminal-simulator.component').then(m => m.TerminalSimulatorComponent)
+      import('./modules/staff-portal/features/new-donation/components/terminal-simulator.component').then(
+        m => m.TerminalSimulatorComponent
+      )
   },
   { path: '**', redirectTo: '' }
 ];

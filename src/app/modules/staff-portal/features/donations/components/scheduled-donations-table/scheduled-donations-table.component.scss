@@ -1,0 +1,88 @@
+// ── Topbar: single-row with all controls ─────────────────────────────────────
+.donations-topbar {
+  gap: 10px;
+  flex-wrap: nowrap;
+  .topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+.topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--gray-200);
+  flex-shrink: 0;
+}
+.donations-search {
+  width: 240px;
+  flex-shrink: 0;
+}
+.f-sel {
+  width: 140px;
+  height: 36px;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.f-date {
+  font-size: 13px;
+  width: 140px;
+  flex-shrink: 0;
+}
+.btn-sm {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 12px;
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────
+.appt-row {
+  cursor: pointer;
+  transition: var(--transition);
+  &:hover {
+    background: var(--gray-50);
+  }
+}
+.apt-id-cell {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+.donor-cell {
+  max-width: 160px;
+}
+.donor-name {
+  font-weight: 700;
+  font-size: 13px;
+}
+.donor-sub {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.cat-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+// ── Table cell variants ────────────────────────────────────────────────────
+.td-date-primary {
+  font-weight: 700;
+  font-size: 13px;
+}
+.td-date-secondary {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.td-text-sm {
+  font-size: 13px;
+}
+.td-bold {
+  font-weight: 700;
+}
+.badge--xs {
+  font-size: 10px;
+}

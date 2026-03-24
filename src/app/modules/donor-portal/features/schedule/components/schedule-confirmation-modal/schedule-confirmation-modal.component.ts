@@ -11,7 +11,7 @@ import { ConfirmationState } from '../../models/schedule.state';
   imports: [DatePipe, IconComponent, ModalComponent, QrCodeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './schedule-confirmation-modal.component.html',
-  styleUrl: './schedule-confirmation-modal.component.scss',
+  styleUrl: './schedule-confirmation-modal.component.scss'
 })
 export class ScheduleConfirmationModalComponent {
   open = input.required<boolean>();

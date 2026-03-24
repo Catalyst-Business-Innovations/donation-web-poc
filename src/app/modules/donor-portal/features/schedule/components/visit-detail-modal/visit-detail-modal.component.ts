@@ -11,7 +11,7 @@ import { ScheduledVisitState } from '../../models/schedule.state';
   imports: [DatePipe, IconComponent, ModalComponent, QrCodeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './visit-detail-modal.component.html',
-  styleUrl: './visit-detail-modal.component.scss',
+  styleUrl: './visit-detail-modal.component.scss'
 })
 export class VisitDetailModalComponent {
   visit = input.required<ScheduledVisitState | null>();

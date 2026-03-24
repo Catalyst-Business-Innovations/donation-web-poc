@@ -14,16 +14,9 @@
 </div>
 
 <div class="page-content">
-  <app-history-filters
-    [years]="years"
-    [selectedYear]="selectedYear()"
-    (yearChanged)="selectedYear.set($event)"
-  />
+  <app-history-filters [years]="years" [selectedYear]="selectedYear()" (yearChanged)="selectedYear.set($event)" />
 
-  <app-history-summary-cards
-    [summary]="summary()"
-    (yearEndSummaryRequested)="onYearEndSummary()"
-  />
+  <app-history-summary-cards [summary]="summary()" (yearEndSummaryRequested)="onYearEndSummary()" />
 
   <app-history-list
     [donations]="filteredDonations()"

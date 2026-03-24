@@ -1,0 +1,53 @@
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.pipeline-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+
+  &:hover {
+    background: var(--gray-50);
+  }
+
+  &.active {
+    background: var(--primary-light);
+  }
+}
+
+.ps-icon {
+  font-size: 22px;
+}
+
+.ps-count {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--gray-900);
+}
+
+.ps-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.pipeline-arrow {
+  font-size: 20px;
+  color: var(--gray-300);
+}

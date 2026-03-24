@@ -8,7 +8,7 @@ import { ScheduledVisitState } from '../../models/schedule.state';
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './upcoming-visits-list.component.html',
-  styleUrl: './upcoming-visits-list.component.scss',
+  styleUrl: './upcoming-visits-list.component.scss'
 })
 export class UpcomingVisitsListComponent {
   visits = input.required<ScheduledVisitState[]>();

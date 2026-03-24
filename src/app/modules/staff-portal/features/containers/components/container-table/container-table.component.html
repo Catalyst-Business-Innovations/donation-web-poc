@@ -1,0 +1,120 @@
+<div class="card">
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="check-col">
+            <input type="checkbox" [checked]="allSelected()" (change)="selectAllToggled.emit()" />
+          </th>
+          <th>Ref #</th>
+          <th>Type</th>
+          <th>Department</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Destination</th>
+          <th>Items</th>
+          <th>Updated</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of rows(); track c.id) {
+          <tr [class.row-selected]="isSelected(c.id)">
+            <td class="check-col" (click)="$event.stopPropagation()">
+              <input type="checkbox" [checked]="isSelected(c.id)" (change)="selectToggled.emit(c.id)" />
+            </td>
+            <td class="clickable-cell" (click)="detailRequested.emit(c.id)">
+              <div class="barcode-cell">{{ c.barcode }}</div>
+              @if (c.donorVisitLabel) {
+                <div class="donor-label">{{ c.donorVisitLabel }}</div>
+              }
+            </td>
+            <td>
+              <span class="type-badge">{{ c.typeLabel }}</span>
+            </td>
+            <td>
+              @if (c.deptName) {
+                <span class="badge badge-info badge--xs">{{ c.deptName }}</span>
+              } @else {
+                <span class="text-muted"></span>
+              }
+            </td>
+            <td>
+              @if (c.catName) {
+                <span class="cat-name">{{ c.catName }}</span>
+              } @else {
+                <span class="text-muted">Any</span>
+              }
+            </td>
+            <td>
+              <span class="badge {{ c.statusBadgeClass }}">{{ c.statusLabel }}</span>
+            </td>
+            <td>
+              @if (c.destination) {
+                <span class="badge {{ c.destBadgeClass }}">
+                  <app-icon [name]="c.destIcon!" [size]="12" class="dest-icon"></app-icon>
+                  {{ c.destLabel }}
+                </span>
+                @if (c.transferToLocationName) {
+                  <div class="transfer-location">&rarr; {{ c.transferToLocationName }}</div>
+                }
+              } @else {
+                <span class="text-muted">TBD</span>
+              }
+            </td>
+            <td>
+              @if (c.fillPct > 0) {
+                <div class="fill-bar">
+                  <div class="fill-bar-inner" [style.width.%]="c.fillPct" [class.fill-full]="c.fillPct >= 90"></div>
+                </div>
+                <div class="fill-label">
+                  {{ c.totalItems }}
+                  <span class="fill-cap">/ {{ c.capacity }}</span>
+                </div>
+              } @else {
+                <span class="items-count">{{ c.totalItems || '' }}</span>
+              }
+            </td>
+            <td class="updated-at">{{ c.updatedAt | date: 'M/d h:mm a' }}</td>
+            <td>
+              <div class="table-actions">
+                @if (c.nextStatus) {
+                  <button
+                    class="btn-advance"
+                    (click)="advanceRequested.emit(c.id); $event.stopPropagation()"
+                    [title]="c.nextStatusLabel"
+                  >
+                    {{ c.nextStatusLabel }}
+                  </button>
+                }
+                <button
+                  class="btn-icon"
+                  title="View Details"
+                  (click)="detailRequested.emit(c.id); $event.stopPropagation()"
+                >
+                  <app-icon name="eye" size="14" />
+                </button>
+                <button class="btn-icon" title="Edit" (click)="editRequested.emit(c.id); $event.stopPropagation()">
+                  <app-icon name="edit" size="14" />
+                </button>
+                <button
+                  class="btn-icon"
+                  title="Print Label"
+                  (click)="printRequested.emit(c.id); $event.stopPropagation()"
+                >
+                  <app-icon name="printer" [size]="14"></app-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (rows().length === 0) {
+      <div class="empty-state">
+        <div class="empty-state-icon"><app-icon name="layers" [size]="40"></app-icon></div>
+        <div class="empty-state-title">No containers match</div>
+      </div>
+    }
+  </div>
+</div>

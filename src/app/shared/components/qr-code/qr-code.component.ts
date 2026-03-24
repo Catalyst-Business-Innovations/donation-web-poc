@@ -8,8 +8,11 @@ import QRCode from 'qrcode';
     @if (dataUrl()) {
       <img [src]="dataUrl()" [width]="size" [height]="size" alt="QR Code" style="display: block;" />
     } @else {
-      <div [style.width.px]="size" [style.height.px]="size"
-           style="background: #f3f3f3; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+      <div
+        [style.width.px]="size"
+        [style.height.px]="size"
+        style="background: #f3f3f3; border-radius: 4px; display: flex; align-items: center; justify-content: center;"
+      >
         <span style="font-size: 11px; color: #999">Loading…</span>
       </div>
     }

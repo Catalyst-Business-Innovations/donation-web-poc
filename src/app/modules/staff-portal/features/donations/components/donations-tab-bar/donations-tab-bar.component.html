@@ -1,0 +1,12 @@
+<div class="tab-switcher">
+  <button
+    class="tab-btn"
+    [class.active]="activeTab() === 'scheduled-donations'"
+    (click)="tabChanged.emit('scheduled-donations')"
+  >
+    Scheduled Donations
+  </button>
+  <button class="tab-btn" [class.active]="activeTab() === 'completions'" (click)="tabChanged.emit('completions')">
+    Completed Donations
+  </button>
+</div>

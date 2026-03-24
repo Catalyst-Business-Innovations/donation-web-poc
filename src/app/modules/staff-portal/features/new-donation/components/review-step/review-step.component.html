@@ -1,0 +1,160 @@
+<div class="page-content anim-in">
+  <!-- Summary header -->
+  <div class="rs-header">
+    <div class="rs-header-icon"><app-icon name="check-circle" size="22" /></div>
+    <div>
+      <div class="rs-header-title">Review Summary</div>
+      <div class="rs-header-sub">Confirm all details before completing the donation</div>
+    </div>
+    <button class="sb-back-btn sb-back-btn--ml-auto" (click)="onGoBack()">Back</button>
+  </div>
+
+  <div class="review-two-col">
+    <!-- Card 1: Summary -->
+    <div class="card">
+      <!-- Donor -->
+      <div class="rs-overview-bar rs-overview-bar--mb">
+        @if (donor() === null) {
+          <div class="sb-donor-chip sb-donor-anon">
+            <div class="sb-donor-avatar sb-donor-avatar-anon"><app-icon name="user" [size]="18"></app-icon></div>
+            <div class="sb-donor-info">
+              <span class="sb-donor-name">Anonymous</span>
+              <span class="sb-donor-meta">No loyalty points</span>
+            </div>
+          </div>
+        } @else if (donor(); as d) {
+          <div class="sb-donor-chip">
+            <div class="sb-donor-avatar">{{ d.initials }}</div>
+            <div class="sb-donor-info">
+              <span class="sb-donor-name">{{ d.displayName }}</span>
+              <span class="sb-donor-meta">
+                <app-icon [name]="getTierCfg(d.tier).icon" [size]="11"></app-icon>
+                {{ getTierCfg(d.tier).label }} · {{ d.points | number }} pts
+              </span>
+            </div>
+          </div>
+        }
+        @if (donor() && estPoints() > 0) {
+          <div class="rs-points-badge rs-points-badge--ml-auto">+{{ estPoints() }} pts</div>
+        }
+      </div>
+
+      <!-- Items -->
+      @if (donationType() !== DT.Monetary) {
+        <div class="rs-section-label">Items to Donate</div>
+        <div class="rs-items-list">
+          @for (item of reviewItems(); track item.key) {
+            <div class="rs-item-row">
+              <div class="rs-item-name">{{ item.name }}</div>
+              <div class="rs-item-right">
+                <span class="rs-item-qty">&times; {{ item.qty }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="rs-totals">
+          <div class="rs-total-row">
+            <span>Total Items</span>
+            <strong>{{ totalItems() }}</strong>
+          </div>
+        </div>
+      }
+
+      <!-- Monetary -->
+      @if (donationType() !== DT.Items) {
+        @if (donationType() !== DT.Monetary) {
+          <div class="rs-divider"></div>
+        }
+        <div class="rs-section-label">Monetary Donation</div>
+        <div class="rs-pay-row">
+          <div class="rs-pay-amount">${{ (monetary() ?? 0).toFixed(2) }}</div>
+          <div class="rs-pay-method">
+            @if (paymentMethod() === 'cash') {
+              <span class="rs-method-badge">
+                <app-icon name="dollar" [size]="12"></app-icon>
+                Cash
+              </span>
+            }
+            @if (paymentMethod() === 'card') {
+              <span class="rs-method-badge">
+                <app-icon name="credit-card" [size]="12"></app-icon>
+                Card
+              </span>
+            }
+          </div>
+        </div>
+        @if (paymentMethod() === 'cash' && (cashTendered() ?? 0) > 0) {
+          <div class="rs-pay-details">
+            <div class="rs-pay-detail-row">
+              <span>Tendered</span>
+              <strong>${{ cashTendered()!.toFixed(2) }}</strong>
+            </div>
+            <div class="rs-pay-detail-row">
+              <span>Change Due</span>
+              <strong>${{ (cashTendered()! - (monetary() ?? 0)).toFixed(2) }}</strong>
+            </div>
+          </div>
+        }
+        @if (paymentMethod() === 'card' && cardApproved()) {
+          <div class="rs-pay-details">
+            <div class="rs-pay-detail-row">
+              <span>Transaction Ref #</span>
+              <strong class="rs-txn-ref">{{ cardTxnRef() }}</strong>
+            </div>
+            <div class="rs-pay-detail-row">
+              <span>Amount Charged</span>
+              <strong>${{ (monetary() ?? 0).toFixed(2) }}</strong>
+            </div>
+          </div>
+        }
+        @if (paymentMethod() === 'card' && cardDeclined()) {
+          <div class="rs-card-failure">
+            <app-icon name="x-circle" [size]="24"></app-icon>
+            <div class="rs-card-success-info">
+              <div class="rs-card-failure-title">Card Declined</div>
+              <div class="rs-card-failure-sub">{{ cardDeclineReason() }}</div>
+            </div>
+          </div>
+          <div class="rs-pay-details">
+            <div class="rs-pay-detail-row">
+              <span>Amount</span>
+              <strong>${{ (monetary() ?? 0).toFixed(2) }}</strong>
+            </div>
+            <div class="rs-pay-detail-row">
+              <span>Action Required</span>
+              <button class="btn btn-secondary btn-sm" (click)="onCardRetry()">Retry Payment</button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Card 2: Delivery + CTA -->
+    <div class="card">
+      <div class="rs-section-label">Receipt Delivery</div>
+      <div class="rs-delivery-opts">
+        @for (opt of deliveryOpts; track opt.value) {
+          <label class="delivery-opt" [class.active]="delivery() === opt.value">
+            <input
+              type="radio"
+              name="del"
+              [value]="opt.value"
+              [checked]="delivery() === opt.value"
+              (change)="onDeliveryChange(opt.value)"
+            />
+            <app-icon [name]="opt.icon" [size]="14"></app-icon>
+            {{ opt.label }}
+          </label>
+        }
+      </div>
+
+      <div class="rs-cta-block">
+        <button class="btn btn-success btn-lg complete-btn" (click)="onComplete()" [disabled]="!canComplete()">
+          <app-icon name="check-circle" [size]="18"></app-icon>
+          Complete Donation
+        </button>
+        <div class="rs-cta-hint">Receipt will be sent after completion</div>
+      </div>
+    </div>
+  </div>
+</div>

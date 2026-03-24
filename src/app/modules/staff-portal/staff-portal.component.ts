@@ -39,9 +39,7 @@ export class StaffPortalComponent {
     },
     {
       title: 'Reporting',
-      items: [
-        { label: 'Dashboard', icon: 'grid', route: '/staff/dashboard' }
-      ]
+      items: [{ label: 'Dashboard', icon: 'grid', route: '/staff/dashboard' }]
     },
     {
       title: 'Admin',

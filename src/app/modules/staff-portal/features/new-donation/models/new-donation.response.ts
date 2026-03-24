@@ -1,4 +1,4 @@
-import { DonationStatus } from '../../../../../core/models/domain.models';
+import { DonationStatus } from '@core/models/domain.models';
 
 export interface DonationItemResponse {
   id: string;

@@ -8,7 +8,7 @@ import { IconComponent } from '@shared/components/icon/icon.component';
   imports: [RouterLink, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './quick-actions-card.component.html',
-  styleUrl: './quick-actions-card.component.scss',
+  styleUrl: './quick-actions-card.component.scss'
 })
 export class QuickActionsCardComponent {
   findStoreClicked = output<void>();

@@ -1,0 +1,51 @@
+<div class="settings-card">
+  <div class="settings-card-header">
+    <div class="settings-card-icon"><app-icon name="award" [size]="20"></app-icon></div>
+    <div>
+      <div class="settings-card-title">Loyalty Tiers</div>
+      <div class="settings-card-desc">Configure tier thresholds, multipliers, and view perks for each level</div>
+    </div>
+  </div>
+  <div class="settings-card-body">
+    <div class="tier-grid">
+      @for (tier of localTiers; track tier.tier) {
+        <div class="tier-card" [style.--tier-color]="tier.color" [style.--tier-bg]="tier.bgColor">
+          <div class="tier-card-header">
+            <div class="tier-card-icon">
+              <app-icon [name]="tier.icon" [size]="22"></app-icon>
+            </div>
+            <div class="tier-card-rank">Tier {{ tier.rank }}</div>
+          </div>
+          <div class="tier-card-name">{{ tier.label }}</div>
+          <div class="tier-card-fields">
+            <div class="tier-field">
+              <label>Min Visits</label>
+              <input type="number" class="form-input" [(ngModel)]="tier.minDonations" min="0" />
+            </div>
+            <div class="tier-field">
+              <label>Points Multiplier</label>
+              <div class="multiplier-input">
+                <input type="number" class="form-input" [(ngModel)]="tier.pointsMultiplier" step="0.5" min="1" />
+                <span class="multiplier-x">&times;</span>
+              </div>
+            </div>
+          </div>
+          @if (tier.perks && tier.perks.length) {
+            <div class="tier-card-perks">
+              <div class="tier-perks-label">Perks</div>
+              @for (perk of tier.perks; track perk) {
+                <div class="tier-perk">
+                  <app-icon name="checkmark" [size]="12"></app-icon>
+                  <span>{{ perk }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+  <div class="settings-card-footer">
+    <button class="btn btn-success" (click)="save()">Save Tiers</button>
+  </div>
+</div>

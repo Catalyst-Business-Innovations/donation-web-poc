@@ -1,0 +1,38 @@
+<div class="summary-row">
+  <div
+    class="sum-card sum-blue"
+    [class.active]="activeStatus() === DS.Scheduled"
+    (click)="statusClicked.emit(activeStatus() === DS.Scheduled ? '' : DS.Scheduled)"
+  >
+    <div class="sum-num">{{ counts().scheduled }}</div>
+    <div class="sum-lbl">Scheduled</div>
+  </div>
+  <div
+    class="sum-card sum-yellow"
+    [class.active]="activeStatus() === DS.CheckedIn"
+    (click)="statusClicked.emit(activeStatus() === DS.CheckedIn ? '' : DS.CheckedIn)"
+  >
+    <div class="sum-num">{{ counts().checkedIn }}</div>
+    <div class="sum-lbl">Checked In</div>
+  </div>
+  <div
+    class="sum-card sum-green"
+    [class.active]="activeStatus() === DS.Completed"
+    (click)="statusClicked.emit(activeStatus() === DS.Completed ? '' : DS.Completed)"
+  >
+    <div class="sum-num">{{ counts().completed }}</div>
+    <div class="sum-lbl">Completed</div>
+  </div>
+  <div
+    class="sum-card sum-red"
+    [class.active]="activeStatus() === DS.Cancelled"
+    (click)="statusClicked.emit(activeStatus() === DS.Cancelled ? '' : DS.Cancelled)"
+  >
+    <div class="sum-num">{{ counts().cancelled }}</div>
+    <div class="sum-lbl">Cancelled</div>
+  </div>
+  <div class="sum-card sum-gray" [class.active]="activeStatus() === ''" (click)="statusClicked.emit('')">
+    <div class="sum-num">{{ counts().total }}</div>
+    <div class="sum-lbl">All</div>
+  </div>
+</div>

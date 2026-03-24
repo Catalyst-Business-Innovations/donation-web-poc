@@ -1,0 +1,77 @@
+<div class="card">
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Reference #</th>
+          <th>Donor</th>
+          <th>Date &amp; Time</th>
+          <th>Store</th>
+          <th>Method</th>
+          <th>Items</th>
+          <th>Categories</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of donations(); track a.id) {
+          <tr class="appt-row" (click)="viewRequested.emit(a.id)">
+            <td>
+              <span class="apt-id-cell">{{ a.referenceNumber }}</span>
+            </td>
+            <td>
+              <div class="donor-cell">
+                <div class="donor-name">{{ a.donorName }}</div>
+                @if (a.donorPhone) {
+                  <div class="donor-sub">{{ a.donorPhone }}</div>
+                }
+              </div>
+            </td>
+            <td>
+              <div class="td-date-primary">{{ a.date | date: 'MMM d, yyyy' }}</div>
+              <div class="td-date-secondary">{{ a.time }}</div>
+            </td>
+            <td class="td-text-sm">{{ a.locationName }}</td>
+            <td>
+              <span class="badge {{ a.methodBadgeClass }}">{{ a.methodLabel }}</span>
+            </td>
+            <td class="td-bold">{{ a.itemCount ?? '—' }}</td>
+            <td>
+              <div class="cat-pills">
+                @for (cat of a.categories.slice(0, 2); track cat) {
+                  <span class="badge badge-gray badge--xs">{{ cat }}</span>
+                }
+                @if (a.categories.length > 2) {
+                  <span class="badge badge-gray badge--xs">+{{ a.categories.length - 2 }}</span>
+                }
+              </div>
+            </td>
+            <td>
+              <span class="badge {{ a.statusBadgeClass }}">{{ a.statusLabel }}</span>
+            </td>
+            <td>
+              <div class="table-actions" (click)="$event.stopPropagation()">
+                <button class="btn-icon" title="View" (click)="viewRequested.emit(a.id)">
+                  <app-icon name="eye" size="14" />
+                </button>
+                @if (a.status === AS.Scheduled) {
+                  <button class="btn-icon" title="Cancel" (click)="cancelRequested.emit(a.id)">
+                    <app-icon name="close" size="14" />
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (donations().length === 0) {
+      <div class="empty-state">
+        <div class="empty-state-icon"><app-icon name="calendar" [size]="40"></app-icon></div>
+        <div class="empty-state-title">No scheduled donations match</div>
+        <div class="empty-state-text">Try adjusting your search or filters.</div>
+      </div>
+    }
+  </div>
+</div>

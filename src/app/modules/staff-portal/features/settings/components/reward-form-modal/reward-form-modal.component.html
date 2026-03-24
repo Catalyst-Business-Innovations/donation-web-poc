@@ -1,0 +1,82 @@
+<app-modal
+  [open]="isOpen"
+  [title]="title"
+  [confirmLabel]="confirmLabel"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  (closed)="closed.emit()"
+  (confirmed)="onConfirm()"
+>
+  @if (localForm) {
+    <div class="modal-form-body">
+      <div class="form-group modal-form-group">
+        <label class="form-label">Name *</label>
+        <input class="form-input" [(ngModel)]="localForm.name" placeholder="e.g. $5 Discount" />
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="form-label">Description</label>
+        <input class="form-input" [(ngModel)]="localForm.description" placeholder="Short description" />
+      </div>
+      <div class="modal-form-grid modal-form-group">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-input" [(ngModel)]="localForm.rewardType">
+            @for (rt of rewardTypes(); track rt.value) {
+              <option [ngValue]="rt.value">{{ rt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Value ($)</label>
+          <input class="form-input" type="number" [(ngModel)]="localForm.value" min="0" />
+        </div>
+      </div>
+      <div class="form-group modal-form-group">
+        <label class="form-label">Points Required</label>
+        <input class="form-input" type="number" [(ngModel)]="localForm.pointsRequired" min="1" />
+      </div>
+      <div class="modal-form-grid modal-form-group">
+        <div class="form-group">
+          <label class="form-label">Max per User (optional)</label>
+          <input
+            class="form-input"
+            type="number"
+            [(ngModel)]="localForm.maxRedemptionsPerUser"
+            min="1"
+            placeholder="Unlimited"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Total Limit (optional)</label>
+          <input
+            class="form-input"
+            type="number"
+            [(ngModel)]="localForm.totalRedemptionLimit"
+            min="1"
+            placeholder="Unlimited"
+          />
+        </div>
+      </div>
+      <div class="rule-row rule-row--borderless" (click)="localForm.isActive = !localForm.isActive">
+        <div>
+          <div class="rule-label">Active</div>
+          <div class="rule-desc">Visible and redeemable by donors</div>
+        </div>
+        <label class="toggle" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="localForm.isActive" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+      <div class="rule-row rule-row--borderless" (click)="localForm.isGiftable = !localForm.isGiftable">
+        <div>
+          <div class="rule-label">Giftable</div>
+          <div class="rule-desc">Allow donors to gift this reward to others</div>
+        </div>
+        <label class="toggle" (click)="$event.stopPropagation()">
+          <input type="checkbox" [(ngModel)]="localForm.isGiftable" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+    </div>
+  }
+</app-modal>

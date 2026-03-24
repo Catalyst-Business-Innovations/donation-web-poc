@@ -10,7 +10,7 @@ import { ReceiptDetailState } from '../../models/receipts.state';
   imports: [DatePipe, IconComponent, ModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './receipt-detail-modal.component.html',
-  styleUrl: './receipt-detail-modal.component.scss',
+  styleUrl: './receipt-detail-modal.component.scss'
 })
 export class ReceiptDetailModalComponent {
   receipt = input.required<ReceiptDetailState | null>();

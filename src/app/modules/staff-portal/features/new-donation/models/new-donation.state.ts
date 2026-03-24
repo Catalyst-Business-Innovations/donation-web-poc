@@ -1,4 +1,4 @@
-import { DonorTier, DonationScope, ReceiptDelivery } from '../../../../../core/models/domain.models';
+import { DonorTier, DonationScope, ReceiptDelivery } from '@core/models/domain.models';
 
 export type WizardStep = 1 | 2 | 3 | 4 | 5;
 
@@ -35,4 +35,22 @@ export interface EnrollForm {
   lastName: string;
   phone: string;
   email: string;
+}
+
+export interface StepDefinition {
+  n: number;
+  label: string;
+}
+
+export interface ReviewItemState {
+  key: string;
+  name: string;
+  qty: number;
+  total: number;
+}
+
+export interface DonationConfirmationState {
+  donationId: number;
+  donationRefNumber: string;
+  receiptNumber: string;
 }

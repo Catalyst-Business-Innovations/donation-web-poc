@@ -9,7 +9,7 @@ import { DonationHistoryItemState } from '../../models/history.state';
   imports: [DatePipe, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './history-list.component.html',
-  styleUrl: './history-list.component.scss',
+  styleUrl: './history-list.component.scss'
 })
 export class HistoryListComponent {
   donations = input.required<DonationHistoryItemState[]>();

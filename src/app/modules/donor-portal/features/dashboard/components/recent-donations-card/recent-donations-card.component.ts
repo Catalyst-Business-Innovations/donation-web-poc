@@ -10,7 +10,7 @@ import { RecentDonationState } from '../../models/dashboard.state';
   imports: [DatePipe, RouterLink, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './recent-donations-card.component.html',
-  styleUrl: './recent-donations-card.component.scss',
+  styleUrl: './recent-donations-card.component.scss'
 })
 export class RecentDonationsCardComponent {
   donations = input.required<RecentDonationState[]>();

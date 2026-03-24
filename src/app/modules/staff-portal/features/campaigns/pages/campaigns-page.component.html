@@ -1,0 +1,117 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- MODE: LIST                                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+@if (pageMode() === 'list') {
+  <app-campaign-list-filters
+    [query]="query()"
+    (queryChanged)="onQueryChanged($event)"
+    (createClicked)="onCreateClicked()"
+  />
+
+  <div class="page-content">
+    <app-campaign-status-counts
+      [counts]="counts()"
+      [activeFilter]="statusFilter()"
+      (filterChanged)="onStatusFilterChanged($event)"
+    />
+
+    <app-campaign-table
+      [campaigns]="filtered()"
+      (viewClicked)="onViewCampaign($event)"
+      (editClicked)="onEditCampaign($event)"
+      (activateClicked)="onActivateCampaign($event)"
+      (pauseClicked)="onPauseCampaign($event)"
+      (executeClicked)="onOpenExecute($event)"
+    />
+  </div>
+
+  <app-campaign-execute-modal
+    [open]="showExecuteModal()"
+    [campaign]="executeCampaign()"
+    [results]="executeResults()"
+    (closed)="onCloseExecuteModal()"
+    (confirmed)="onRunCampaign()"
+  />
+}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- MODE: WIZARD                                                               -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+@if (pageMode() === 'wizard') {
+  <app-campaign-wizard-shell
+    [wizardTitle]="wizardTitle()"
+    [wizardIntent]="wizardIntent()"
+    [wizardSteps]="wizardSteps()"
+    [currentStep]="wizardStep()"
+    [currentStepIndex]="currentStepIndex()"
+    [isFirstStep]="isFirstStep()"
+    [isLastStep]="isLastStep()"
+    [isViewMode]="isViewMode()"
+    [canProceedStep1]="canProceedStep1()"
+    [stepProgress]="stepProgress()"
+    [visibleStepNums]="visibleStepNums()"
+    (stepClicked)="onGoToStep($event)"
+    (nextClicked)="onNextStep()"
+    (prevClicked)="onPrevStep()"
+    (closeClicked)="onCloseWizard()"
+    (saveClicked)="onSaveCampaign()"
+    (switchToEditClicked)="onSwitchToEdit()"
+  >
+    <!-- ═══════ STEP 1: Campaign Details ═══════ -->
+    @if (wizardStep() === 1) {
+      <app-campaign-details-step
+        [form]="form()"
+        [criterionDraft]="criterionDraft()"
+        [departments]="departments"
+        [isViewMode]="isViewMode()"
+        (formChanged)="onFormChanged($event)"
+        (criterionDraftChanged)="onCriterionDraftChanged($event)"
+        (criterionAdded)="onCriterionAdded()"
+        (criterionRemoved)="onCriterionRemoved($event)"
+      />
+    }
+
+    <!-- ═══════ STEP 2: Email Template ═══════ -->
+    @if (wizardStep() === 2) {
+      <app-email-template-step
+        [emailSubject]="emailSubject()"
+        [emailBlocks]="emailBlocks()"
+        [selectedBlockId]="selectedBlockId()"
+        [showStarterPicker]="showStarterPicker()"
+        [isViewMode]="isViewMode()"
+        [emailSubjectPreview]="emailSubjectPreview()"
+        (subjectChanged)="onEmailSubjectChanged($event)"
+        (starterApplied)="onStarterApplied($event)"
+        (blockAdded)="onBlockAdded($event)"
+        (blockSelected)="onBlockSelected($event)"
+        (blockUpdated)="onBlockUpdated($event)"
+        (blockRemoved)="onBlockRemoved($event)"
+        (blockMoved)="onBlockMoved($event)"
+        (starterPickerToggled)="onStarterPickerToggled()"
+      />
+    }
+
+    <!-- ═══════ STEP 3: SMS Template ═══════ -->
+    @if (wizardStep() === 3) {
+      <app-sms-template-step
+        [smsBody]="smsBody()"
+        [isViewMode]="isViewMode()"
+        [smsBodyPreview]="smsBodyPreview()"
+        (bodyChanged)="onSmsBodyChanged($event)"
+      />
+    }
+
+    <!-- ═══════ STEP 4: Review ═══════ -->
+    @if (wizardStep() === 4) {
+      <app-campaign-review-step
+        [form]="form()"
+        [emailBlocks]="emailBlocks()"
+        [emailSubject]="emailSubject()"
+        [smsBody]="smsBody()"
+        [isViewMode]="isViewMode()"
+        [hasRequiredTemplates]="hasRequiredTemplates()"
+        (goToStep)="onGoToStep($event)"
+      />
+    }
+  </app-campaign-wizard-shell>
+}

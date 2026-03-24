@@ -1,0 +1,25 @@
+:host {
+  display: contents;
+}
+
+.donors-search {
+  width: 240px;
+  flex-shrink: 0;
+  input {
+    padding-right: 12px;
+  }
+}
+
+.topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--gray-200);
+  flex-shrink: 0;
+}
+
+.f-sel {
+  width: 140px;
+  height: 36px;
+  font-size: 13px;
+  flex-shrink: 0;
+}

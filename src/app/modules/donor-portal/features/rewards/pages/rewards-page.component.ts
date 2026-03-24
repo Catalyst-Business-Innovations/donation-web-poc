@@ -20,11 +20,11 @@ import { RewardCatalogueItemState } from '../models/rewards.state';
     RewardCatalogueComponent,
     TransactionHistoryListComponent,
     RedeemModalComponent,
-    GiftModalComponent,
+    GiftModalComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './rewards-page.component.html',
-  styleUrl: './rewards-page.component.scss',
+  styleUrl: './rewards-page.component.scss'
 })
 export class RewardsPageComponent {
   private readonly rewardsService = inject(DonorRewardsService);
@@ -40,9 +40,7 @@ export class RewardsPageComponent {
   protected readonly selectedGiftReward = signal<RewardCatalogueItemState | null>(null);
   protected readonly giftSearchQuery = signal('');
 
-  protected readonly giftSearchResults = computed(() =>
-    this.rewardsService.searchDonors(this.giftSearchQuery())
-  );
+  protected readonly giftSearchResults = computed(() => this.rewardsService.searchDonors(this.giftSearchQuery()));
 
   onRedeemClicked(reward: RewardCatalogueItemState): void {
     this.selectedRedeemReward.set(reward);

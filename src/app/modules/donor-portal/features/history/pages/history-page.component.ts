@@ -13,7 +13,7 @@ import { HistoryListComponent } from '../components/history-list/history-list.co
   imports: [DatePipe, IconComponent, HistoryFiltersComponent, HistorySummaryCardsComponent, HistoryListComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './history-page.component.html',
-  styleUrl: './history-page.component.scss',
+  styleUrl: './history-page.component.scss'
 })
 export class HistoryPageComponent {
   private readonly historyService = inject(HistoryService);

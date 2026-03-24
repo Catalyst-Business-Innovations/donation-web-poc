@@ -1,0 +1,401 @@
+<div class="wiz-step wiz-step-wide">
+  <div class="wiz-step-header">
+    <div class="wiz-step-icon-wrap wiz-step-icon-email"><app-icon name="mail" size="22" /></div>
+    <div>
+      <h3>Email Template</h3>
+      <p>Build your email using content blocks. Pick a starter or start from scratch.</p>
+    </div>
+  </div>
+
+  <div class="email-builder">
+    <!-- Left: block list & tools -->
+    <div class="eb-sidebar">
+      <!-- Subject -->
+      <div class="eb-sidebar-card">
+        <div class="eb-sidebar-card-title">
+          <app-icon name="mail" size="13" />
+          Subject Line
+        </div>
+        <input
+          class="form-input"
+          [ngModel]="emailSubject()"
+          (ngModelChange)="subjectChanged.emit($event)"
+          placeholder="e.g., Help us collect winter donations!"
+          [disabled]="isViewMode()"
+        />
+      </div>
+
+      @if (!isViewMode()) {
+        <!-- Starter templates -->
+        @if (emailBlocks().length === 0) {
+          <div class="eb-sidebar-card">
+            <div class="eb-sidebar-card-title">
+              <app-icon name="grid" size="13" />
+              Start with a Template
+            </div>
+            <div class="starter-grid">
+              @for (s of starters; track s.name) {
+                <button class="starter-card" (click)="starterApplied.emit(s)">
+                  <app-icon [name]="$any(s.icon)" size="20" />
+                  <div class="starter-name">{{ s.name }}</div>
+                  <div class="starter-desc">{{ s.description }}</div>
+                </button>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="eb-sidebar-card">
+            <div class="eb-sidebar-card-title">
+              <app-icon name="grid" size="13" />
+              Templates
+            </div>
+            <button class="btn btn-secondary btn-sm btn--full-width" (click)="starterPickerToggled.emit()">
+              {{ showStarterPicker() ? 'Hide' : 'Replace with Template...' }}
+            </button>
+            @if (showStarterPicker()) {
+              <div class="starter-grid starter-grid--spaced">
+                @for (s of starters; track s.name) {
+                  <button class="starter-card" (click)="starterApplied.emit(s)">
+                    <app-icon [name]="$any(s.icon)" size="20" />
+                    <div class="starter-name">{{ s.name }}</div>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Add blocks -->
+        <div class="eb-sidebar-card">
+          <div class="eb-sidebar-card-title">
+            <app-icon name="plus" size="13" />
+            Add Block
+          </div>
+          <div class="eb-block-palette">
+            @for (bt of blockTypes; track bt.type) {
+              <button class="eb-palette-btn" (click)="blockAdded.emit(bt.type)">
+                <app-icon [name]="$any(bt.icon)" size="14" />
+                {{ bt.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Merge variables -->
+        <div class="eb-sidebar-card">
+          <div class="eb-sidebar-card-title">
+            <app-icon name="copy" size="13" />
+            Merge Variables
+          </div>
+          <div class="tpl-var-chips">
+            @for (v of mergeVars; track v.key) {
+              <button
+                class="tpl-var-chip"
+                [title]="'Inserts ' + v.sample"
+                [class.disabled]="!selectedBlock"
+                (click)="onMergeVarClick(v.key)"
+              >
+                {{ v.label }}
+              </button>
+            }
+          </div>
+          @if (!selectedBlock) {
+            <div class="eb-hint">
+              <app-icon name="info" size="11" />
+              Select a block first, then click a variable to insert it.
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Block list -->
+      <div class="eb-sidebar-card">
+        <div class="eb-sidebar-card-title">
+          <app-icon name="list" size="13" />
+          Blocks
+          <span class="eb-block-count">{{ emailBlocks().length }}</span>
+        </div>
+        @if (emailBlocks().length === 0) {
+          <div class="eb-empty-blocks">
+            <app-icon name="layers" size="20" />
+            <span>No blocks yet</span>
+            <span class="eb-hint">Add blocks or choose a starter template above.</span>
+          </div>
+        }
+        <div class="eb-block-list">
+          @for (block of emailBlocks(); track block.id; let i = $index) {
+            <div
+              class="eb-block-item"
+              [class.selected]="selectedBlockId() === block.id"
+              (click)="blockSelected.emit(block.id)"
+            >
+              <div class="eb-block-item-label">
+                <span class="eb-block-type-icon"><app-icon [name]="blockIcon(block.type)" size="12" /></span>
+                <span>{{ block.type | titlecase }}</span>
+                @if (block.type !== 'divider' && block.type !== 'spacer') {
+                  <span class="eb-block-preview-text">
+                    {{ block.content.substring(0, 30) }}{{ block.content.length > 30 ? '...' : '' }}
+                  </span>
+                }
+              </div>
+              @if (!isViewMode()) {
+                <div class="eb-block-item-actions">
+                  <button
+                    class="btn-icon-sm"
+                    [disabled]="i === 0"
+                    (click)="$event.stopPropagation(); blockMoved.emit({ id: block.id, dir: -1 })"
+                    title="Move up"
+                  >
+                    <app-icon name="chevron-up" size="12" />
+                  </button>
+                  <button
+                    class="btn-icon-sm"
+                    [disabled]="i === emailBlocks().length - 1"
+                    (click)="$event.stopPropagation(); blockMoved.emit({ id: block.id, dir: 1 })"
+                    title="Move down"
+                  >
+                    <app-icon name="chevron-down" size="12" />
+                  </button>
+                  <button
+                    class="btn-icon-sm btn-danger-icon"
+                    (click)="$event.stopPropagation(); blockRemoved.emit(block.id)"
+                    title="Remove"
+                  >
+                    <app-icon name="delete" size="12" />
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- Inline editor for selected block -->
+            @if (selectedBlockId() === block.id && !isViewMode()) {
+              <div class="eb-block-editor">
+                @if (block.type === 'header') {
+                  <div class="form-group">
+                    <label class="form-label">Heading Text</label>
+                    <input
+                      class="form-input"
+                      [ngModel]="block.content"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { content: $event } })"
+                    />
+                  </div>
+                  <div class="eb-editor-row">
+                    <div class="form-group">
+                      <label class="form-label">Level</label>
+                      <select
+                        class="form-select"
+                        [ngModel]="block.level"
+                        (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { level: +$event } })"
+                      >
+                        <option [ngValue]="1">H1</option>
+                        <option [ngValue]="2">H2</option>
+                        <option [ngValue]="3">H3</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Align</label>
+                      <select
+                        class="form-select"
+                        [ngModel]="block.align"
+                        (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { align: $event } })"
+                      >
+                        <option value="left">Left</option>
+                        <option value="center">Center</option>
+                        <option value="right">Right</option>
+                      </select>
+                    </div>
+                  </div>
+                }
+                @if (block.type === 'text') {
+                  <div class="form-group">
+                    <label class="form-label">Text Content</label>
+                    <textarea
+                      class="form-input"
+                      rows="4"
+                      [ngModel]="block.content"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { content: $event } })"
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Align</label>
+                    <select
+                      class="form-select"
+                      [ngModel]="block.align"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { align: $event } })"
+                    >
+                      <option value="left">Left</option>
+                      <option value="center">Center</option>
+                      <option value="right">Right</option>
+                    </select>
+                  </div>
+                }
+                @if (block.type === 'button') {
+                  <div class="form-group">
+                    <label class="form-label">Button Label</label>
+                    <input
+                      class="form-input"
+                      [ngModel]="block.content"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { content: $event } })"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Link URL</label>
+                    <input
+                      class="form-input"
+                      [ngModel]="block.meta"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { meta: $event } })"
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Align</label>
+                    <select
+                      class="form-select"
+                      [ngModel]="block.align"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { align: $event } })"
+                    >
+                      <option value="left">Left</option>
+                      <option value="center">Center</option>
+                      <option value="right">Right</option>
+                    </select>
+                  </div>
+                }
+                @if (block.type === 'image') {
+                  <div class="form-group">
+                    <label class="form-label">Alt Text</label>
+                    <input
+                      class="form-input"
+                      [ngModel]="block.content"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { content: $event } })"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Image URL</label>
+                    <input
+                      class="form-input"
+                      [ngModel]="block.meta"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { meta: $event } })"
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Align</label>
+                    <select
+                      class="form-select"
+                      [ngModel]="block.align"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { align: $event } })"
+                    >
+                      <option value="left">Left</option>
+                      <option value="center">Center</option>
+                      <option value="right">Right</option>
+                    </select>
+                  </div>
+                }
+                @if (block.type === 'spacer') {
+                  <div class="form-group">
+                    <label class="form-label">Height (px)</label>
+                    <input
+                      type="number"
+                      class="form-input"
+                      [ngModel]="block.level"
+                      (ngModelChange)="blockUpdated.emit({ id: block.id, patch: { level: +$event } })"
+                      min="4"
+                      max="100"
+                    />
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Live Preview -->
+    <div class="eb-preview">
+      <div class="eb-preview-toolbar">
+        <div class="eb-preview-title">
+          <app-icon name="eye" size="14" />
+          Live Preview
+        </div>
+      </div>
+      <div class="tpl-email-preview">
+        <div class="tpl-email-window-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="tpl-email-chrome">
+          <div class="tpl-email-header-row">
+            <span class="tpl-email-label">From:</span>
+            <span>Our Organization &lt;noreply&#64;example.org&gt;</span>
+          </div>
+          <div class="tpl-email-header-row">
+            <span class="tpl-email-label">To:</span>
+            <span>jane.doe&#64;example.com</span>
+          </div>
+          <div class="tpl-email-header-row">
+            <span class="tpl-email-label">Subject:</span>
+            <strong>{{ emailSubjectPreview() }}</strong>
+          </div>
+        </div>
+        <div class="tpl-email-body">
+          @if (emailBlocks().length === 0) {
+            <div class="eb-preview-empty">
+              <app-icon name="mail" size="28" />
+              <p>Your email preview will appear here</p>
+              <span class="eb-hint">Add blocks from the sidebar to get started</span>
+            </div>
+          } @else {
+            @for (block of emailBlocks(); track block.id) {
+              <div
+                class="eb-preview-block"
+                [class.eb-preview-block-selected]="selectedBlockId() === block.id"
+                (click)="blockSelected.emit(block.id)"
+              >
+                @if (block.type === 'header') {
+                  @if ((block.level || 1) === 1) {
+                    <h1 [style.text-align]="block.align">{{ block.content }}</h1>
+                  }
+                  @if ((block.level || 1) === 2) {
+                    <h2 [style.text-align]="block.align">{{ block.content }}</h2>
+                  }
+                  @if ((block.level || 1) === 3) {
+                    <h3 [style.text-align]="block.align">{{ block.content }}</h3>
+                  }
+                }
+                @if (block.type === 'text') {
+                  <p [style.text-align]="block.align">{{ block.content }}</p>
+                }
+                @if (block.type === 'button') {
+                  <p [style.text-align]="block.align">
+                    <span class="eb-preview-button">{{ block.content }}</span>
+                  </p>
+                }
+                @if (block.type === 'divider') {
+                  <hr />
+                }
+                @if (block.type === 'image') {
+                  <p [style.text-align]="block.align">
+                    @if (block.meta) {
+                      <img [src]="block.meta" [alt]="block.content" class="eb-preview-img" />
+                    } @else {
+                      <span class="eb-preview-img-placeholder">
+                        <app-icon name="image" size="32" />
+                        <br />
+                        Image
+                      </span>
+                    }
+                  </p>
+                }
+                @if (block.type === 'spacer') {
+                  <div [style.height.px]="block.level || 20"></div>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

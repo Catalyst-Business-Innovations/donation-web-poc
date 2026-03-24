@@ -1,4 +1,5 @@
-.redeem-modal-body {}
+.redeem-modal-body {
+}
 
 .redeem-hero {
   text-align: center;
@@ -51,24 +52,37 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  &:last-child { margin-bottom: 0; }
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .confirm-label {
   font-size: 13px;
   font-weight: 600;
   color: var(--gray-600);
-  &--strong { font-weight: 700; color: var(--gray-800); }
+  &--strong {
+    font-weight: 700;
+    color: var(--gray-800);
+  }
 }
 
 .confirm-value {
   font-size: 13px;
   font-weight: 800;
   color: var(--gray-900);
-  &--primary { color: var(--primary); }
-  &--danger { color: var(--danger); }
-  &--secondary { color: var(--secondary); }
-  &--info { color: var(--info); }
+  &--primary {
+    color: var(--primary);
+  }
+  &--danger {
+    color: var(--danger);
+  }
+  &--secondary {
+    color: var(--secondary);
+  }
+  &--info {
+    color: var(--info);
+  }
 }
 
 .confirm-divider {

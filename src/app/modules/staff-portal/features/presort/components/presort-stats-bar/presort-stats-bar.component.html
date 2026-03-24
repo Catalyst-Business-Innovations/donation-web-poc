@@ -1,0 +1,16 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Presort</div>
+    <div class="topbar-subtitle">Route donation containers to appropriate departments</div>
+  </div>
+  <div class="topbar-actions">
+    <div
+      class="pending-chip"
+      [class.pending-warn]="queueSummary().backlogSeverity === 'warn'"
+      [class.pending-danger]="queueSummary().backlogSeverity === 'danger'"
+    >
+      <app-icon name="package" [size]="14"></app-icon>
+      {{ queueSummary().count }} Awaiting Presort
+    </div>
+  </div>
+</div>

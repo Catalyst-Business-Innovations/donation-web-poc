@@ -1,0 +1,41 @@
+<div class="card mb-card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">
+        <app-icon name="map-pin" [size]="16"></app-icon>
+        Store Status
+      </div>
+      <div class="card-subtitle">Live store performance today</div>
+    </div>
+  </div>
+  <div class="loc-grid">
+    @for (loc of stores(); track loc.id) {
+      <div class="loc-card">
+        <div class="lc-header">
+          <div>
+            <div class="lc-name">{{ loc.name }}</div>
+            <div class="lc-addr">{{ loc.address }}</div>
+          </div>
+          <div class="lc-status">
+            <div class="status-dot {{ loc.status }}"></div>
+            <span>{{ loc.status }}</span>
+          </div>
+        </div>
+        <div class="lc-stats">
+          <div class="lc-stat">
+            <div>{{ loc.donationsToday }}</div>
+            <span>Donations</span>
+          </div>
+          <div class="lc-stat">
+            <div>{{ loc.itemsToday }}</div>
+            <span>Items</span>
+          </div>
+          <div class="lc-stat">
+            <div>{{ loc.staffCount }}</div>
+            <span>Staff</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

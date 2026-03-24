@@ -1,0 +1,89 @@
+<div class="wiz-step wiz-step-wide">
+  <div class="wiz-step-header">
+    <div class="wiz-step-icon-wrap wiz-step-icon-sms"><app-icon name="phone" size="22" /></div>
+    <div>
+      <h3>SMS Template</h3>
+      <p>Compose your SMS message. Keep it concise — aim for 160 characters per segment.</p>
+    </div>
+  </div>
+
+  <div class="sms-builder">
+    <!-- Left: editor -->
+    <div class="sms-editor-pane">
+      @if (!isViewMode()) {
+        <div class="eb-sidebar-card">
+          <div class="eb-sidebar-card-title">
+            <app-icon name="copy" size="13" />
+            Insert Variable
+          </div>
+          <div class="tpl-var-chips">
+            @for (v of mergeVars; track v.key) {
+              <button class="tpl-var-chip" (click)="insertVariable(v.key)" [title]="'Inserts ' + v.sample">
+                {{ v.label }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+      <div class="eb-sidebar-card">
+        <div class="eb-sidebar-card-title">
+          <app-icon name="file-text" size="13" />
+          Message
+        </div>
+        <textarea
+          #smsBodyEditor
+          class="form-input tpl-textarea tpl-textarea-sms"
+          rows="8"
+          [ngModel]="smsBody()"
+          (ngModelChange)="bodyChanged.emit($event)"
+          [disabled]="isViewMode()"
+          placeholder="Write your SMS message. Use merge variables from the toolbar above."
+        ></textarea>
+        <!-- Character progress bar -->
+        <div class="sms-progress-bar">
+          <div
+            class="sms-progress-fill"
+            [style.width.%]="charCount <= 160 ? (charCount / 160) * 100 : 100"
+            [class.sms-progress-warning]="charCount > 140 && charCount <= 160"
+            [class.sms-progress-over]="charCount > 160"
+          ></div>
+        </div>
+        <div class="sms-counter" [class.sms-warning]="charCount > 160">
+          <span>{{ charCount }} / 160 characters</span>
+          <span class="sms-segments">
+            {{ segments }} segment{{ segments !== 1 ? 's' : '' }}
+            @if (segments > 1) {
+              <span class="sms-segments-note">({{ segments * 153 - charCount }} chars remaining)</span>
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+    <!-- Right: phone preview -->
+    <div class="sms-preview-pane">
+      <div class="eb-preview-toolbar">
+        <div class="eb-preview-title">
+          <app-icon name="eye" size="14" />
+          Preview
+        </div>
+      </div>
+      <div class="tpl-sms-preview">
+        <div class="tpl-sms-phone">
+          <div class="tpl-sms-notch"></div>
+          <div class="tpl-sms-phone-header"><span>Our Organization</span></div>
+          <div class="tpl-sms-bubble-area">
+            @if (smsBodyPreview()) {
+              <div class="tpl-sms-bubble">{{ smsBodyPreview() }}</div>
+              <div class="tpl-sms-time">Just now</div>
+            } @else {
+              <div class="tpl-sms-empty">Your message preview will appear here...</div>
+            }
+          </div>
+          <div class="tpl-sms-meta">
+            SMS · {{ previewCharCount }} chars · {{ segments }} segment{{ segments !== 1 ? 's' : '' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Dashboard Overview</div>
+    <div class="topbar-subtitle">Real-time metrics across all locations</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-secondary" (click)="onFilterClick()">Last 30 Days</button>
+    <button class="btn btn-primary" (click)="onExportClick()">Export</button>
+  </div>
+</div>
+
+<div class="page-content">
+  <app-metrics-grid [metrics]="metrics"></app-metrics-grid>
+
+  <div class="charts-row">
+    <app-trend-chart [trends]="trends"></app-trend-chart>
+    <app-category-donut
+      [segments]="donutSegments"
+      [categories]="categoryBreakdown"
+      [totalDonations]="totalDonations"
+    ></app-category-donut>
+  </div>
+
+  <app-store-status-grid [stores]="storeStatuses"></app-store-status-grid>
+
+  <app-recent-donations-table [donations]="recentDonations"></app-recent-donations-table>
+</div>

@@ -1,0 +1,14 @@
+<div class="pipeline">
+  @for (stage of stages(); track stage.status; let last = $last) {
+    <div class="pipeline-stage" [class.active]="activeStatus() === stage.status" (click)="onStageClick(stage.status)">
+      <div class="ps-icon">
+        <app-icon [name]="stage.icon" [size]="22" />
+      </div>
+      <div class="ps-count">{{ stage.count }}</div>
+      <div class="ps-label">{{ stage.label }}</div>
+    </div>
+    @if (!last) {
+      <div class="pipeline-arrow">&rarr;</div>
+    }
+  }
+</div>

@@ -1,0 +1,38 @@
+<div class="ps-item-row" [class.salvage-row]="item().isSalvageOrDispose">
+  <span class="ps-item-icon">{{ item().icon }}</span>
+  <span class="ps-item-name">{{ item().categoryName }}</span>
+
+  <div class="ps-qty">
+    <button (click)="onAdjust(-1)">&minus;</button>
+    <span>{{ item().quantity }}</span>
+    <button (click)="onAdjust(1)">+</button>
+  </div>
+
+  <select
+    class="form-select ps-cond"
+    [value]="item().condition"
+    (change)="onConditionChange($any($event.target).value)"
+  >
+    @for (c of conditions; track c.value) {
+      <option [value]="c.value">{{ c.label }}</option>
+    }
+  </select>
+
+  @if (showEcommerce() && (item().condition === IC.Sellable || item().condition === IC.NeedsRefurbishment)) {
+    <div class="ps-ecomm-qty">
+      <span class="ps-ecomm-lbl">E-Com</span>
+      <input
+        type="number"
+        min="0"
+        [max]="item().quantity"
+        class="form-input ps-ecomm-input"
+        [value]="item().ecommerceQty"
+        (change)="onEcommerceQtyChange($any($event.target).value)"
+      />
+    </div>
+  }
+
+  <button class="btn-icon danger" (click)="onRemove()" title="Remove">
+    <app-icon name="close" size="13" />
+  </button>
+</div>

@@ -1,0 +1,76 @@
+<app-modal
+  [open]="open()"
+  title="Confirm Presort Completion"
+  confirmLabel="Complete &amp; Generate Label"
+  cancelLabel="Go Back"
+  [showCancel]="true"
+  confirmVariant="success"
+  (closed)="closed.emit()"
+  (confirmed)="confirmed.emit()"
+>
+  @if (confirmState(); as cs) {
+    <div class="confirm-body">
+      <div class="confirm-hero">
+        <app-icon name="package" [size]="28"></app-icon>
+        <div>
+          <div class="confirm-hero-title">Ready to finalize container</div>
+          <div class="confirm-hero-sub">{{ cs.barcode }} &middot; {{ cs.donorVisitLabel }}</div>
+        </div>
+      </div>
+
+      <div class="confirm-grid">
+        <div class="confirm-cell">
+          <div class="confirm-cell-lbl">Container Type</div>
+          <div class="confirm-cell-val">{{ cs.containerTypeLabel }}</div>
+        </div>
+        <div class="confirm-cell">
+          <div class="confirm-cell-lbl">Destination</div>
+          <div class="confirm-cell-val">{{ cs.destinationLabel }}</div>
+        </div>
+        <div class="confirm-cell">
+          <div class="confirm-cell-lbl">Total Items</div>
+          <div class="confirm-cell-val">{{ cs.totalItemCount }}</div>
+        </div>
+        <div class="confirm-cell">
+          <div class="confirm-cell-lbl">Categories</div>
+          <div class="confirm-cell-val">{{ cs.categoryCount }}</div>
+        </div>
+        @if (cs.isSeasonal) {
+          <div class="confirm-cell confirm-cell-wide confirm-cell-warn">
+            <div class="confirm-cell-lbl">Seasonal Hold</div>
+            <div class="confirm-cell-val">{{ cs.seasonalTag }}</div>
+          </div>
+        }
+        @if (cs.ecommerce) {
+          <div class="confirm-cell confirm-cell-wide confirm-cell-info">
+            <div class="confirm-cell-lbl">E-Commerce Cherry-Pick</div>
+            <div class="confirm-cell-val">Enabled</div>
+          </div>
+        }
+        @if (cs.salvageWeightLbs) {
+          <div class="confirm-cell confirm-cell-wide confirm-cell-danger">
+            <div class="confirm-cell-lbl">Salvage Weight</div>
+            <div class="confirm-cell-val">{{ cs.salvageWeightLbs }} lbs</div>
+          </div>
+        }
+      </div>
+
+      <div class="confirm-items">
+        <div class="confirm-items-title">Items Summary</div>
+        @for (item of cs.items; track item.categoryKey) {
+          <div class="confirm-item-row">
+            <span class="confirm-item-icon">{{ item.icon }}</span>
+            <span class="confirm-item-name">{{ item.categoryName }}</span>
+            <span class="confirm-item-qty">{{ item.quantity }} items</span>
+            <span class="badge" [class]="item.conditionBadgeClass">
+              {{ condLabel(item.condition) }}
+            </span>
+            @if (item.ecommerceQty > 0) {
+              <span class="badge badge-info">E-Com: {{ item.ecommerceQty }}</span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</app-modal>

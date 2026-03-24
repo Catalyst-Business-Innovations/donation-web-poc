@@ -1,6 +1,11 @@
 @if (open) {
   <div class="modal-overlay" (click)="onOverlayClick($event)">
-    <div class="modal" [class.modal-lg]="size === 'lg'" [class.modal-sm]="size === 'sm'" (click)="$event.stopPropagation()">
+    <div
+      class="modal"
+      [class.modal-lg]="size === 'lg'"
+      [class.modal-sm]="size === 'sm'"
+      (click)="$event.stopPropagation()"
+    >
       <div class="modal-header">
         <div class="modal-title">{{ title }}</div>
         <button class="modal-close" (click)="closed.emit()"><app-icon name="close" size="20" /></button>
@@ -15,7 +20,9 @@
           @if (showCancel) {
             <button class="btn btn-secondary" (click)="closed.emit()">{{ effectiveCancelLabel }}</button>
           }
-          <button class="btn btn-{{ confirmVariant }}" [disabled]="confirmDisabled" (click)="confirmed.emit()">{{ effectiveConfirmLabel }}</button>
+          <button class="btn btn-{{ confirmVariant }}" [disabled]="confirmDisabled" (click)="confirmed.emit()">
+            {{ effectiveConfirmLabel }}
+          </button>
         </div>
       }
     </div>

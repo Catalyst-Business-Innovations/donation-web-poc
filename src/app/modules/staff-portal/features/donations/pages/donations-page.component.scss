@@ -1,0 +1,39 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.donations-topbar {
+  .topbar-actions {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+}
+
+.topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--gray-200);
+  flex-shrink: 0;
+}
+
+.donations-search {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.f-sel {
+  width: 140px;
+  height: 36px;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.f-date {
+  font-size: 13px;
+  width: 140px;
+  flex-shrink: 0;
+}

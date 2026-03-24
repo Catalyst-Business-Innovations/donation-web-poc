@@ -8,7 +8,7 @@ import { PointsHeroState } from '../../models/rewards.state';
   imports: [DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './points-hero.component.html',
-  styleUrl: './points-hero.component.scss',
+  styleUrl: './points-hero.component.scss'
 })
 export class PointsHeroComponent {
   hero = input.required<PointsHeroState>();

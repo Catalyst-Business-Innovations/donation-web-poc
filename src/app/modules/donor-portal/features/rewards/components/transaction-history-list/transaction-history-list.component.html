@@ -6,17 +6,32 @@
         <div class="txn-name">
           {{ txn.rewardName }}
           @if (txn.isGift && txn.giftedToName) {
-            <span class="txn-gift-tag"><app-icon name="gift" [size]="10"></app-icon> Gifted</span>
+            <span class="txn-gift-tag">
+              <app-icon name="gift" [size]="10"></app-icon>
+              Gifted
+            </span>
           }
           @if (txn.isGift && txn.giftedFromName) {
-            <span class="txn-gift-tag txn-gift-tag--received"><app-icon name="gift" [size]="10"></app-icon> Received</span>
+            <span class="txn-gift-tag txn-gift-tag--received">
+              <app-icon name="gift" [size]="10"></app-icon>
+              Received
+            </span>
           }
         </div>
         <div class="txn-meta">
           {{ txn.createdAt | date: 'MMM d, yyyy' }}
-          @if (txn.giftedToName) { &middot; Gifted to <strong>{{ txn.giftedToName }}</strong> }
-          @if (txn.giftedFromName) { &middot; From <strong>{{ txn.giftedFromName }}</strong> }
-          @if (txn.voucherCode) { &middot; Code: <strong>{{ txn.voucherCode }}</strong> }
+          @if (txn.giftedToName) {
+            &middot; Gifted to
+            <strong>{{ txn.giftedToName }}</strong>
+          }
+          @if (txn.giftedFromName) {
+            &middot; From
+            <strong>{{ txn.giftedFromName }}</strong>
+          }
+          @if (txn.voucherCode) {
+            &middot; Code:
+            <strong>{{ txn.voucherCode }}</strong>
+          }
         </div>
       </div>
       <div class="txn-points">

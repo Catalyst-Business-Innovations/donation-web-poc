@@ -1,0 +1,287 @@
+<div class="nd-host">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">{{ topTitle() }}</div>
+      <div class="topbar-subtitle">{{ topSubtitle() }}</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" (click)="cancel()">
+        <app-icon name="close" [size]="14"></app-icon>
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Stepper -->
+  <app-donation-stepper [steps]="steps()" [currentStep]="st.step()"></app-donation-stepper>
+
+  <!-- Summary Bar -->
+  @if (st.donor() !== undefined && !isReviewStep()) {
+    <div class="summary-bar global-summary">
+      <!-- Donor chip -->
+      @if (st.donor() === null) {
+        <div class="sb-donor-chip sb-donor-anon">
+          <div class="sb-donor-avatar sb-donor-avatar-anon"><app-icon name="user" [size]="18"></app-icon></div>
+          <div class="sb-donor-info">
+            <span class="sb-donor-name">Anonymous</span>
+            <span class="sb-donor-meta">No loyalty points</span>
+          </div>
+        </div>
+      } @else {
+        <div class="sb-donor-chip">
+          <div class="sb-donor-avatar">{{ st.donor()!.initials }}</div>
+          <div class="sb-donor-info">
+            <span class="sb-donor-name">{{ st.donor()!.displayName }}</span>
+            <span class="sb-donor-meta">
+              <app-icon [name]="tierCfgFn(st.donor()!.tier).icon" [size]="11"></app-icon>
+              {{ tierCfgFn(st.donor()!.tier).label }} · {{ st.donor()!.points | number }} pts
+            </span>
+          </div>
+        </div>
+      }
+      <button class="sb-change-btn" (click)="clearDonor(); st.goToStep(1)">Change</button>
+
+      <!-- Donation type -->
+      @if (st.step() > 1 && st.donationType()) {
+        <div class="sb-divider"></div>
+        <div class="sb-stat">
+          <div class="sb-val sb-val-sm">
+            @if (st.donationType() === DT.Items) {
+              <app-icon name="package" [size]="20"></app-icon>
+            } @else if (st.donationType() === DT.Monetary) {
+              <app-icon name="dollar" [size]="20"></app-icon>
+            } @else {
+              <app-icon name="gift" [size]="20"></app-icon>
+            }
+          </div>
+          <div class="sb-lbl">
+            {{
+              st.donationType() === DT.Items ? 'Items' : st.donationType() === DT.Monetary ? 'Money' : 'Items & Money'
+            }}
+          </div>
+        </div>
+      }
+
+      <!-- Item count -->
+      @if (st.step() > 2 && st.totalItems() > 0) {
+        <div class="sb-divider"></div>
+        <div class="sb-stat">
+          <div class="sb-val">{{ st.totalItems() }}</div>
+          <div class="sb-lbl">Items</div>
+        </div>
+      }
+
+      <!-- Points -->
+      @if (st.step() > 2 && st.donor() && st.estPoints() > 0) {
+        <div class="sb-divider"></div>
+        <div class="sb-stat">
+          <div class="sb-val">+{{ st.estPoints() }}</div>
+          <div class="sb-lbl">Points</div>
+        </div>
+      }
+
+      <!-- Monetary -->
+      @if (isAddMoneyStep() && (monetary() ?? 0) > 0) {
+        <div class="sb-divider"></div>
+        <div class="sb-stat">
+          <div class="sb-val">${{ (monetary() ?? 0).toFixed(0) }}</div>
+          <div class="sb-lbl">
+            Money
+            @if (paymentMethod()) {
+              |
+              @if (paymentMethod() === 'cash') {
+                <app-icon name="dollar" [size]="11"></app-icon>
+                Cash
+              } @else {
+                <app-icon name="credit-card" [size]="11"></app-icon>
+                Card
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Navigation buttons -->
+      <div class="sb-actions">
+        @if (st.step() > 1) {
+          <button class="sb-back-btn" (click)="st.prevStep()">Back</button>
+        }
+        @if (st.step() === 1) {
+          <button class="btn btn-success btn-lg" (click)="st.nextStep()">Continue</button>
+        }
+        @if (st.step() === 2 && st.donationType()) {
+          <button class="btn btn-success btn-lg" (click)="st.nextStep()">Continue</button>
+        }
+        @if (isAddItemsStep()) {
+          <button class="btn btn-success btn-lg" [disabled]="st.totalItems() === 0" (click)="st.nextStep()">
+            {{ st.donationType() === DT.Both ? 'Continue' : 'Review' }}
+          </button>
+        }
+        @if (isAddMoneyStep()) {
+          <button class="btn btn-success btn-lg" [disabled]="!canProceedFromMoney()" (click)="st.nextStep()">
+            Review
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- STEP 1: Identify -->
+  @if (st.step() === 1) {
+    <app-donor-identify-step
+      [searchResults]="searchResults()"
+      [sdResults]="sdResults()"
+      [sdNotFound]="sdNotFound()"
+      [tierCfgFn]="tierCfgFn"
+      (donorSelected)="onDonorSelected($event)"
+      (anonymousSelected)="onAnonymousSelected()"
+      (donorEnrolled)="onDonorEnrolled($event)"
+      (scanQR)="onScanQR()"
+      (quickDonate)="onQuickDonate($event)"
+      (scheduledLookup)="onScheduledLookup($event)"
+      (scheduledScanQR)="onScheduledScanQR()"
+      (scheduledLoad)="onScheduledLoad($event)"
+      (searchChanged)="onSearchChanged($event)"
+    ></app-donor-identify-step>
+  }
+
+  <!-- STEP 2: Donation Type -->
+  @if (st.step() === 2) {
+    <app-donation-type-step
+      [donor]="st.donor()"
+      [donationType]="st.donationType()"
+      (typeSelected)="onTypeSelected($event)"
+    ></app-donation-type-step>
+  }
+
+  <!-- STEP 3 / Add Items -->
+  @if (isAddItemsStep()) {
+    <app-add-items-step
+      [departments]="svc.departments"
+      [selectedItems]="st.selectedItems()"
+      (itemAdjusted)="onItemAdjusted($event)"
+    ></app-add-items-step>
+  }
+
+  <!-- Add Money Step -->
+  @if (isAddMoneyStep()) {
+    <app-add-money-step
+      [isCashAccepted]="isCashAccepted()"
+      [monetary]="monetary()"
+      [paymentMethod]="paymentMethod()"
+      [cashTendered]="cashTendered()"
+      [cardApproved]="cardApproved()"
+      [cardDeclined]="cardDeclined()"
+      [cardDeclineReason]="cardDeclineReason()"
+      (monetaryChanged)="onMonetaryChanged($event)"
+      (paymentMethodSelected)="onPaymentMethodSelected($event)"
+      (cashTenderedChanged)="onCashTenderedChanged($event)"
+      (cardRetry)="onCardRetry()"
+    ></app-add-money-step>
+  }
+
+  <!-- Review Step -->
+  @if (isReviewStep()) {
+    <app-review-step
+      [donor]="st.donor()"
+      [donationType]="st.donationType()"
+      [totalItems]="st.totalItems()"
+      [estPoints]="st.estPoints()"
+      [reviewItems]="reviewItems()"
+      [monetary]="monetary()"
+      [paymentMethod]="paymentMethod()"
+      [cashTendered]="cashTendered()"
+      [cardApproved]="cardApproved()"
+      [cardDeclined]="cardDeclined()"
+      [cardDeclineReason]="cardDeclineReason()"
+      [cardTxnRef]="cardTxnRef()"
+      [delivery]="delivery()"
+      [canComplete]="canComplete()"
+      [tierCfgFn]="tierCfgFn"
+      (goBack)="st.prevStep()"
+      (deliveryChanged)="onDeliveryChanged($event)"
+      (completed)="onComplete()"
+      (cardRetry)="onCardRetry()"
+    ></app-review-step>
+  }
+</div>
+
+<!-- Container Picker Modal -->
+<app-modal
+  [open]="showContainerPicker()"
+  title="Assign Container"
+  confirmLabel="Confirm"
+  [showCancel]="true"
+  cancelLabel="Clear Selection"
+  (closed)="selectedContainer.set(null); showContainerPicker.set(false)"
+  (confirmed)="showContainerPicker.set(false)"
+>
+  <div class="cpicker-body">
+    <div class="search-bar search-bar--mb-12">
+      <span class="search-icon"><app-icon name="search" size="14" /></span>
+      <input
+        [ngModel]="containerSearchQ()"
+        (ngModelChange)="containerSearchQ.set($event)"
+        placeholder="Search by barcode, type or donor..."
+      />
+    </div>
+    @if (availableContainers().length === 0) {
+      <div class="cpicker-empty">No open containers found.</div>
+    } @else {
+      <div class="cpicker-list">
+        @for (c of availableContainers(); track c.id) {
+          <div
+            class="cpicker-row"
+            [class.selected]="selectedContainer()?.id === c.id"
+            (click)="selectedContainer.set(c); showContainerPicker.set(false)"
+          >
+            <div class="cpicker-icon">
+              <app-icon name="package" [size]="18"></app-icon>
+            </div>
+            <div class="cpicker-info">
+              <div class="cpicker-barcode">{{ c.barcode }}</div>
+              <div class="cpicker-meta">
+                {{ svc.containerTypeLabel(c.containerType) }} · {{ c.locationName }}
+                @if (c.donorVisitLabel) {
+                  · {{ c.donorVisitLabel }}
+                }
+              </div>
+            </div>
+            <div class="cpicker-right">
+              <span
+                class="badge"
+                [class.badge-success]="c.status === CS.Available"
+                [class.badge-info]="c.status === CS.ReadyForSorting"
+                [class.badge-warning]="c.status === CS.Sorting"
+                [class.badge-purple]="c.status === CS.InUse"
+              >
+                {{ svc.containerStatusLabel(c.status) }}
+              </span>
+              <span class="cpicker-items">{{ c.totalItems }} items</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</app-modal>
+
+<!-- Donation Confirmation Modal -->
+<app-donation-confirmation-modal
+  [open]="showConfirmation()"
+  [donationId]="donationId()"
+  [donationRefNumber]="donationRefNumber()"
+  [receiptNumber]="receiptNum"
+  [donor]="st.donor()"
+  [donationType]="st.donationType()"
+  [totalItems]="st.totalItems()"
+  [estPoints]="st.estPoints()"
+  [monetary]="monetary()"
+  [paymentMethod]="paymentMethod()"
+  [tierCfgFn]="tierCfgFn"
+  [associateSearchResults]="associateResults()"
+  (closed)="onConfirmationClosed()"
+  (associateSearchChanged)="onAssociateSearchChanged($event)"
+  (confirmAssociation)="onConfirmAssociation($event)"
+></app-donation-confirmation-modal>

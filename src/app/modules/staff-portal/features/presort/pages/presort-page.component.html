@@ -1,0 +1,135 @@
+<app-presort-stats-bar [stats]="stats()" [queueSummary]="queueSummary()" />
+
+<div class="page-content">
+  <div class="presort-layout">
+    <!-- Queue Column -->
+    <div class="queue-col">
+      <app-presort-queue-list
+        [queue]="queue()"
+        [activeId]="formState().activeId"
+        [backlogSeverity]="queueSummary().backlogSeverity"
+        (selected)="onContainerSelected($event)"
+        (quickComplete)="onQuickComplete($event)"
+      />
+    </div>
+
+    <!-- Presort Form Column -->
+    <div class="form-col">
+      <app-presort-work-panel
+        [form]="formState()"
+        [activeQueueItem]="activeQueueItem()"
+        [categories]="categories()"
+        (destChanged)="onDestChanged($event)"
+        (containerTypeChanged)="onContainerTypeChanged($event)"
+        (presortMethodChanged)="onPresortMethodChanged($event)"
+        (seasonalChanged)="onSeasonalChanged($event)"
+        (seasonalTagChanged)="onSeasonalTagChanged($event)"
+        (ecommerceChanged)="onEcommerceChanged($event)"
+        (notesChanged)="onNotesChanged($event)"
+        (salvageWeightChanged)="onSalvageWeightChanged($event)"
+        (itemAdjusted)="onItemAdjusted($event)"
+        (itemConditionChanged)="onItemConditionChanged($event)"
+        (itemEcommerceQtyChanged)="onItemEcommerceQtyChanged($event)"
+        (itemRemoved)="onItemRemoved($event)"
+        (categoryAdded)="onCategoryAdded($event)"
+        (completeClicked)="onComplete()"
+        (splitClicked)="onSplit()"
+        (cancelClicked)="onCancel()"
+      />
+    </div>
+
+    <!-- Stats Column -->
+    <div class="stats-col">
+      <div class="card">
+        <div class="card-title card-title--spaced">Today's Throughput</div>
+        <div class="thru-row">
+          <span>Sorted Today</span>
+          <strong>{{ stats().sortedToday }}</strong>
+        </div>
+        <div class="thru-row">
+          <span>Items Processed</span>
+          <strong>{{ stats().itemsProcessed }}</strong>
+        </div>
+        <div class="thru-row">
+          <span>Avg Sort Time</span>
+          <strong>{{ stats().avgSortMinutes }} min</strong>
+        </div>
+        <div class="thru-row">
+          <span>Oldest Queued</span>
+          <strong [class]="'stat-age-' + stats().oldestQueuedSeverity">{{ stats().oldestQueuedLabel }}</strong>
+        </div>
+        <div class="thru-row">
+          <span>Salvage Rate</span>
+          <strong>{{ stats().salvageRate }}%</strong>
+        </div>
+        <div class="thru-row thru-row--last">
+          <span>E-Com Diverted</span>
+          <strong>{{ stats().ecommerceItems }} items</strong>
+        </div>
+
+        <div class="dept-breakdown">
+          <div class="dept-breakdown-title">Dept Volume</div>
+          @for (d of stats().deptVolume; track d.name) {
+            <div class="dep-item">
+              <div class="dep-hdr">
+                <span>{{ d.name }}</span>
+                <span>{{ d.pct }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width]="d.pct + '%'" [style.background]="d.color"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Complete Confirmation Modal -->
+<app-presort-confirm-modal
+  [open]="showConfirm()"
+  [confirmState]="confirmState()"
+  (closed)="showConfirm.set(false)"
+  (confirmed)="onConfirmComplete()"
+/>
+
+<!-- Split Confirmation Modal -->
+<app-presort-split-modal
+  [open]="showSplitConfirm()"
+  [items]="formState().items"
+  [destinationLabel]="splitDestLabel()"
+  (closed)="showSplitConfirm.set(false)"
+  (confirmed)="onConfirmSplit()"
+/>
+
+<!-- Quick Complete Confirmation Modal -->
+<app-modal
+  [open]="!!quickCompleteId()"
+  title="Quick Complete — Dock-Side Pre-Sorted"
+  confirmLabel="Mark Complete → Production"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  confirmVariant="success"
+  (closed)="quickCompleteId.set(null)"
+  (confirmed)="onConfirmQuickComplete()"
+>
+  <div class="confirm-body">
+    <div class="confirm-hero">
+      <app-icon name="check-circle" [size]="28"></app-icon>
+      <div>
+        <div class="confirm-hero-title">
+          {{ quickCompleteBarcode() }}
+        </div>
+        <div class="confirm-hero-sub">This container was sorted at the dock intake. No detail entry needed.</div>
+      </div>
+    </div>
+    <p class="quick-complete-note">
+      Container will be marked
+      <strong>Presorted</strong>
+      and routed directly to
+      <strong>Production</strong>
+      .
+    </p>
+  </div>
+</app-modal>

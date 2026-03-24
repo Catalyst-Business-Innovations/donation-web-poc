@@ -22,30 +22,48 @@
 
       <div class="apt-detail-grid">
         <div class="apt-row">
-          <span class="apt-key"><app-icon name="map-pin" [size]="13"></app-icon> Store</span>
+          <span class="apt-key">
+            <app-icon name="map-pin" [size]="13"></app-icon>
+            Store
+          </span>
           <strong class="apt-val">{{ v.location }}</strong>
         </div>
         <div class="apt-row">
-          <span class="apt-key"><app-icon name="calendar" [size]="13"></app-icon> Date</span>
+          <span class="apt-key">
+            <app-icon name="calendar" [size]="13"></app-icon>
+            Date
+          </span>
           <strong class="apt-val">{{ v.date | date: 'MMMM d, yyyy' }}</strong>
         </div>
         <div class="apt-row">
-          <span class="apt-key"><app-icon name="clock" [size]="13"></app-icon> Time</span>
+          <span class="apt-key">
+            <app-icon name="clock" [size]="13"></app-icon>
+            Time
+          </span>
           <strong class="apt-val">{{ v.time }}</strong>
         </div>
         @if (v.recurring) {
           <div class="apt-row">
-            <span class="apt-key"><app-icon name="refresh" [size]="13"></app-icon> Frequency</span>
+            <span class="apt-key">
+              <app-icon name="refresh" [size]="13"></app-icon>
+              Frequency
+            </span>
             <strong class="apt-val">{{ v.recurring }}</strong>
           </div>
         }
         <div class="apt-row">
-          <span class="apt-key"><app-icon name="package" [size]="13"></app-icon> Items Planned</span>
+          <span class="apt-key">
+            <app-icon name="package" [size]="13"></app-icon>
+            Items Planned
+          </span>
           <strong class="apt-val">{{ v.items }}</strong>
         </div>
         @if (v.notes) {
           <div class="apt-row">
-            <span class="apt-key"><app-icon name="file-text" [size]="13"></app-icon> Notes</span>
+            <span class="apt-key">
+              <app-icon name="file-text" [size]="13"></app-icon>
+              Notes
+            </span>
             <span class="apt-val">{{ v.notes }}</span>
           </div>
         }

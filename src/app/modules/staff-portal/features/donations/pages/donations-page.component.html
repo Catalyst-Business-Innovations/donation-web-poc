@@ -1,0 +1,89 @@
+<div class="topbar donations-topbar">
+  <div>
+    <div class="topbar-title">Donations</div>
+    <div class="topbar-subtitle">{{ counts().total }} total across all stores</div>
+  </div>
+  <div class="topbar-actions">
+    <app-donations-tab-bar [activeTab]="activeTab()" (tabChanged)="onTabChanged($event)" />
+
+    <div class="topbar-divider"></div>
+
+    @if (activeTab() === 'scheduled-donations') {
+      <div class="search-bar donations-search">
+        <span class="search-icon"><app-icon name="search" size="14" /></span>
+        <input [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search donor, Ref #, store…" />
+      </div>
+      <select class="form-select f-sel" [ngModel]="methodFilter()" (ngModelChange)="methodFilter.set($event)">
+        <option [ngValue]="''">All Methods</option>
+        <option [ngValue]="AT.Scheduled">Scheduled</option>
+        <option [ngValue]="AT.WalkIn">Walk-In</option>
+        <option [ngValue]="AT.Pickup">Pickup</option>
+      </select>
+      <select class="form-select f-sel" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+        <option [ngValue]="''">All Statuses</option>
+        <option [ngValue]="DS.Scheduled">Scheduled</option>
+        <option [ngValue]="DS.CheckedIn">Checked In</option>
+        <option [ngValue]="DS.Completed">Completed</option>
+        <option [ngValue]="DS.Cancelled">Cancelled</option>
+        <option [ngValue]="DS.NoShow">No Show</option>
+      </select>
+      <input
+        class="form-select f-sel f-date"
+        type="date"
+        [ngModel]="dateFilter()"
+        (ngModelChange)="dateFilter.set($event)"
+      />
+      @if (dateFilter()) {
+        <button class="btn btn-secondary btn-sm" (click)="dateFilter.set('')">
+          <app-icon name="close" size="13" /> Clear
+        </button>
+      }
+    }
+
+    @if (activeTab() === 'completions') {
+      <div class="search-bar donations-search">
+        <span class="search-icon"><app-icon name="search" size="14" /></span>
+        <input [ngModel]="donQuery()" (ngModelChange)="donQuery.set($event)" placeholder="Search donor, Ref #…" />
+      </div>
+    }
+  </div>
+</div>
+
+<div class="page-content">
+  @if (activeTab() === 'scheduled-donations') {
+    <app-donation-status-counts
+      [counts]="counts()"
+      [activeStatus]="statusFilter()"
+      (statusClicked)="onStatusClicked($event)"
+    />
+
+    <app-scheduled-donations-table
+      [donations]="filteredScheduled()"
+      (viewRequested)="onViewScheduled($event)"
+      (cancelRequested)="onCancelScheduled($event)"
+    />
+  }
+
+  @if (activeTab() === 'completions') {
+    <app-completed-donations-table
+      [donations]="filteredCompleted()"
+      (linkRequested)="onLinkRequested($event)"
+    />
+  }
+</div>
+
+<app-scheduled-donation-detail-modal
+  [donation]="selectedDetail()"
+  (closed)="onCloseDetail()"
+  (cancelled)="onCancelScheduled(selectedDetail()!.id)"
+  (checkedIn)="onCheckInScheduled()"
+  (started)="onStartScheduled()"
+/>
+
+<app-link-donor-modal
+  [donation]="linkingDonation()"
+  [searchResults]="linkResults()"
+  [(searchQuery)]="linkSearchQ"
+  (closed)="onLinkClosed()"
+  (confirmed)="onLinkConfirmed($event)"
+/>

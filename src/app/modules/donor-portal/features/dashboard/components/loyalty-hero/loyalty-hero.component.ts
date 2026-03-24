@@ -9,7 +9,7 @@ import { DonorStatsState, TierDisplayState } from '../../models/dashboard.state'
   imports: [DecimalPipe, DatePipe, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './loyalty-hero.component.html',
-  styleUrl: './loyalty-hero.component.scss',
+  styleUrl: './loyalty-hero.component.scss'
 })
 export class LoyaltyHeroComponent {
   donor = input.required<DonorStatsState>();

@@ -1,0 +1,241 @@
+.add-money-host {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .preset-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+}
+
+.preset-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.preset-btn {
+  padding: 8px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  &.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+}
+
+.input-prefix-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  &--mt {
+    margin-top: 8px;
+  }
+}
+.input-prefix {
+  position: absolute;
+  left: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-500);
+  pointer-events: none;
+}
+.input-with-prefix {
+  padding-left: 26px !important;
+}
+
+.pay-method-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.pay-method-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    box-shadow 0.15s;
+
+  .pm-icon {
+    font-size: 28px;
+  }
+  .pm-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+  }
+
+  &:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+
+  &.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+
+    .pm-label {
+      color: var(--primary);
+    }
+  }
+}
+
+.cash-flow {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-100);
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .change-display {
+    padding: 10px 14px;
+    background: var(--success-light);
+    border: 1px solid var(--success);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--success-dark, #166534);
+
+    strong {
+      font-size: 17px;
+      margin-left: 4px;
+    }
+  }
+
+  .change-insufficient {
+    padding: 10px 14px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #991b1b;
+  }
+}
+
+.card-terminal {
+  margin-top: 16px;
+  padding: 28px;
+  text-align: center;
+  border: 2px dashed var(--gray-300);
+  border-radius: 10px;
+  background: var(--gray-50);
+
+  .terminal-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+  .terminal-msg {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+  .terminal-sub {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 4px;
+  }
+}
+
+.card-approved {
+  margin-top: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 10px;
+  background: #dcfce7;
+  border: 2px solid #16a34a;
+  color: #15803d;
+
+  app-icon {
+    flex-shrink: 0;
+  }
+  .ca-body {
+    flex: 1;
+  }
+  .ca-title {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .ca-sub {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+}
+.card-declined {
+  margin-top: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 2px solid #ef4444;
+  color: #dc2626;
+
+  app-icon {
+    flex-shrink: 0;
+  }
+  .ca-body {
+    flex: 1;
+  }
+  .ca-title {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .ca-sub {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+  .ca-retry {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+}
+.terminal-pulse {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin: 14px auto 0;
+  animation: pulse-anim 1.5s ease-in-out infinite;
+}
+@keyframes pulse-anim {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}

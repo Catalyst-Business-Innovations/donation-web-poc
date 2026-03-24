@@ -5,7 +5,7 @@ import { Component, ChangeDetectionStrategy, input, output } from '@angular/core
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './history-filters.component.html',
-  styleUrl: './history-filters.component.scss',
+  styleUrl: './history-filters.component.scss'
 })
 export class HistoryFiltersComponent {
   years = input.required<number[]>();

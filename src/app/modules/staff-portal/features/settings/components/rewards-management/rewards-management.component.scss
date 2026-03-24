@@ -1,0 +1,246 @@
+/* ── Settings Card ── */
+.settings-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+}
+
+.settings-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.settings-card-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--primary-50, #eff6ff);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.settings-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.settings-card-desc {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-top: 1px;
+}
+
+.settings-card-header-body {
+  flex: 1;
+}
+
+.settings-card-body {
+  padding: 20px;
+
+  &.no-padding {
+    padding: 0;
+  }
+}
+
+/* ── Reward Filters ── */
+.reward-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.filter-group {
+  display: flex;
+  gap: 4px;
+}
+
+.filter-btn {
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+}
+
+.filter-select {
+  height: 32px;
+  font-size: 12px;
+  padding: 0 10px;
+  min-width: 120px;
+}
+
+/* ── Reward Table ── */
+.reward-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-400);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--gray-50);
+  }
+
+  td {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--gray-800);
+    border-bottom: 1px solid var(--gray-50);
+    vertical-align: middle;
+  }
+
+  tbody tr:hover {
+    background: var(--gray-25, #fafafa);
+  }
+}
+
+.type-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.12s ease;
+
+  &:hover {
+    background: var(--gray-100);
+    color: var(--gray-700);
+  }
+}
+
+.btn-icon-danger {
+  color: var(--danger) !important;
+
+  &:hover {
+    background: var(--danger-light, #fef2f2);
+  }
+}
+
+.btn-icon-approve {
+  color: var(--success);
+
+  &:hover {
+    background: var(--success-light, #f0fdf4);
+    color: var(--success);
+  }
+}
+
+.btn-icon-reject {
+  color: var(--danger);
+
+  &:hover {
+    background: var(--danger-light, #fef2f2);
+    color: var(--danger);
+  }
+}
+
+.btn-icon-muted {
+  color: var(--gray-500);
+}
+
+.reward-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.reward-desc-cell {
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-top: 2px;
+}
+
+.td-value {
+  font-weight: 700;
+}
+
+.td-points-required {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.td-points-used {
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.td-limits {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+.td-empty {
+  color: var(--gray-400);
+}
+
+.td-donor-name {
+  font-weight: 600;
+}
+
+.td-voucher-code {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+
+.td-date {
+  font-size: 12px;
+}
+
+.td-empty-state {
+  text-align: center;
+  padding: 24px;
+  color: var(--gray-400);
+}

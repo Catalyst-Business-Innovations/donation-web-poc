@@ -1,0 +1,25 @@
+<app-modal
+  [open]="open()"
+  title="Bulk Status Update"
+  confirmLabel="Apply to All"
+  cancelLabel="Cancel"
+  size="sm"
+  [showCancel]="true"
+  (closed)="closed.emit()"
+  (confirmed)="confirmed.emit(bulkStatus())"
+>
+  <p class="bulk-desc">
+    Update status for
+    <strong>{{ selectionCount() }}</strong>
+    selected container(s).
+  </p>
+  <div class="form-group">
+    <label class="form-label">New Status</label>
+    <select class="form-select" [ngModel]="bulkStatus()" (ngModelChange)="statusChanged.emit($event)">
+      <option [ngValue]="CS.Available">Available</option>
+      <option [ngValue]="CS.InUse">In Use</option>
+      <option [ngValue]="CS.ReadyForSorting">Ready for Sorting</option>
+      <option [ngValue]="CS.Sorting">Sorting</option>
+    </select>
+  </div>
+</app-modal>

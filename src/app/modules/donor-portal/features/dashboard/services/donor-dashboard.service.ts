@@ -7,7 +7,7 @@ import {
   ImpactItemState,
   RecentDonationState,
   CampaignSummaryState,
-  BadgeState,
+  BadgeState
 } from '../models/dashboard.state';
 import {
   mapDonorToStats,
@@ -15,7 +15,7 @@ import {
   mapDonorToImpactItems,
   mapDonationToRecentDonation,
   mapCampaignToSummary,
-  mapDonorToBadges,
+  mapDonorToBadges
 } from '../models/dashboard.mapper';
 
 @Injectable({ providedIn: 'root' })
@@ -42,7 +42,8 @@ export class DonorDashboardService {
   }
 
   readonly activeCampaigns = computed(() =>
-    this.mockData.campaigns()
+    this.mockData
+      .campaigns()
       .filter(c => c.status === CampaignStatus.Active)
       .map(mapCampaignToSummary)
   );

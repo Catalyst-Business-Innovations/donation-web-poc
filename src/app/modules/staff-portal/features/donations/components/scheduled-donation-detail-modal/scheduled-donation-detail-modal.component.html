@@ -1,0 +1,110 @@
+<app-modal
+  [open]="!!donation()"
+  [title]="donation()?.referenceNumber ?? 'Scheduled Donation'"
+  [confirmLabel]="donation()?.isScheduledStatus ? 'Check In & Start Donation' : 'Close'"
+  cancelLabel="Close"
+  [showCancel]="!!donation()?.isScheduledStatus"
+  (closed)="closed.emit()"
+  (confirmed)="donation()?.isScheduledStatus ? checkedIn.emit() : closed.emit()"
+>
+  @if (donation(); as d) {
+    <div class="detail-layout">
+      <!-- Left: QR + Reference # -->
+      <div class="detail-left">
+        <div class="apt-id-badge">{{ d.referenceNumber }}</div>
+        <div class="qr-frame">
+          <app-qr-code [value]="d.referenceNumber" [size]="150"></app-qr-code>
+        </div>
+        <div class="qr-hint">Scan at check-in</div>
+
+        <span class="badge {{ d.statusBadgeClass }} badge--sm-pad detail-status-badge">
+          {{ d.statusLabel }}
+        </span>
+
+        @if (d.isScheduledStatus) {
+          <button class="btn btn-success btn-sm detail-complete-btn" (click)="started.emit()">Mark Completed</button>
+        }
+      </div>
+
+      <!-- Right: Details -->
+      <div class="detail-right">
+        <div class="detail-section-hdr">Donor</div>
+        <div class="detail-grid">
+          <div class="dg-row">
+            <span class="dg-key">Name</span>
+            <span class="dg-val">{{ d.donorName }}</span>
+          </div>
+          @if (d.donorPhone) {
+            <div class="dg-row">
+              <span class="dg-key">Phone</span>
+              <span class="dg-val">{{ d.donorPhone }}</span>
+            </div>
+          }
+          @if (d.donorEmail) {
+            <div class="dg-row">
+              <span class="dg-key">Email</span>
+              <span class="dg-val">{{ d.donorEmail }}</span>
+            </div>
+          }
+          @if (d.address) {
+            <div class="dg-row">
+              <span class="dg-key">Address</span>
+              <span class="dg-val">{{ d.address }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="detail-section-hdr">Scheduled Donation</div>
+        <div class="detail-grid">
+          <div class="dg-row">
+            <span class="dg-key">Date</span>
+            <span class="dg-val">{{ d.date | date: 'MMMM d, yyyy' }}</span>
+          </div>
+          <div class="dg-row">
+            <span class="dg-key">Time</span>
+            <span class="dg-val">{{ d.time }}</span>
+          </div>
+          <div class="dg-row">
+            <span class="dg-key">Store</span>
+            <span class="dg-val">{{ d.locationName }}</span>
+          </div>
+          <div class="dg-row">
+            <span class="dg-key">Method</span>
+            <span class="badge {{ d.methodBadgeClass }} badge--sm">{{ d.methodLabel }}</span>
+          </div>
+          @if (d.recurring) {
+            <div class="dg-row">
+              <span class="dg-key">Frequency</span>
+              <span class="dg-val">{{ d.recurring }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="detail-section-hdr">Items Planned</div>
+        <div class="detail-grid">
+          <div class="dg-row">
+            <span class="dg-key">Qty</span>
+            <span class="dg-val dg-val--qty">{{ d.itemCount ?? '—' }}</span>
+          </div>
+          @if (d.categories.length > 0) {
+            <div class="dg-row dg-wrap">
+              <span class="dg-key">Categories</span>
+              <div class="cat-pills">
+                @for (cat of d.categories; track cat) {
+                  <span class="badge badge-info badge--sm">{{ cat }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (d.notes) {
+          <div class="detail-notes">
+            <div class="detail-section-hdr">Notes</div>
+            <div class="notes-body">{{ d.notes }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</app-modal>

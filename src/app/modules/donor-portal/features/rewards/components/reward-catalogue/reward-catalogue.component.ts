@@ -9,7 +9,7 @@ import { RewardCatalogueItemState } from '../../models/rewards.state';
   imports: [DecimalPipe, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './reward-catalogue.component.html',
-  styleUrl: './reward-catalogue.component.scss',
+  styleUrl: './reward-catalogue.component.scss'
 })
 export class RewardCatalogueComponent {
   rewards = input.required<RewardCatalogueItemState[]>();

@@ -1,0 +1,74 @@
+<div class="card">
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Receipt #</th>
+          <th>Donor</th>
+          <th>Date</th>
+          <th>Store</th>
+          <th>Items</th>
+          <th>Est. Value</th>
+          <th>Points</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (d of donations(); track d.id) {
+          <tr class="appt-row">
+            <td>
+              <span class="apt-id-cell">{{ d.receiptNumber }}</span>
+            </td>
+            <td>
+              <div class="donor-cell">
+                @if (d.donorName) {
+                  <div class="donor-name">{{ d.donorName }}</div>
+                  @if (d.donorTierLabel) {
+                    <span class="badge {{ d.donorTierBadgeClass }} badge--xs">{{ d.donorTierLabel }}</span>
+                  }
+                } @else {
+                  <span class="anon-label">Anonymous</span>
+                  @if (d.associatedDonorName) {
+                    <div class="donor-sub">Linked: {{ d.associatedDonorName }}</div>
+                  }
+                }
+              </div>
+            </td>
+            <td>
+              <div class="td-date-primary">{{ d.timestamp | date: 'MMM d, yyyy' }}</div>
+              <div class="td-date-secondary">{{ d.timestamp | date: 'h:mm a' }}</div>
+            </td>
+            <td class="td-text-sm">{{ d.locationName }}</td>
+            <td class="td-bold">{{ d.totalItems }}</td>
+            <td class="td-bold">{{ d.totalEstimatedValue | number: '1.2-2' }}</td>
+            <td>
+              @if (d.loyaltyPointsEarned != null) {
+                <span class="badge badge-success badge--xs">+{{ d.loyaltyPointsEarned }}</span>
+              } @else {
+                <span class="anon-label">—</span>
+              }
+            </td>
+            <td>
+              <span class="badge {{ d.statusBadgeClass }}">{{ d.statusLabel }}</span>
+            </td>
+            <td>
+              <div class="table-actions">
+                @if (d.isAnonymous && !d.associatedDonorName) {
+                  <button class="btn btn-secondary btn-sm" (click)="linkRequested.emit(d.id)">Link Donor</button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (donations().length === 0) {
+      <div class="empty-state">
+        <div class="empty-state-icon"><app-icon name="gift" [size]="40"></app-icon></div>
+        <div class="empty-state-title">No completed donations match</div>
+        <div class="empty-state-text">Try adjusting your search.</div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="summary-row">
+  <div class="sum-card sum-gray" [class.active]="activeFilter() === CS.Draft" (click)="toggleFilter(CS.Draft)">
+    <div class="sum-num">{{ counts().draft }}</div>
+    <div class="sum-lbl">Draft</div>
+  </div>
+  <div class="sum-card sum-green" [class.active]="activeFilter() === CS.Active" (click)="toggleFilter(CS.Active)">
+    <div class="sum-num">{{ counts().active }}</div>
+    <div class="sum-lbl">Active</div>
+  </div>
+  <div class="sum-card sum-yellow" [class.active]="activeFilter() === CS.Paused" (click)="toggleFilter(CS.Paused)">
+    <div class="sum-num">{{ counts().paused }}</div>
+    <div class="sum-lbl">Paused</div>
+  </div>
+  <div class="sum-card sum-blue" [class.active]="activeFilter() === CS.Completed" (click)="toggleFilter(CS.Completed)">
+    <div class="sum-num">{{ counts().completed }}</div>
+    <div class="sum-lbl">Completed</div>
+  </div>
+</div>

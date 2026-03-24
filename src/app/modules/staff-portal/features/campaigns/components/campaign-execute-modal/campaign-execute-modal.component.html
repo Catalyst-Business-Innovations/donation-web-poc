@@ -1,0 +1,79 @@
+<app-modal
+  [open]="open()"
+  title="Run Campaign"
+  [confirmLabel]="confirmLabel"
+  cancelLabel="Cancel"
+  [showCancel]="showCancel"
+  [confirmDisabled]="confirmDisabled"
+  (closed)="closed.emit()"
+  (confirmed)="onConfirm()"
+>
+  @if (campaign(); as c) {
+    <div class="exec-modal-body">
+      @if (!results()) {
+        @if (!c.hasRequiredTemplates) {
+          <div class="exec-warning-banner">
+            <app-icon name="alert-circle" size="18" />
+            <div>
+              <strong>Templates not configured</strong>
+              <p>This campaign requires templates before it can be sent. Edit the campaign to add them.</p>
+            </div>
+          </div>
+        } @else {
+          <p class="exec-confirm-text">
+            This will send
+            <strong>{{ c.channelLabel }}</strong>
+            notifications to all eligible donors for campaign
+            <strong>"{{ c.name }}"</strong>
+            .
+          </p>
+          @if (c.emailTemplateBody) {
+            <div class="exec-tpl-summary">
+              <div class="exec-tpl-header">
+                <app-icon name="mail" size="14" />
+                <strong>Email Template</strong>
+              </div>
+              <div class="exec-tpl-detail">
+                <span class="exec-tpl-label">Subject:</span>
+                {{ c.emailTemplateSubject || '(no subject)' }}
+              </div>
+              <div class="exec-tpl-detail exec-tpl-body-preview">
+                {{ c.emailTemplateBody.substring(0, 120) }}{{ c.emailTemplateBody.length > 120 ? '...' : '' }}
+              </div>
+            </div>
+          }
+          @if (c.smsTemplateBody) {
+            <div class="exec-tpl-summary">
+              <div class="exec-tpl-header">
+                <app-icon name="phone" size="14" />
+                <strong>SMS Template</strong>
+              </div>
+              <div class="exec-tpl-detail exec-tpl-body-preview">
+                {{ c.smsTemplateBody.substring(0, 120) }}{{ c.smsTemplateBody.length > 120 ? '...' : '' }}
+              </div>
+            </div>
+          }
+          <div class="exec-info-row">
+            <app-icon name="users" size="16" />
+            <span>All eligible donors will be notified.</span>
+          </div>
+          <div class="exec-info-row exec-info-row--warning">
+            <app-icon name="alert-circle" size="16" />
+            <span>This action cannot be undone.</span>
+          </div>
+        }
+      } @else {
+        <div class="exec-result">
+          <div class="exec-result-num exec-result-num--success">{{ results()!.sent }}</div>
+          <div class="exec-result-lbl">Delivered</div>
+        </div>
+        @if (results()!.failed > 0) {
+          <div class="exec-result exec-result--spaced">
+            <div class="exec-result-num exec-result-num--danger">{{ results()!.failed }}</div>
+            <div class="exec-result-lbl">Failed</div>
+          </div>
+        }
+      }
+    </div>
+  }
+</app-modal>

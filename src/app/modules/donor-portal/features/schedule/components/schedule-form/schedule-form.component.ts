@@ -9,7 +9,7 @@ import { LocationOptionState } from '../../models/schedule.state';
   imports: [FormsModule, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './schedule-form.component.html',
-  styleUrl: './schedule-form.component.scss',
+  styleUrl: './schedule-form.component.scss'
 })
 export class ScheduleFormComponent {
   locations = input.required<LocationOptionState[]>();

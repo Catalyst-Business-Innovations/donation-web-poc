@@ -10,11 +10,11 @@ export const mapDonationToHistoryItem = (d: Donation): DonationHistoryItemState 
   statusBadgeClass: d.status === DonationStatus.Completed ? 'badge-success' : 'badge-warning',
   totalItems: d.totalItems,
   loyaltyPointsEarned: d.loyaltyPointsEarned ?? 0,
-  items: d.items.map(item => ({ categoryName: item.categoryName, quantity: item.quantity })),
+  items: d.items.map(item => ({ categoryName: item.categoryName, quantity: item.quantity }))
 });
 
 export const mapDonationsToSummary = (donations: Donation[]): HistorySummaryState => ({
   donations: donations.length,
   items: donations.reduce((s, d) => s + d.totalItems, 0),
-  points: donations.reduce((s, d) => s + (d.loyaltyPointsEarned ?? 0), 0),
+  points: donations.reduce((s, d) => s + (d.loyaltyPointsEarned ?? 0), 0)
 });

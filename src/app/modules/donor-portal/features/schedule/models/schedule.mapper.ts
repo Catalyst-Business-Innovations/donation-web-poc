@@ -8,5 +8,5 @@ export const mapLocationToOption = (loc: Location): LocationOptionState => ({
   hours: loc.hours,
   statusLabel: LocationStatusLabel[loc.status],
   statusBadgeClass: loc.status === LocationStatus.Open ? 'badge-success' : 'badge-warning',
-  isClosed: loc.status === LocationStatus.Closed,
+  isClosed: loc.status === LocationStatus.Closed
 });

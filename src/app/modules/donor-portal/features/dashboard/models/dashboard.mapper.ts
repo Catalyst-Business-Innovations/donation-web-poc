@@ -5,7 +5,7 @@ import {
   ImpactItemState,
   RecentDonationState,
   CampaignSummaryState,
-  BadgeState,
+  BadgeState
 } from './dashboard.state';
 
 export const mapDonorToStats = (donor: Donor): DonorStatsState => ({
@@ -14,7 +14,7 @@ export const mapDonorToStats = (donor: Donor): DonorStatsState => ({
   joinDate: donor.joinDate,
   totalDonations: donor.totalDonations,
   loyaltyPoints: donor.loyaltyPoints,
-  lifetimeValue: donor.lifetimeValue,
+  lifetimeValue: donor.lifetimeValue
 });
 
 export const mapDonorToTierDisplay = (
@@ -36,7 +36,7 @@ export const mapDonorToTierDisplay = (
     tier: currentTier,
     nextTier,
     progress,
-    donationsToNext: nextTier ? nextTier.minDonations - donor.totalDonations : 0,
+    donationsToNext: nextTier ? nextTier.minDonations - donor.totalDonations : 0
   };
 };
 
@@ -44,7 +44,7 @@ export const mapDonorToImpactItems = (donor: Donor): ImpactItemState[] => [
   { icon: 'layers', value: `${donor.totalDonations * 12} lbs`, label: 'Textiles diverted from landfill' },
   { icon: 'users', value: `${donor.totalDonations * 4}`, label: 'Families potentially helped' },
   { icon: 'refresh', value: `${Math.round(donor.totalDonations * 2.4)} kg`, label: 'CO\u2082 emissions offset' },
-  { icon: 'dollar', value: `$${donor.lifetimeValue.toLocaleString()}`, label: 'Community value generated' },
+  { icon: 'dollar', value: `$${donor.lifetimeValue.toLocaleString()}`, label: 'Community value generated' }
 ];
 
 export const mapDonationToRecentDonation = (d: Donation): RecentDonationState => ({
@@ -52,7 +52,7 @@ export const mapDonationToRecentDonation = (d: Donation): RecentDonationState =>
   locationName: d.locationName,
   timestamp: d.timestamp,
   totalItems: d.totalItems,
-  loyaltyPointsEarned: d.loyaltyPointsEarned ?? 0,
+  loyaltyPointsEarned: d.loyaltyPointsEarned ?? 0
 });
 
 export const mapCampaignToSummary = (c: Campaign): CampaignSummaryState => ({
@@ -60,7 +60,7 @@ export const mapCampaignToSummary = (c: Campaign): CampaignSummaryState => ({
   name: c.name,
   description: c.description,
   startDate: c.startDate,
-  endDate: c.endDate,
+  endDate: c.endDate
 });
 
 export const mapDonorToBadges = (donor: Donor): BadgeState[] => [
@@ -69,5 +69,5 @@ export const mapDonorToBadges = (donor: Donor): BadgeState[] => [
   { icon: 'check-circle', label: '25 Donations', earned: donor.totalDonations >= 25 },
   { icon: 'trending-up', label: '50 Donations', earned: donor.totalDonations >= 50 },
   { icon: 'users', label: 'Community Hero', earned: donor.lifetimeValue >= 5000 },
-  { icon: 'calendar', label: 'Year-Round Donor', earned: false },
+  { icon: 'calendar', label: 'Year-Round Donor', earned: false }
 ];

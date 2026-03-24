@@ -5,13 +5,13 @@ import {
   TierProgressState,
   RewardCatalogueItemState,
   RewardTransactionState,
-  DonorSearchResultState,
+  DonorSearchResultState
 } from '../models/rewards.state';
 import {
   mapRewardToCatalogueItem,
   mapTransactionToState,
   mapTiersToProgress,
-  mapDonorToSearchResult,
+  mapDonorToSearchResult
 } from '../models/rewards.mapper';
 
 @Injectable({ providedIn: 'root' })
@@ -20,13 +20,13 @@ export class DonorRewardsService {
   private readonly donor = this.mockData.donors[0];
 
   readonly catalogue = computed<RewardCatalogueItemState[]>(() =>
-    this.mockData.getAvailableRewardsForDonor(this.donor.id)
+    this.mockData
+      .getAvailableRewardsForDonor(this.donor.id)
       .map(r => mapRewardToCatalogueItem(r, this.donor.loyaltyPoints))
   );
 
   readonly txnHistory = computed<RewardTransactionState[]>(() =>
-    this.mockData.getRewardTransactionsForDonor(this.donor.id)
-      .map(mapTransactionToState)
+    this.mockData.getRewardTransactionsForDonor(this.donor.id).map(mapTransactionToState)
   );
 
   getHeroState(): PointsHeroState {
@@ -38,7 +38,7 @@ export class DonorRewardsService {
       tierLabel: tier.label,
       catalogueCount: catalogue.length,
       giftableCount: catalogue.filter(r => r.isGiftable).length,
-      redemptionCount: this.txnHistory().length,
+      redemptionCount: this.txnHistory().length
     };
   }
 
@@ -54,8 +54,9 @@ export class DonorRewardsService {
     const q = query.toLowerCase().trim();
     if (q.length < 2) return [];
     return this.mockData.donors
-      .filter(d => d.id !== this.donor.id &&
-        (`${d.firstName} ${d.lastName}`.toLowerCase().includes(q) || d.phone.includes(q)))
+      .filter(
+        d => d.id !== this.donor.id && (`${d.firstName} ${d.lastName}`.toLowerCase().includes(q) || d.phone.includes(q))
+      )
       .slice(0, 6)
       .map(mapDonorToSearchResult);
   }

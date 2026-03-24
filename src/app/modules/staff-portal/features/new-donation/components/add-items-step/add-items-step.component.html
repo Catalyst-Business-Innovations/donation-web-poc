@@ -1,0 +1,87 @@
+<div class="step2-host anim-in">
+  <!-- Dept tabs -->
+  <div class="dept-tabs">
+    @for (dept of departments(); track dept.key) {
+      <button class="dept-tab" [class.active]="activeDept() === dept.key" (click)="activeDept.set(dept.key)">
+        {{ dept.name }}
+        @if (deptCount(dept.key) > 0) {
+          <span class="dept-count">{{ deptCount(dept.key) }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- Category grid -->
+  <div class="cat-scroll">
+    @for (dept of departments(); track dept.key) {
+      @if (activeDept() === dept.key) {
+        <div class="cat-grid anim-in">
+          <!-- Dept-level any card -->
+          <div
+            class="cat-card cat-card-any"
+            [class.has-items]="getQty(dept.key) > 0"
+            (click)="adjust(key(dept.key), 1)"
+          >
+            <div class="cat-card-any-text">
+              <span class="cat-type-chip cat-type-dept">Department</span>
+              <div class="cat-name">
+                {{ dept.name }}
+                <span class="cat-any-tag">Any</span>
+              </div>
+            </div>
+            <div class="qty-ctrl" (click)="$event.stopPropagation()">
+              <button (click)="adjust(key(dept.key), -1)">&#8722;</button>
+              <span>{{ getQty(dept.key) }}</span>
+              <button (click)="adjust(key(dept.key), 1)">+</button>
+            </div>
+          </div>
+
+          <!-- Categories tree -->
+          <div class="cat-categories-tree">
+            @for (cat of dept.categories; track cat.key) {
+              <div class="cat-group">
+                <div
+                  class="cat-card cat-card-any cat-card-cat"
+                  [class.has-items]="getQty(dept.key, cat.key) > 0"
+                  (click)="adjust(key(dept.key, cat.key), 1)"
+                >
+                  <div class="cat-card-any-text">
+                    <span class="cat-type-chip cat-type-cat">Category</span>
+                    <div class="cat-name">
+                      {{ cat.name }}
+                      <span class="cat-any-tag">Any</span>
+                    </div>
+                  </div>
+                  <div class="qty-ctrl" (click)="$event.stopPropagation()">
+                    <button (click)="adjust(key(dept.key, cat.key), -1)">&#8722;</button>
+                    <span>{{ getQty(dept.key, cat.key) }}</span>
+                    <button (click)="adjust(key(dept.key, cat.key), 1)">+</button>
+                  </div>
+                </div>
+                @if ((cat.subCategories ?? []).length > 0) {
+                  <div class="cat-sub-grid">
+                    @for (sub of cat.subCategories ?? []; track sub.key) {
+                      <div
+                        class="cat-card cat-card-sub"
+                        [class.has-items]="getQty(dept.key, cat.key, sub.key) > 0"
+                        (click)="adjust(key(dept.key, cat.key, sub.key), 1)"
+                      >
+                        <span class="cat-type-chip cat-type-sub">Sub</span>
+                        <div class="cat-name">{{ sub.name }}</div>
+                        <div class="qty-ctrl" (click)="$event.stopPropagation()">
+                          <button (click)="adjust(key(dept.key, cat.key, sub.key), -1)">&#8722;</button>
+                          <span>{{ getQty(dept.key, cat.key, sub.key) }}</span>
+                          <button (click)="adjust(key(dept.key, cat.key, sub.key), 1)">+</button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

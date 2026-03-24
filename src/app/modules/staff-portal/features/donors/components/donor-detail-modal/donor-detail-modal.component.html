@@ -1,0 +1,42 @@
+<app-modal
+  [open]="open()"
+  title="Donor Details"
+  confirmLabel="Edit Donor"
+  (closed)="closed.emit()"
+  (confirmed)="editRequested.emit()"
+>
+  @if (donor(); as d) {
+    <div class="donor-profile-hero">
+      <div class="d-av-xl">{{ d.initials }}</div>
+      <div>
+        <div class="dp-tier">
+          <app-icon [name]="d.tierIcon" [size]="14"></app-icon>
+          {{ d.tierLabel }} MEMBER
+        </div>
+        <div class="dp-name">{{ d.firstName }} {{ d.lastName }}</div>
+        <div class="dp-contact">{{ d.email }} &middot; {{ d.phone }}</div>
+      </div>
+    </div>
+    <div class="dp-stats">
+      <div class="dp-stat">
+        <div>{{ d.totalDonations }}</div>
+        <span>Donations</span>
+      </div>
+      <div class="dp-stat">
+        <div>${{ d.lifetimeValue | number }}</div>
+        <span>Lifetime</span>
+      </div>
+      <div class="dp-stat">
+        <div>{{ d.loyaltyPoints | number }}</div>
+        <span>Points</span>
+      </div>
+    </div>
+    <div class="section-label">Recent Activity</div>
+    @for (don of d.recentDonations; track don.timestamp) {
+      <div class="history-row">
+        <span>{{ don.locationName }}</span>
+        <span class="history-row__date">{{ don.timestamp | date: 'MMM d, yyyy' }}</span>
+      </div>
+    }
+  }
+</app-modal>

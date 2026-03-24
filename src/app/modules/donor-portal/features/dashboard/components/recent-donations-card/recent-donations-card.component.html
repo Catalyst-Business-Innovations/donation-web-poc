@@ -11,9 +11,7 @@
       <div class="don-icon"><app-icon name="package" [size]="20"></app-icon></div>
       <div class="don-content">
         <div class="don-location">{{ d.locationName }}</div>
-        <div class="don-meta">
-          {{ d.timestamp | date: 'MMM d, yyyy' }} · {{ d.totalItems }} items
-        </div>
+        <div class="don-meta">{{ d.timestamp | date: 'MMM d, yyyy' }} · {{ d.totalItems }} items</div>
       </div>
       <div class="don-pts-col">
         @if (d.loyaltyPointsEarned) {

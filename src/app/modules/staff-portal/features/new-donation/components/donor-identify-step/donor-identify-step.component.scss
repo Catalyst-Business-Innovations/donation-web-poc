@@ -1,0 +1,219 @@
+.id-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: stretch;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.id-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+  }
+}
+
+.quick-btn {
+  border: 2px solid var(--gray-200);
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  span:first-child {
+    font-size: 28px;
+  }
+
+  &.qr-btn:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  &.anon-btn:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  &.add-donor-btn:hover {
+    border-color: var(--secondary);
+    background: var(--secondary-light);
+  }
+  &.quick-items-btn:hover {
+    border-color: var(--secondary);
+    background: var(--secondary-light);
+  }
+  &.quick-money-btn:hover {
+    border-color: #16a34a;
+    background: #f0fdf4;
+  }
+}
+
+.donor-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+  &:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+  }
+}
+.d-av {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.dr-info {
+  flex: 1;
+}
+.dr-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+.dr-meta {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+.no-results {
+  text-align: center;
+  padding: 16px;
+  color: var(--gray-400);
+  font-size: 13px;
+}
+
+// Appointment Lookup
+.appt-lookup-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  .form-input {
+    flex: 1;
+  }
+}
+.appt-result {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+}
+.appt-res-body {
+  flex: 1;
+  min-width: 0;
+}
+.appt-res-id {
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-500);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.appt-res-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 4px;
+}
+.appt-res-meta {
+  font-size: 11px;
+  color: var(--gray-600);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.appt-res-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.appt-res-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.appt-res-warn {
+  font-size: 11px;
+  color: var(--danger);
+  font-weight: 600;
+}
+.appt-not-found {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--danger-light, #fff1f0);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+// Enroll
+.enroll-card {
+  margin-top: 16px;
+}
+.enroll-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.enroll-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+// Search bar spacing
+.search-bar {
+  &--mb-8 {
+    margin-bottom: 8px;
+  }
+}
+
+.btn-enroll-cta {
+  margin-top: 8px;
+  width: 100%;
+}

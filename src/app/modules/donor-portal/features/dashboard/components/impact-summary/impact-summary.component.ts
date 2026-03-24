@@ -8,7 +8,7 @@ import { ImpactItemState } from '../../models/dashboard.state';
   imports: [IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './impact-summary.component.html',
-  styleUrl: './impact-summary.component.scss',
+  styleUrl: './impact-summary.component.scss'
 })
 export class ImpactSummaryComponent {
   items = input.required<ImpactItemState[]>();

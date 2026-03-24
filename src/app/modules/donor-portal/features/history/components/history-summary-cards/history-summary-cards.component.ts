@@ -6,7 +6,7 @@ import { HistorySummaryState } from '../../models/history.state';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './history-summary-cards.component.html',
-  styleUrl: './history-summary-cards.component.scss',
+  styleUrl: './history-summary-cards.component.scss'
 })
 export class HistorySummaryCardsComponent {
   summary = input.required<HistorySummaryState>();

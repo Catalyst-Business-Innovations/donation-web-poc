@@ -1,11 +1,13 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { MockDataService } from '../../../../../core/services/mock-data.service';
+import { Injectable, computed, signal, inject } from '@angular/core';
+import { MockDataService } from '@core/services/mock-data.service';
 import { NewDonationState, SelectedDonor, WizardStep } from '../models/new-donation.state';
-import { NewDonationMapper } from '../models/new-donation.mapper';
-import { DonationScope, ReceiptDelivery } from '../../../../../core/models/domain.models';
+import { computeTotalItems, computeTotalValue, computeEstimatedPoints } from '../models/new-donation.mapper';
+import { DonationScope, ReceiptDelivery } from '@core/models/domain.models';
 
 @Injectable({ providedIn: 'root' })
 export class NewDonationStateService {
+  private readonly data = inject(MockDataService);
+
   private _state = signal<NewDonationState>({
     step: 1,
     donationType: null,
@@ -23,23 +25,22 @@ export class NewDonationStateService {
   readonly donationType = computed(() => this._state().donationType);
   readonly selectedItems = computed(() => this._state().selectedItems);
   readonly isPreSorted = computed(() => this._state().isPreSorted);
-  readonly totalItems = computed(() => NewDonationMapper.totalItems(this._state().selectedItems));
-  readonly totalValue = computed(() => NewDonationMapper.totalValue(this._state().selectedItems, this.data.departments));
-  readonly estPoints = computed(() => NewDonationMapper.estimatedPoints(this.totalValue()));
-
-  constructor(private data: MockDataService) {}
+  readonly totalItems = computed(() => computeTotalItems(this._state().selectedItems));
+  readonly totalValue = computed(() => computeTotalValue(this._state().selectedItems, this.data.departments));
+  readonly estPoints = computed(() => computeEstimatedPoints(this.totalValue()));
 
   setDonor(d: SelectedDonor | null | undefined): void {
     this._state.update(s => ({ ...s, donor: d }));
   }
+
   setDonationType(t: DonationScope): void {
     this._state.update(s => ({
       ...s,
       donationType: t,
-      // Clear items when switching to monetary-only so review is clean
       selectedItems: t === DonationScope.Monetary ? {} : s.selectedItems
     }));
   }
+
   nextStep(): void {
     this._state.update(s => {
       const maxStep = s.donationType === DonationScope.Both ? 5 : 4;
@@ -47,6 +48,7 @@ export class NewDonationStateService {
       return { ...s, step: next };
     });
   }
+
   prevStep(): void {
     this._state.update(s => {
       const prev = Math.max(1, (s.step as number) - 1) as WizardStep;

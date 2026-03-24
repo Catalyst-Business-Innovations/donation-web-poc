@@ -1,0 +1,175 @@
+<div class="wiz-step">
+  <div class="wiz-step-header">
+    <div class="wiz-step-icon-wrap wiz-step-icon-review"><app-icon name="check-circle" size="22" /></div>
+    <div>
+      <h3>Review &amp; {{ isViewMode() ? 'Summary' : 'Save' }}</h3>
+      <p>{{ isViewMode() ? 'Campaign summary overview.' : 'Review all settings before saving.' }}</p>
+    </div>
+  </div>
+
+  <!-- Readiness status -->
+  @if (!isViewMode()) {
+    <div
+      class="review-readiness"
+      [class.review-ready]="hasRequiredTemplates()"
+      [class.review-not-ready]="!hasRequiredTemplates()"
+    >
+      @if (hasRequiredTemplates()) {
+        <app-icon name="check-circle" size="16" />
+        <span>All templates are configured. Ready to save!</span>
+      } @else {
+        <app-icon name="alert-circle" size="16" />
+        <span>Some templates are missing. You can still save as draft.</span>
+      }
+    </div>
+  }
+
+  <div class="review-grid">
+    <!-- Details -->
+    <div class="review-card">
+      <div class="review-card-header">
+        <app-icon name="settings" size="16" />
+        Campaign Details
+        @if (!isViewMode()) {
+          <button class="btn btn-ghost btn-sm" (click)="goToStep.emit(1)">
+            <app-icon name="edit" size="12" />
+            Edit
+          </button>
+        }
+      </div>
+      <div class="review-card-body">
+        <div class="review-detail-grid">
+          <div class="review-detail-item">
+            <div class="review-label">Name</div>
+            <div class="review-value">{{ form().name || '--' }}</div>
+          </div>
+          <div class="review-detail-item">
+            <div class="review-label">Channel</div>
+            <div class="review-value">
+              <span class="badge badge-info">{{ channelLabelText }}</span>
+            </div>
+          </div>
+          <div class="review-detail-item">
+            <div class="review-label">Start Date</div>
+            <div class="review-value">{{ form().effectiveFrom || 'Not set' }}</div>
+          </div>
+          <div class="review-detail-item">
+            <div class="review-label">End Date</div>
+            <div class="review-value">{{ form().toDate || 'Not set' }}</div>
+          </div>
+          @if (form().description) {
+            <div class="review-detail-item form-group--full">
+              <div class="review-label">Description</div>
+              <div class="review-value">{{ form().description }}</div>
+            </div>
+          }
+        </div>
+        @if (form().criteria.length > 0) {
+          <div class="review-criteria-section">
+            <div class="review-label">Target Criteria</div>
+            <div class="criteria-list criteria-list--top">
+              @for (c of form().criteria; track $index) {
+                <span class="badge badge-info badge--xs">{{ getCriterionLabel(c) }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Templates row -->
+    <div class="review-templates-row">
+      <!-- Email Template -->
+      @if (showEmailStep) {
+        <div class="review-card review-card-tpl">
+          <div class="review-card-header review-card-header-email">
+            <app-icon name="mail" size="16" />
+            Email Template
+            @if (emailBlocks().length > 0) {
+              <span class="review-tpl-badge review-tpl-ready">
+                <app-icon name="check-circle" size="11" />
+                Ready
+              </span>
+            } @else {
+              <span class="review-tpl-badge review-tpl-missing">
+                <app-icon name="alert-circle" size="11" />
+                Missing
+              </span>
+            }
+            @if (!isViewMode()) {
+              <button class="btn btn-ghost btn-sm" (click)="goToStep.emit(2)">
+                <app-icon name="edit" size="12" />
+                Edit
+              </button>
+            }
+          </div>
+          <div class="review-card-body">
+            @if (emailBlocks().length === 0) {
+              <div class="review-empty-tpl">
+                <app-icon name="mail" size="20" />
+                No email template configured
+              </div>
+            } @else {
+              <div class="review-tpl-info">
+                <div class="review-tpl-row">
+                  <span class="review-label">Subject</span>
+                  {{ emailSubject() || '(no subject)' }}
+                </div>
+                <div class="review-tpl-row">
+                  <span class="review-label">Blocks</span>
+                  {{ emailBlocks().length }} content blocks
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- SMS Template -->
+      @if (showSmsStep) {
+        <div class="review-card review-card-tpl">
+          <div class="review-card-header review-card-header-sms">
+            <app-icon name="phone" size="16" />
+            SMS Template
+            @if (smsBody().trim()) {
+              <span class="review-tpl-badge review-tpl-ready">
+                <app-icon name="check-circle" size="11" />
+                Ready
+              </span>
+            } @else {
+              <span class="review-tpl-badge review-tpl-missing">
+                <app-icon name="alert-circle" size="11" />
+                Missing
+              </span>
+            }
+            @if (!isViewMode()) {
+              <button class="btn btn-ghost btn-sm" (click)="goToStep.emit(3)">
+                <app-icon name="edit" size="12" />
+                Edit
+              </button>
+            }
+          </div>
+          <div class="review-card-body">
+            @if (!smsBody().trim()) {
+              <div class="review-empty-tpl">
+                <app-icon name="phone" size="20" />
+                No SMS template configured
+              </div>
+            } @else {
+              <div class="review-tpl-info">
+                <div class="review-tpl-row">
+                  <span class="review-label">Message</span>
+                  {{ smsBody().substring(0, 100) }}{{ smsBody().length > 100 ? '...' : '' }}
+                </div>
+                <div class="review-tpl-row">
+                  <span class="review-label">Length</span>
+                  {{ smsCharCountVal }} chars · {{ smsSegmentsVal }} segment{{ smsSegmentsVal !== 1 ? 's' : '' }}
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
