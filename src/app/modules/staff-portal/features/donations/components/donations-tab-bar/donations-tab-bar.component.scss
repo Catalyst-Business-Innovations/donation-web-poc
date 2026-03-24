@@ -1,3 +1,11 @@
+:host {
+  flex: 1 1 100%;
+
+  @media (min-width: 768px) {
+    flex: none;
+  }
+}
+
 .tab-switcher {
   display: flex;
   gap: 6px;
@@ -5,16 +13,27 @@
 .tab-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
+  gap: 4px;
+  padding: 6px 10px;
   border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-lg);
   background: var(--white);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--gray-600);
   cursor: pointer;
   transition: var(--transition);
+  white-space: nowrap;
+  flex: 1;
+  justify-content: center;
+
+  @media (min-width: 768px) {
+    flex: none;
+    padding: 7px 14px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
   &:hover {
     border-color: var(--primary);
     color: var(--primary);

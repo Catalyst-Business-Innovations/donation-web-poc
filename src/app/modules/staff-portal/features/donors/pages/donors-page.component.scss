@@ -7,13 +7,33 @@
   overflow-x: hidden;
 }
 
+// Override global .topbar: keep wrapping until 1200px
 .donors-topbar {
+  flex-wrap: wrap !important;
+  height: auto !important;
+  min-height: var(--navbar-height);
+  padding: 10px 12px;
+  align-items: flex-start;
+
+  @media (min-width: 768px) {
+    padding: 10px 16px;
+    align-items: center;
+  }
+  @media (min-width: 1200px) {
+    flex-wrap: nowrap !important;
+    height: var(--navbar-height) !important;
+    padding: 0 24px;
+  }
+
   .topbar-actions {
+    display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    width: 100%;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1200px) {
       flex-wrap: nowrap;
+      width: auto;
     }
   }
 }

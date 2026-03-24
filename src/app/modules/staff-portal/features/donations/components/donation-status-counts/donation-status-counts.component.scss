@@ -34,8 +34,12 @@
   }
 }
 .sum-num {
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 900;
+
+  @media (min-width: 768px) {
+    font-size: 26px;
+  }
 }
 .sum-lbl {
   font-size: 11px;

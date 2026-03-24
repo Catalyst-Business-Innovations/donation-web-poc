@@ -1,3 +1,12 @@
 .search-bar--campaigns {
-  width: 280px;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 220px;
+    flex-shrink: 1;
+  }
+  @media (min-width: 1200px) {
+    width: 280px;
+    flex-shrink: 0;
+  }
 }

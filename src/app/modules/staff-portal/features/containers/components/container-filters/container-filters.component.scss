@@ -1,23 +1,43 @@
+// Override global .topbar: keep wrapping until 1200px
+// because containers has many controls (search + status + selection buttons + action buttons)
 .containers-topbar {
+  flex-wrap: wrap !important;
+  height: auto !important;
+  min-height: var(--navbar-height);
+  padding: 10px 12px;
+  align-items: flex-start;
+
+  @media (min-width: 768px) {
+    padding: 10px 16px;
+    align-items: center;
+  }
+  @media (min-width: 1200px) {
+    flex-wrap: nowrap !important;
+    height: var(--navbar-height) !important;
+    padding: 0 24px;
+  }
+
   .topbar-actions {
+    display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    width: 100%;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1200px) {
       flex-wrap: nowrap;
+      width: auto;
     }
   }
 }
 
 .containers-search {
   width: 100%;
-  min-width: 0;
+  flex-shrink: 1;
 
   @media (min-width: 768px) {
-    width: 160px;
-    flex-shrink: 1;
+    width: 180px;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     width: 220px;
     flex-shrink: 0;
   }
@@ -34,22 +54,22 @@
   flex-shrink: 0;
   display: none;
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     display: block;
   }
 }
 
 .f-sel {
-  width: 100%;
+  width: calc(50% - 4px);
   height: 36px;
   font-size: 13px;
-  min-width: 0;
+  flex-shrink: 0;
 
   @media (min-width: 768px) {
-    width: 100px;
+    width: 120px;
     flex-shrink: 1;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     width: 130px;
     flex-shrink: 0;
   }

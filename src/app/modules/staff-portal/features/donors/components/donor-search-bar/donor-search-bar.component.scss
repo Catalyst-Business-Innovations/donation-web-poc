@@ -4,13 +4,12 @@
 
 .donors-search {
   width: 100%;
-  min-width: 0;
+  flex-shrink: 1;
 
   @media (min-width: 768px) {
-    width: 160px;
-    flex-shrink: 1;
+    width: 180px;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     width: 240px;
     flex-shrink: 0;
   }
@@ -27,22 +26,22 @@
   flex-shrink: 0;
   display: none;
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     display: block;
   }
 }
 
 .f-sel {
-  width: 100%;
+  width: calc(50% - 4px);
   height: 36px;
   font-size: 13px;
-  min-width: 0;
+  flex-shrink: 0;
 
   @media (min-width: 768px) {
-    width: 110px;
+    width: 120px;
     flex-shrink: 1;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1200px) {
     width: 140px;
     flex-shrink: 0;
   }
