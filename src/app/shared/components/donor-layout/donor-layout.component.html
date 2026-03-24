@@ -54,9 +54,7 @@
         @if (dropdownOpen()) {
           <div class="donor-dropdown" role="menu" (click)="$event.stopPropagation()">
             <div class="donor-dd-header">{{ moduleLabel() }}</div>
-            @if (logoutRoute()) {
-              <a [routerLink]="logoutRoute()" class="donor-dd-item donor-dd-danger" role="menuitem">Sign Out</a>
-            }
+            <button type="button" class="donor-dd-item donor-dd-danger" role="menuitem" (click)="signOut()">Sign Out</button>
           </div>
         }
       </div>

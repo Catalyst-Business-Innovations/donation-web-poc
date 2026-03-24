@@ -13,6 +13,7 @@ import { RouterLink, RouterLinkActive, Router, NavigationEnd, ActivatedRoute } f
 import { filter } from 'rxjs/operators';
 import { IconComponent, IconName } from '../icon/icon.component';
 import { CurrentUserService } from '../../../core/services/current-user.service';
+import { DevAuthService } from '../../../core/services/dev-auth.service';
 
 export interface DonorNavItem {
   label: string;
@@ -39,6 +40,7 @@ export class DonorLayoutComponent implements OnInit {
   logoutRoute = input('');
 
   protected readonly currentUser = inject(CurrentUserService);
+  private readonly devAuth = inject(DevAuthService);
   dropdownOpen = signal(false);
   activeCrumb = signal('');
 
@@ -70,6 +72,11 @@ export class DonorLayoutComponent implements OnInit {
   @HostListener('document:click')
   closeDropdown() {
     this.dropdownOpen.set(false);
+  }
+
+  signOut(): void {
+    this.devAuth.logout();
+    this.router.navigate([this.logoutRoute() || '/donor/login']);
   }
 
   private getRouteTitle(): string {

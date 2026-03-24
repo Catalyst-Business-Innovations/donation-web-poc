@@ -1,28 +1,25 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { STORAGE_KEYS } from '../../../../../core/constants/storage-keys';
+import { DevAuthService } from '@core/services/dev-auth.service';
+import { STORAGE_KEYS } from '@core/constants/storage-keys';
 
 @Component({
   selector: 'app-staff-login',
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './staff-login.component.html',
-  styleUrl: './staff-login.component.scss'
+  styleUrl: './staff-login.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StaffLoginComponent implements OnInit {
+export class StaffLoginComponent {
+  private readonly router = inject(Router);
+  private readonly devAuth = inject(DevAuthService);
+
   username = '';
   password = '';
   loading = signal(false);
   error = signal('');
-
-  constructor(private router: Router) {}
-
-  ngOnInit(): void {
-    // Clear any previous session when landing on login page
-    sessionStorage.removeItem(STORAGE_KEYS.STAFF_AUTHENTICATED);
-    sessionStorage.removeItem('staff_username');
-  }
 
   login(): void {
     this.error.set('');
@@ -30,19 +27,24 @@ export class StaffLoginComponent implements OnInit {
       this.error.set('Please enter your username and password.');
       return;
     }
+
     this.loading.set(true);
-    // Simulate auth — replace with real token exchange when company SSO is available
+
+    // Simulate network delay
     setTimeout(() => {
       this.loading.set(false);
+
       if (this.password === 'wrong') {
         this.error.set('Invalid credentials. Please try again.');
-      } else {
-        sessionStorage.setItem(STORAGE_KEYS.STAFF_AUTHENTICATED, 'true');
-        sessionStorage.setItem('staff_username', this.username);
-        const returnUrl = sessionStorage.getItem(STORAGE_KEYS.STAFF_RETURN_URL) || '/staff/new-donation';
-        sessionStorage.removeItem(STORAGE_KEYS.STAFF_RETURN_URL);
-        this.router.navigateByUrl(returnUrl);
+        return;
       }
+
+      // Create simulated JWT session
+      this.devAuth.loginAsStaff(this.username);
+
+      const returnUrl = sessionStorage.getItem(STORAGE_KEYS.STAFF_RETURN_URL) || '/staff/new-donation';
+      sessionStorage.removeItem(STORAGE_KEYS.STAFF_RETURN_URL);
+      this.router.navigateByUrl(returnUrl);
     }, 600);
   }
 }

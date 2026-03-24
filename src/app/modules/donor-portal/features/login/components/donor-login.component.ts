@@ -1,28 +1,25 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { STORAGE_KEYS } from '../../../../../core/constants/storage-keys';
+import { DevAuthService } from '@core/services/dev-auth.service';
+import { STORAGE_KEYS } from '@core/constants/storage-keys';
 
 @Component({
   selector: 'app-donor-login',
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './donor-login.component.html',
-  styleUrl: './donor-login.component.scss'
+  styleUrl: './donor-login.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DonorLoginComponent implements OnInit {
+export class DonorLoginComponent {
+  private readonly router = inject(Router);
+  private readonly devAuth = inject(DevAuthService);
+
   email = '';
   password = '';
   loading = signal(false);
   error = signal('');
-
-  constructor(private router: Router) {}
-
-  ngOnInit(): void {
-    // Clear any previous session when landing on login page
-    sessionStorage.removeItem(STORAGE_KEYS.DONOR_AUTHENTICATED);
-    sessionStorage.removeItem('donor_email');
-  }
 
   login(): void {
     this.error.set('');
@@ -30,20 +27,24 @@ export class DonorLoginComponent implements OnInit {
       this.error.set('Please enter your email and password.');
       return;
     }
+
     this.loading.set(true);
-    // Simulate auth — replace with real API call
+
+    // Simulate network delay
     setTimeout(() => {
       this.loading.set(false);
+
       if (this.password === 'wrong') {
         this.error.set('Invalid email or password. Please try again.');
-      } else {
-        // Store a minimal session token in sessionStorage for the guard to read
-        sessionStorage.setItem(STORAGE_KEYS.DONOR_AUTHENTICATED, 'true');
-        sessionStorage.setItem('donor_email', this.email);
-        const returnUrl = sessionStorage.getItem(STORAGE_KEYS.DONOR_RETURN_URL) || '/donor/dashboard';
-        sessionStorage.removeItem(STORAGE_KEYS.DONOR_RETURN_URL);
-        this.router.navigateByUrl(returnUrl);
+        return;
       }
+
+      // Create simulated JWT session — matches donor by email
+      this.devAuth.loginAsDonor(this.email);
+
+      const returnUrl = sessionStorage.getItem(STORAGE_KEYS.DONOR_RETURN_URL) || '/donor/dashboard';
+      sessionStorage.removeItem(STORAGE_KEYS.DONOR_RETURN_URL);
+      this.router.navigateByUrl(returnUrl);
     }, 600);
   }
 }

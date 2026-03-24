@@ -10,39 +10,26 @@ export class CurrentUserService {
   private readonly mockData = inject(MockDataService);
   private readonly authService = inject(AuthService);
 
-  /**
-   * Active portal context — set by the portal shell component on init.
-   */
-  private readonly _portal = signal<PortalContext>('staff');
+  private readonly _portal = signal<PortalContext>(this.resolvePortalFromToken());
   readonly portal = this._portal.asReadonly();
 
-  /**
-   * Donor identity — in production, resolved from JWT `userid` claim.
-   * For now, defaults to the first mock donor.
-   */
-  private readonly _donorId = signal<number>(this.mockData.donors[0]?.id ?? 0);
+  private readonly _donorId = signal<number>(this.resolveDonorIdFromToken());
   readonly donorId = this._donorId.asReadonly();
+
+  readonly isAuthenticated = computed(() => this.authService.isAuthenticated());
 
   readonly donor = computed<Donor>(() => {
     const id = this._donorId();
     return this.mockData.donors.find(d => d.id === id) ?? this.mockData.donors[0];
   });
 
-  /**
-   * Staff session — in production, resolved from JWT claims.
-   * For now, uses the mock staff session.
-   */
   readonly staffSession = computed<StaffSession>(() => this.mockData.session);
 
   /**
-   * Common user properties derived from JWT or mock data.
+   * Display name — portal-aware.
+   * Staff portal: always shows staff session name.
+   * Donor portal: always shows donor name.
    */
-  readonly userId = computed(() =>
-    this._portal() === 'donor'
-      ? String(this._donorId())
-      : String(this.mockData.session.staffId)
-  );
-
   readonly displayName = computed(() => {
     if (this._portal() === 'donor') {
       const d = this.donor();
@@ -59,6 +46,11 @@ export class CurrentUserService {
       : (parts[0]?.[0] ?? '').toUpperCase();
   });
 
+  /**
+   * Email — portal-aware.
+   * Staff portal: from JWT or empty.
+   * Donor portal: from donor record.
+   */
   readonly email = computed(() => {
     if (this._portal() === 'donor') {
       return this.donor().email;
@@ -66,11 +58,39 @@ export class CurrentUserService {
     return this.authService.getUserInfo()?.email ?? '';
   });
 
+  readonly userId = computed(() =>
+    this._portal() === 'donor' ? String(this._donorId()) : String(this.mockData.session.staffId)
+  );
+
+  readonly role = computed(() => this.authService.getUserInfo()?.role ?? '');
+
   setPortal(portal: PortalContext): void {
     this._portal.set(portal);
   }
 
   setDonorId(id: number): void {
     this._donorId.set(id);
+  }
+
+  /**
+   * Resolve portal context from JWT role on service init / page refresh.
+   */
+  private resolvePortalFromToken(): PortalContext {
+    const info = this.authService.getUserInfo();
+    return info?.role === 'donor' ? 'donor' : 'staff';
+  }
+
+  /**
+   * Resolve donor ID from JWT on service init / page refresh.
+   */
+  private resolveDonorIdFromToken(): number {
+    const info = this.authService.getUserInfo();
+    if (info?.role === 'donor' && info.userid) {
+      const id = Number(info.userid);
+      if (!isNaN(id) && this.mockData.donors.some(d => d.id === id)) {
+        return id;
+      }
+    }
+    return this.mockData.donors[0]?.id ?? 0;
   }
 }

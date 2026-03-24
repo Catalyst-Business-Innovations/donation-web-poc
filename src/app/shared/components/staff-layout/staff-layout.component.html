@@ -56,9 +56,7 @@
         @if (dropdownOpen()) {
           <div class="sl-dropdown" role="menu" (click)="$event.stopPropagation()">
             <div class="sl-dd-header">{{ currentUser.staffSession().locationName }}</div>
-            @if (logoutRoute()) {
-              <a [routerLink]="logoutRoute()" class="sl-dd-item sl-dd-danger" role="menuitem">Sign Out</a>
-            }
+            <button type="button" class="sl-dd-item sl-dd-danger" role="menuitem" (click)="signOut()">Sign Out</button>
           </div>
         }
       </div>

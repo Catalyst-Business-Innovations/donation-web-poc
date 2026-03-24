@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { staffTokenGuard } from './core/guards/staff-token.guard';
+import { staffAuthGuard } from './core/guards/staff-auth.guard';
 
 export const routes: Routes = [
   {
@@ -13,7 +13,7 @@ export const routes: Routes = [
   },
   {
     path: 'staff',
-    canActivate: [staffTokenGuard],
+    canActivate: [staffAuthGuard],
     loadComponent: () => import('./modules/staff-portal/staff-portal.component').then(m => m.StaffPortalComponent),
     loadChildren: () => import('./modules/staff-portal/staff-portal.routes').then(m => m.staffRoutes)
   },
