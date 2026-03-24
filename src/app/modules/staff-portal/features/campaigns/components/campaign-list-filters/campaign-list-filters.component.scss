@@ -1,12 +1,19 @@
 .search-bar--campaigns {
   width: 100%;
+  min-width: 0;
 
   @media (min-width: 768px) {
-    width: 220px;
-    flex-shrink: 1;
+    flex: 1 1 200px;
+    max-width: 280px;
   }
   @media (min-width: 1200px) {
-    width: 280px;
-    flex-shrink: 0;
+    flex: 0 0 280px;
+    max-width: none;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    padding-right: 12px;
   }
 }

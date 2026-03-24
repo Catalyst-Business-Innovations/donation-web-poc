@@ -8,7 +8,6 @@
 }
 
 // Override global .topbar: keep wrapping behavior until 1200px
-// because donations has many filter controls (tabs + search + 3 selects + date + clear)
 .donations-topbar {
   flex-wrap: wrap !important;
   height: auto !important;
@@ -40,31 +39,39 @@
 }
 
 .topbar-divider {
-  width: 1px;
-  height: 20px;
-  background: var(--gray-200);
-  flex-shrink: 0;
   display: none;
 
   @media (min-width: 1200px) {
     display: block;
-  }
-}
-
-// Mobile: search full width, selects pair up 2 per row via calc(50%)
-.donations-search {
-  width: 100%;
-  flex-shrink: 1;
-
-  @media (min-width: 768px) {
-    width: 180px;
-  }
-  @media (min-width: 1200px) {
-    width: 240px;
+    width: 1px;
+    height: 20px;
+    background: var(--gray-200);
     flex-shrink: 0;
   }
 }
 
+// Search: full width on mobile, flexible on tablet
+.donations-search {
+  width: 100%;
+  min-width: 0;
+
+  @media (min-width: 768px) {
+    flex: 1 1 200px;
+    max-width: 280px;
+  }
+  @media (min-width: 1200px) {
+    flex: 0 0 240px;
+    max-width: none;
+  }
+
+  input {
+    width: 100%;
+    min-width: 0;
+    padding-right: 12px;
+  }
+}
+
+// Selects: half-width on mobile, fixed on tablet, never shrink
 .f-sel {
   width: calc(50% - 4px);
   height: 36px;
@@ -72,27 +79,23 @@
   flex-shrink: 0;
 
   @media (min-width: 768px) {
-    width: 120px;
-    flex-shrink: 1;
+    width: 130px;
   }
   @media (min-width: 1200px) {
     width: 140px;
-    flex-shrink: 0;
   }
 }
 
 .f-date {
-  font-size: 13px;
-  height: 36px;
   width: calc(50% - 4px);
+  height: 36px;
+  font-size: 13px;
   flex-shrink: 0;
 
   @media (min-width: 768px) {
-    width: 120px;
-    flex-shrink: 1;
+    width: 130px;
   }
   @media (min-width: 1200px) {
     width: 140px;
-    flex-shrink: 0;
   }
 }
