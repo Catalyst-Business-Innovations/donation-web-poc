@@ -1,9 +1,13 @@
 .add-money-host {
-  max-width: 560px;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  @media (min-width: 640px) {
+    max-width: 560px;
+  }
 
   .preset-row {
     display: flex;

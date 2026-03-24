@@ -1,11 +1,18 @@
 .loyalty-hero {
   background: linear-gradient(135deg, var(--slate-bg), var(--slate-dark));
   border-radius: var(--radius-xl);
-  padding: 28px;
+  padding: 20px;
   display: flex;
-  gap: 32px;
+  flex-direction: column;
+  gap: 20px;
   margin-bottom: 24px;
   color: #fff;
+
+  @media (min-width: 768px) {
+    padding: 28px;
+    flex-direction: row;
+    gap: 32px;
+  }
 }
 
 .lh-left {
@@ -37,9 +44,13 @@
 }
 
 .lh-name {
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 900;
   margin-bottom: 8px;
+
+  @media (min-width: 768px) {
+    font-size: 26px;
+  }
 }
 
 .lh-points {
@@ -50,8 +61,12 @@
 }
 
 .lh-pts-num {
-  font-size: 40px;
+  font-size: 28px;
   font-weight: 900;
+
+  @media (min-width: 768px) {
+    font-size: 40px;
+  }
 }
 
 .lh-pts-label {
@@ -77,11 +92,19 @@
 
 .lh-right {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
   justify-content: center;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  padding-left: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 16px;
+
+  @media (min-width: 768px) {
+    flex-direction: column;
+    border-top: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0;
+    padding-left: 32px;
+  }
 }
 
 .lh-stat {
@@ -89,8 +112,12 @@
 }
 
 .lh-sv {
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 900;
+
+  @media (min-width: 768px) {
+    font-size: 26px;
+  }
 }
 
 .lh-sl {
@@ -106,16 +133,3 @@
   }
 }
 
-@media (max-width: 900px) {
-  .loyalty-hero {
-    flex-direction: column;
-  }
-
-  .lh-right {
-    flex-direction: row;
-    border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-left: 0;
-    padding-top: 16px;
-  }
-}

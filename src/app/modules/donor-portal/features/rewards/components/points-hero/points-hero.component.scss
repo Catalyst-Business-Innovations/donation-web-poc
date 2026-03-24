@@ -1,12 +1,20 @@
 .pts-hero {
   background: linear-gradient(135deg, var(--slate-bg), var(--slate-dark));
   border-radius: var(--radius-xl);
-  padding: 32px;
+  padding: 20px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
   color: var(--white);
   margin-bottom: 24px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px;
+  }
 }
 
 .ph-label {
@@ -18,9 +26,13 @@
 }
 
 .ph-num {
-  font-size: 48px;
+  font-size: 32px;
   font-weight: 900;
   line-height: 1;
+
+  @media (min-width: 768px) {
+    font-size: 48px;
+  }
 }
 
 .ph-rate {
@@ -32,7 +44,11 @@
 .ph-right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
+
+  @media (min-width: 768px) {
+    gap: 24px;
+  }
 }
 
 .ph-stat {
@@ -40,9 +56,13 @@
 }
 
 .ph-stat-value {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 800;
   line-height: 1;
+
+  @media (min-width: 768px) {
+    font-size: 28px;
+  }
 }
 
 .ph-stat-label {

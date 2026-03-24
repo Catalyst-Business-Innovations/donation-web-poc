@@ -37,10 +37,14 @@
   font-size: 10px;
   color: var(--gray-500);
   margin-top: 2px;
-  max-width: 140px;
+  max-width: 90px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @media (min-width: 768px) {
+    max-width: 140px;
+  }
 }
 
 .type-badge {
@@ -73,12 +77,16 @@
 }
 
 .fill-bar {
-  width: 80px;
+  width: 50px;
   height: 6px;
   background: var(--gray-200);
   border-radius: var(--radius-full);
   overflow: hidden;
   margin-bottom: 3px;
+
+  @media (min-width: 768px) {
+    width: 80px;
+  }
 }
 
 .fill-bar-inner {

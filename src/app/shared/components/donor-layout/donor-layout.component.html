@@ -1,5 +1,6 @@
 <div class="module-layout">
-  <aside class="sidebar">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar" [class.open]="sidebarOpen()">
     <div class="sidebar-logo">
       <img src="../../../assets/brijjlogo.svg" alt="Brijjworks" class="logo-img" />
       <div>
@@ -26,9 +27,24 @@
     </nav>
   </aside>
 
+  <!-- ═══ BACKDROP (mobile only) ═══ -->
+  @if (sidebarOpen()) {
+    <div class="donor-backdrop" (click)="closeSidebar()" aria-hidden="true"></div>
+  }
+
+  <!-- ═══ MAIN ═══ -->
   <div class="donor-main">
     <!-- Navbar -->
     <header class="donor-navbar">
+      <button
+        type="button"
+        class="donor-hamburger"
+        (click)="toggleSidebar()"
+        aria-label="Toggle navigation menu"
+      >
+        <app-icon name="menu" [size]="20"></app-icon>
+      </button>
+
       <h4 class="donor-navbar-title">{{ activeCrumb() }}</h4>
 
       <div
@@ -60,6 +76,7 @@
       </div>
     </header>
 
+    <!-- Content -->
     <main class="main-content">
       <ng-content />
     </main>

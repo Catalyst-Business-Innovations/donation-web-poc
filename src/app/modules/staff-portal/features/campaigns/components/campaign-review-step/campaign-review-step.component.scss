@@ -78,8 +78,12 @@
 
 .review-templates-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
 }
 
 .review-card {
@@ -120,15 +124,23 @@
 
 .review-detail-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 .review-detail-item {
   padding: 10px 0;
   border-bottom: 1px solid var(--gray-50);
 }
 .form-group--full {
-  grid-column: span 2;
+  grid-column: span 1;
+
+  @media (min-width: 640px) {
+    grid-column: span 2;
+  }
 }
 .review-criteria-section {
   padding-top: 10px;

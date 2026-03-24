@@ -3,8 +3,18 @@
 }
 
 .donors-search {
-  width: 240px;
-  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+
+  @media (min-width: 768px) {
+    width: 160px;
+    flex-shrink: 1;
+  }
+  @media (min-width: 1024px) {
+    width: 240px;
+    flex-shrink: 0;
+  }
+
   input {
     padding-right: 12px;
   }
@@ -15,11 +25,25 @@
   height: 20px;
   background: var(--gray-200);
   flex-shrink: 0;
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: block;
+  }
 }
 
 .f-sel {
-  width: 140px;
+  width: 100%;
   height: 36px;
   font-size: 13px;
-  flex-shrink: 0;
+  min-width: 0;
+
+  @media (min-width: 768px) {
+    width: 110px;
+    flex-shrink: 1;
+  }
+  @media (min-width: 1024px) {
+    width: 140px;
+    flex-shrink: 0;
+  }
 }

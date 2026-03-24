@@ -72,11 +72,19 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0 16px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 .form-group--full {
-  grid-column: span 2;
+  grid-column: span 1;
+
+  @media (min-width: 640px) {
+    grid-column: span 2;
+  }
 }
 
 .form-label-opt {
@@ -90,8 +98,12 @@
 
 .channel-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 10px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 .channel-card {
   position: relative;
@@ -181,6 +193,7 @@
 }
 .criterion-builder {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   .crit-select {

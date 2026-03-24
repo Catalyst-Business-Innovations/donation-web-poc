@@ -8,8 +8,12 @@
 
 .loc-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: 1fr;
   gap: 14px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
 }
 
 .loc-card {
@@ -50,7 +54,11 @@
   padding: 14px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
+
+  @media (min-width: 640px) {
+    gap: 8px;
+  }
 }
 
 .lc-stat {

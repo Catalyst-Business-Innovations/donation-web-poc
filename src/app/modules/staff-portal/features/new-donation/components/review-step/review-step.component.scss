@@ -1,8 +1,8 @@
 .rs-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 20px;
+  gap: 10px;
+  padding: 14px;
   background: linear-gradient(135deg, var(--primary-light) 0%, #eef2ff 100%);
   border: 1px solid var(--primary-200, #c7d2fe);
   border-radius: var(--radius);
@@ -35,8 +35,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 46px;
-  padding: 0 24px;
+  height: 40px;
+  padding: 0 16px;
   border: 1.5px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
@@ -46,6 +46,11 @@
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
+
+  @media (min-width: 768px) {
+    height: 46px;
+    padding: 0 24px;
+  }
   &:hover {
     background: var(--primary);
     color: #fff;
@@ -59,11 +64,18 @@
   background: linear-gradient(135deg, var(--primary-light) 0%, #f0f4ff 60%, #fafafa 100%);
   border: 1.5px solid var(--primary-200, #c7d2fe);
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
-  padding: 12px 18px;
+  padding: 10px 12px;
   border-radius: 14px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  @media (min-width: 768px) {
+    padding: 12px 18px;
+    flex-wrap: nowrap;
+    gap: 16px;
+  }
   &--mb {
     margin-bottom: 16px;
   }
@@ -133,9 +145,13 @@
 
 .review-two-col {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1fr;
   gap: 16px;
   align-items: start;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
 }
 
 .rs-section-label {
@@ -201,10 +217,14 @@
   justify-content: space-between;
 }
 .rs-pay-amount {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 900;
   color: var(--gray-900);
   letter-spacing: -0.5px;
+
+  @media (min-width: 768px) {
+    font-size: 28px;
+  }
 }
 .rs-method-badge {
   display: inline-flex;

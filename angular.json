@@ -29,7 +29,10 @@
             ],
             "styles": ["src/styles/styles.scss"],
             "scripts": [],
-            "allowedCommonJsDependencies": ["qrcode"]
+            "allowedCommonJsDependencies": ["qrcode"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/styles"]
+            }
           },
           "configurations": {
             "production": {

@@ -13,12 +13,18 @@
 .hc-hdr {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
+  gap: 8px;
+  padding: 10px 12px;
   cursor: pointer;
   transition: background 0.2s ease;
+
   &:hover {
     background: var(--gray-50);
+  }
+
+  @media (min-width: 768px) {
+    gap: 14px;
+    padding: 14px 18px;
   }
 }
 .hc-icon {

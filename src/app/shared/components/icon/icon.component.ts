@@ -52,7 +52,8 @@ export type IconName =
   | 'sliders'
   | 'bell'
   | 'cart'
-  | 'scan';
+  | 'scan'
+  | 'menu';
 
 @Component({
   selector: 'app-icon',

@@ -17,7 +17,8 @@
       "Bash(xargs wc:*)",
       "Bash(__NEW_LINE_943433b46a80d1aa__ echo:*)",
       "Bash(npx tsc:*)",
-      "Bash(grep -n \"MockDataService\" src/app/modules/*/features/*/pages/*.component.ts)"
+      "Bash(grep -n \"MockDataService\" src/app/modules/*/features/*/pages/*.component.ts)",
+      "Bash(npm install:*)"
     ]
   }
 }

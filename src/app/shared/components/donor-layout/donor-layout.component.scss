@@ -1,3 +1,5 @@
+@use '../../../../styles/breakpoints' as bp;
+
 :host {
   display: contents;
 }
@@ -6,19 +8,78 @@
 .module-layout {
   display: flex;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--bg-page);
+  position: relative;
 }
 
 /* ═══ Sidebar ═══ */
 .sidebar {
-  width: 240px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
   background: #fff;
   border-right: 1px solid var(--gray-200);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   overflow: hidden;
+  z-index: 1000;
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition:
+    transform var(--sidebar-transition),
+    visibility var(--sidebar-transition);
+
+  &.open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  @include bp.lg {
+    position: static;
+    transform: translateX(0);
+    visibility: visible;
+  }
+}
+
+/* ═══ Backdrop overlay ═══ */
+.donor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  z-index: 999;
+
+  @include bp.lg {
+    display: none;
+  }
+}
+
+/* ═══ Hamburger ═══ */
+.donor-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  color: var(--gray-600);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: background var(--transition);
+
+  &:hover {
+    background: var(--gray-100);
+  }
+
+  @include bp.lg {
+    display: none;
+  }
 }
 
 /* Logo */
@@ -115,17 +176,26 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   min-width: 0;
 }
 
-/* Content padding — breathing room from sidebar + navbar edges */
+/* Content */
 .main-content {
-  margin: 16px;
+  margin: 8px;
   background: #fff;
   border-radius: var(--radius-lg);
   border: 1px solid var(--gray-200);
   box-shadow: var(--shadow-sm);
+
+  @include bp.md {
+    margin: 12px;
+  }
+
+  @include bp.lg {
+    margin: 16px;
+  }
 }
 
 /* Donor Navbar */
@@ -136,9 +206,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 36px;
+  padding: 0 16px;
   flex-shrink: 0;
-  gap: 16px;
+  gap: 12px;
+
+  @include bp.lg {
+    padding: 0 36px;
+    gap: 16px;
+  }
 }
 
 .donor-navbar-title {
@@ -148,6 +223,10 @@
   font-family: var(--font-head);
   letter-spacing: -0.2px;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 /* Profile dropdown trigger */
@@ -155,6 +234,7 @@
   position: relative;
   cursor: pointer;
   user-select: none;
+  margin-left: auto;
 }
 
 .donor-profile {
@@ -183,7 +263,12 @@
   flex-shrink: 0;
 }
 .donor-user-info {
+  display: none;
   line-height: 1.3;
+
+  @include bp.md {
+    display: block;
+  }
 }
 .donor-user-name {
   font-size: 14px;
@@ -199,9 +284,14 @@
 .donor-arrow {
   color: var(--gray-400);
   flex-shrink: 0;
-  display: flex;
+  display: none;
   align-items: center;
   transition: transform var(--transition);
+
+  @include bp.md {
+    display: flex;
+  }
+
   &.open {
     transform: rotate(180deg);
   }

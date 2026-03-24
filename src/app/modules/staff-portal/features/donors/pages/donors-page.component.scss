@@ -3,12 +3,17 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .donors-topbar {
   .topbar-actions {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 8px;
+
+    @media (min-width: 1024px) {
+      flex-wrap: nowrap;
+    }
   }
 }

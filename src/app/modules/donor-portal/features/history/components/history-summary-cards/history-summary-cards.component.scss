@@ -1,12 +1,19 @@
 .year-summary {
   display: flex;
   align-items: center;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
   background: linear-gradient(135deg, var(--slate-bg), var(--slate-dark));
   color: #fff;
-  padding: 18px 24px;
+  padding: 16px;
   border-radius: var(--radius-lg);
   margin-bottom: 20px;
+
+  @media (min-width: 768px) {
+    flex-wrap: nowrap;
+    gap: 20px;
+    padding: 18px 24px;
+  }
 }
 
 .ys-stat {
@@ -29,6 +36,11 @@
   width: 1px;
   height: 36px;
   background: rgba(255, 255, 255, 0.15);
+  display: none;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
 }
 
 .ys-action {

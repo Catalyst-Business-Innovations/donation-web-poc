@@ -1,15 +1,28 @@
 .id-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
   margin-bottom: 16px;
   align-items: stretch;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }
 
 .quick-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
 }
 
 .id-divider {
@@ -37,16 +50,27 @@
   border-radius: 14px;
   background: #fff;
   cursor: pointer;
-  padding: 18px 12px;
+  padding: 14px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 12px;
   font-weight: 700;
   transition: all 0.2s ease;
+  text-align: center;
+
   span:first-child {
-    font-size: 28px;
+    font-size: 24px;
+  }
+
+  @media (min-width: 768px) {
+    padding: 18px 12px;
+    gap: 8px;
+
+    span:first-child {
+      font-size: 28px;
+    }
   }
 
   &.qr-btn:hover {
@@ -101,6 +125,7 @@
 }
 .dr-info {
   flex: 1;
+  min-width: 0;
 }
 .dr-name {
   font-weight: 700;
@@ -122,19 +147,33 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
+
   .form-input {
     flex: 1;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    flex-wrap: nowrap;
   }
 }
 .appt-result {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
   margin-top: 14px;
-  padding: 14px 16px;
+  padding: 12px;
   background: var(--primary-light);
   border: 1px solid var(--primary);
   border-radius: var(--radius);
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+  }
 }
 .appt-res-body {
   flex: 1;
@@ -147,6 +186,7 @@
   color: var(--gray-500);
   letter-spacing: 0.5px;
   margin-bottom: 2px;
+  word-break: break-all;
 }
 .appt-res-name {
   font-size: 15px;
@@ -170,10 +210,15 @@
 }
 .appt-res-actions {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
   flex-shrink: 0;
+
+  @media (min-width: 640px) {
+    flex-direction: column;
+    align-items: flex-end;
+  }
 }
 .appt-res-warn {
   font-size: 11px;
@@ -197,8 +242,13 @@
 }
 .enroll-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
 }
 .enroll-actions {
   display: flex;

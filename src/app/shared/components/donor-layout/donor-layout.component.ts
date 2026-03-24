@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { filter } from 'rxjs/operators';
 import { IconComponent, IconName } from '../icon/icon.component';
 import { CurrentUserService } from '../../../core/services/current-user.service';
@@ -26,6 +27,8 @@ export interface DonorNavSection {
   items: DonorNavItem[];
 }
 
+const DESKTOP_BP = '(min-width: 1024px)';
+
 @Component({
   selector: 'app-donor-layout',
   standalone: true,
@@ -41,7 +44,9 @@ export class DonorLayoutComponent implements OnInit {
 
   protected readonly currentUser = inject(CurrentUserService);
   private readonly devAuth = inject(DevAuthService);
+  private readonly bpObserver = inject(BreakpointObserver);
   dropdownOpen = signal(false);
+  sidebarOpen = signal(false);
   activeCrumb = signal('');
 
   private readonly router = inject(Router);
@@ -50,17 +55,38 @@ export class DonorLayoutComponent implements OnInit {
 
   ngOnInit() {
     this.activeCrumb.set(this.getRouteTitle());
+
     this.router.events
       .pipe(
         filter(e => e instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(() => this.activeCrumb.set(this.getRouteTitle()));
+      .subscribe(() => {
+        this.activeCrumb.set(this.getRouteTitle());
+        this.sidebarOpen.set(false);
+      });
+
+    this.bpObserver
+      .observe(DESKTOP_BP)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(result => {
+        if (result.matches) {
+          this.sidebarOpen.set(false);
+        }
+      });
   }
 
   toggleDropdown(e: Event) {
     e.stopPropagation();
     this.dropdownOpen.update(v => !v);
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
   }
 
   onKeydown(e: KeyboardEvent) {

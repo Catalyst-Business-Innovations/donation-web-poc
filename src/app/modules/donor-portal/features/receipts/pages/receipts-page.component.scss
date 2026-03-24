@@ -3,19 +3,25 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .irs-banner {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
   background: linear-gradient(135deg, var(--warning-50), var(--warning-100));
   border: 1px solid var(--warning-500);
   border-radius: var(--radius-lg);
-  padding: 18px;
+  padding: 12px;
   margin-bottom: 20px;
   color: var(--gray-800);
+
+  @media (min-width: 768px) {
+    gap: 16px;
+    padding: 18px;
+  }
 
   &__icon {
     font-size: 28px;

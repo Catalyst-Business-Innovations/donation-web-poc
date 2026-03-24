@@ -1,6 +1,6 @@
 <div class="sl-shell">
   <!-- ═══ SIDEBAR ═══ -->
-  <aside class="sl-sidebar">
+  <aside class="sl-sidebar" [class.open]="sidebarOpen()">
     <div class="sl-logo">
       <img src="../../../assets/brijjlogo.svg" alt="Brijjworks" class="sl-logo-img" />
       <div class="sl-logo-text">
@@ -27,10 +27,24 @@
     </nav>
   </aside>
 
+  <!-- ═══ BACKDROP (mobile only) ═══ -->
+  @if (sidebarOpen()) {
+    <div class="sl-backdrop" (click)="closeSidebar()" aria-hidden="true"></div>
+  }
+
   <!-- ═══ MAIN ═══ -->
   <div class="sl-main">
     <!-- Navbar -->
     <header class="sl-navbar">
+      <button
+        type="button"
+        class="sl-hamburger"
+        (click)="toggleSidebar()"
+        aria-label="Toggle navigation menu"
+      >
+        <app-icon name="menu" [size]="20"></app-icon>
+      </button>
+
       <h4 class="sl-navbar-title">{{ activeCrumb() }}</h4>
 
       <div

@@ -54,8 +54,13 @@
 
 .sms-builder {
   display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 16px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+  }
 }
 
 .sms-editor-pane {
@@ -191,7 +196,8 @@
   padding: 12px 0;
 }
 .tpl-sms-phone {
-  width: 320px;
+  width: 100%;
+  max-width: 320px;
   background: var(--gray-50);
   border: 2px solid var(--gray-200);
   border-radius: var(--radius-xl);

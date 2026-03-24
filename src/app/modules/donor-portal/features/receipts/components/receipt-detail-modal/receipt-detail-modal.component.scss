@@ -21,8 +21,12 @@
 
   &__org-name {
     font-weight: 800;
-    font-size: 18px;
+    font-size: 15px;
     color: var(--primary);
+
+    @media (min-width: 768px) {
+      font-size: 18px;
+    }
   }
 
   &__org-ein {
@@ -32,8 +36,15 @@
 
   &__meta {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 8px;
     font-size: 13px;
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 0;
+    }
   }
 
   &__meta-label {
@@ -109,9 +120,14 @@
 
   &__actions {
     display: flex;
+    flex-direction: column;
     gap: 8px;
     padding-top: 12px;
     border-top: 1px solid var(--gray-200);
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+    }
   }
 
   &__actions-btn {

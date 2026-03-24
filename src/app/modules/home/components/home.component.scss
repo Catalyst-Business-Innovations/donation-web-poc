@@ -4,7 +4,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 32px;
+  padding: 24px 16px;
+
+  @media (min-width: 768px) {
+    padding: 48px 32px;
+  }
 }
 .landing-inner {
   max-width: 960px;
@@ -13,8 +17,12 @@
 
 .landing-header {
   text-align: center;
-  margin-bottom: 56px;
+  margin-bottom: 32px;
   color: var(--gray-900);
+
+  @media (min-width: 768px) {
+    margin-bottom: 56px;
+  }
 }
 .landing-logo {
   display: flex;
@@ -24,12 +32,16 @@
   color: var(--primary);
 }
 .landing-header h1 {
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: 800;
   color: var(--gray-900);
   letter-spacing: -1px;
   margin-bottom: 10px;
   font-family: var(--font-head);
+
+  @media (min-width: 768px) {
+    font-size: 3rem;
+  }
 }
 .landing-header p {
   font-size: 16px;
@@ -42,15 +54,20 @@
 
 .module-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 360px));
+  grid-template-columns: 1fr;
   justify-content: center;
-  gap: 24px;
+  gap: 16px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 360px));
+    gap: 24px;
+  }
 }
 
 .module-card {
   background: #fff;
   border-radius: var(--radius-xl);
-  padding: 36px 32px;
+  padding: 24px 20px;
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-slow);
@@ -58,6 +75,10 @@
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
+
+  @media (min-width: 768px) {
+    padding: 36px 32px;
+  }
 
   &::before {
     content: "";
@@ -132,14 +153,5 @@
   transition: background var(--transition);
   &:hover {
     background: var(--brand-blue-hover);
-  }
-}
-
-@media (max-width: 600px) {
-  .landing-header h1 {
-    font-size: 2rem;
-  }
-  .module-card {
-    padding: 24px;
   }
 }

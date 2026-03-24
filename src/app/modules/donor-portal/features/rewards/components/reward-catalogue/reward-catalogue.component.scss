@@ -8,8 +8,13 @@
 
 .reward-catalogue {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 12px;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
 }
 
 .reward-card {
@@ -123,8 +128,3 @@
   color: var(--gray-400);
 }
 
-@media (max-width: 900px) {
-  .reward-catalogue {
-    grid-template-columns: 1fr;
-  }
-}

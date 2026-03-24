@@ -1,5 +1,10 @@
 .year-btns {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
   margin-bottom: 16px;
+
+  @media (min-width: 768px) {
+    gap: 8px;
+  }
 }
