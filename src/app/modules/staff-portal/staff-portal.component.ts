@@ -19,7 +19,7 @@ import { CurrentUserService } from '../../core/services/current-user.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StaffPortalComponent implements OnInit {
-  protected currentUser = inject(CurrentUserService);
+  private readonly currentUser = inject(CurrentUserService);
 
   readonly sections: StaffNavSection[] = [
     {

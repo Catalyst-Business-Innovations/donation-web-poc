@@ -27,7 +27,7 @@ export class AuthService {
 
   setTokens(accessToken: string, refreshToken: string, sessionId: string): void {
     if (!accessToken || !refreshToken || !sessionId) {
-      console.error('setTokens: all token values must be non-empty');
+      if (!environment.production) console.error('setTokens: all token values must be non-empty');
       return;
     }
 
@@ -41,7 +41,7 @@ export class AuthService {
 
   setAccessToken(accessToken: string): void {
     if (!accessToken) {
-      console.error('setAccessToken: token must be non-empty');
+      if (!environment.production) console.error('setAccessToken: token must be non-empty');
       return;
     }
 
@@ -79,7 +79,7 @@ export class AuthService {
     try {
       return jwtDecode<DecodedToken>(token);
     } catch (error) {
-      console.error('Invalid token', error);
+      if (!environment.production) console.error('Invalid token', error);
       return null;
     }
   }
@@ -102,7 +102,8 @@ export class AuthService {
     }
 
     this.cachedTokenString = token;
-    this.cachedUserInfo = this.decodeToken(token) as UserInfo | null;
+    const decoded = this.decodeToken(token);
+    this.cachedUserInfo = decoded ? this.toUserInfo(decoded) : null;
     return this.cachedUserInfo;
   }
 
@@ -136,8 +137,6 @@ export class AuthService {
     localStorage.removeItem(STORAGE_KEYS.USER_INFO);
     sessionStorage.removeItem(STORAGE_KEYS.STAFF_RETURN_URL);
     sessionStorage.removeItem(STORAGE_KEYS.DONOR_RETURN_URL);
-    sessionStorage.removeItem(STORAGE_KEYS.STAFF_AUTHENTICATED);
-    sessionStorage.removeItem(STORAGE_KEYS.DONOR_AUTHENTICATED);
 
     // Delete auth cookies
     if (this.isLocalhost()) {
@@ -193,9 +192,29 @@ export class AuthService {
 
     if (sessionId) {
       this.logout({ sessionId, userId }).subscribe({
-        error: (error) => console.error('Logout API error:', error),
+        error: (err) => { if (!environment.production) console.error('Logout API error:', err); },
       });
     }
+  }
+
+  /**
+   * Safely convert a decoded token to UserInfo.
+   * Validates that required fields exist rather than using an unsafe cast.
+   */
+  private toUserInfo(decoded: DecodedToken): UserInfo | null {
+    if (!decoded.exp || !decoded.iat || !decoded.nbf) return null;
+    return {
+      userid: decoded.userid ?? '',
+      companyid: decoded.companyid ?? '',
+      email: decoded.email ?? '',
+      fullname: decoded.fullname ?? '',
+      role: decoded.role ?? '',
+      phonenumber: decoded.phonenumber,
+      exp: decoded.exp,
+      iat: decoded.iat,
+      nbf: decoded.nbf,
+      iss: decoded.iss ?? '',
+    };
   }
 
   private invalidateCache(): void {

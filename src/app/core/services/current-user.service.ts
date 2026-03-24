@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { MockDataService } from './mock-data.service';
 import { AuthService } from './auth.service';
 import { Donor, StaffSession } from '../models/domain.models';
+import { environment } from '../../../environments/environment';
 
 export type PortalContext = 'staff' | 'donor';
 
@@ -71,7 +72,9 @@ export class CurrentUserService {
   setPortal(portal: PortalContext): void {
     const jwtRole = this.authService.getUserInfo()?.role;
     if (jwtRole && jwtRole !== portal) {
-      console.warn(`setPortal('${portal}') rejected — JWT role is '${jwtRole}'`);
+      if (!environment.production) {
+        console.warn(`setPortal('${portal}') rejected — JWT role is '${jwtRole}'`);
+      }
       return;
     }
     this._portal.set(portal);
@@ -84,7 +87,9 @@ export class CurrentUserService {
   setDonorId(id: number): void {
     const jwtUserId = this.authService.getUserInfo()?.userid;
     if (jwtUserId && Number(jwtUserId) !== id) {
-      console.warn(`setDonorId(${id}) rejected — JWT userid is '${jwtUserId}'`);
+      if (!environment.production) {
+        console.warn(`setDonorId(${id}) rejected — JWT userid is '${jwtUserId}'`);
+      }
       return;
     }
     this._donorId.set(id);
