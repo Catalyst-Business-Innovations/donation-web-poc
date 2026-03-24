@@ -1,0 +1,36 @@
+.year-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: linear-gradient(135deg, var(--slate-bg), var(--slate-dark));
+  color: #fff;
+  padding: 18px 24px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+}
+
+.ys-stat {
+  text-align: center;
+}
+
+.ys-val {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.ys-lbl {
+  font-size: 10px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ys-div {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.ys-action {
+  margin-left: auto;
+}

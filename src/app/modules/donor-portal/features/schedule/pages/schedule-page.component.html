@@ -1,0 +1,48 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Schedule Donation</div>
+    <div class="topbar-subtitle">Pre-plan your visit and set up a Giving cart</div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="sched-grid">
+    <app-schedule-form
+      [locations]="locations"
+      [timeSlots]="timeSlots"
+      [today]="today"
+      [(selectedLocation)]="selectedLocation"
+      [(selectedDate)]="selectedDate"
+      [(selectedTime)]="selectedTime"
+      [(notes)]="notes"
+      (submitRequested)="onSubmit()"
+    />
+
+    <div class="right-col">
+      <app-cart-editor
+        [items]="cart()"
+        [categories]="categories"
+        [totalItems]="totalCartItems"
+        (itemAdded)="onAddCartItem($event)"
+        (itemRemoved)="onRemoveCartItem($event)"
+      />
+
+      <app-upcoming-visits-list
+        [visits]="upcoming"
+        (visitSelected)="onViewVisit($event)"
+        (cancelRequested)="onCancelVisit($event)"
+      />
+    </div>
+  </div>
+</div>
+
+<app-visit-detail-modal
+  [visit]="selectedVisit()"
+  (closed)="onCloseVisitDetail()"
+/>
+
+<app-schedule-confirmation-modal
+  [open]="showConfirmation()"
+  [confirmation]="confirmation()"
+  (closed)="onCloseConfirmation()"
+/>

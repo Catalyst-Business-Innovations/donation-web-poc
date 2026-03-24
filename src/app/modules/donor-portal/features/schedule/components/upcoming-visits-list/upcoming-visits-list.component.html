@@ -1,0 +1,23 @@
+<div class="card">
+  <div class="card-title card-title--spaced">Upcoming Donations</div>
+  @for (s of visits(); track s.date) {
+    <div class="upcoming-row upcoming-row-click" (click)="visitSelected.emit(s)">
+      <div class="up-date">
+        <div class="up-day">{{ s.day }}</div>
+        <div class="up-month">{{ s.month }}</div>
+      </div>
+      <div class="upcoming-row__info">
+        <div class="upcoming-row__location">{{ s.location }}</div>
+        <div class="upcoming-row__meta">{{ s.time }} · {{ s.items }} items planned</div>
+      </div>
+      <app-icon name="arrow-right" size="14" class="upcoming-row__arrow" />
+      <button
+        class="btn-icon danger"
+        (click)="$event.stopPropagation(); cancelRequested.emit(s)"
+        title="Cancel"
+      >
+        <app-icon name="close" size="14" />
+      </button>
+    </div>
+  }
+</div>

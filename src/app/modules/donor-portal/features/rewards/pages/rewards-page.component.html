@@ -1,0 +1,36 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Loyalty &amp; Rewards</div>
+    <div class="topbar-subtitle">{{ donorPoints | number }} points available</div>
+  </div>
+</div>
+
+<div class="page-content">
+  <app-points-hero [hero]="heroState" />
+
+  <app-tier-progress-card [progress]="tierProgress" />
+
+  <app-reward-catalogue
+    [rewards]="catalogue()"
+    (redeemClicked)="onRedeemClicked($event)"
+    (giftClicked)="onGiftClicked($event)"
+  />
+
+  <app-transaction-history-list [transactions]="txnHistory()" />
+</div>
+
+<app-redeem-modal
+  [reward]="selectedRedeemReward()"
+  [donorPoints]="donorPoints"
+  (confirmed)="onRedeemConfirmed()"
+  (cancelled)="onRedeemCancelled()"
+/>
+
+<app-gift-modal
+  [reward]="selectedGiftReward()"
+  [searchResults]="giftSearchResults()"
+  [donorPoints]="donorPoints"
+  (searchQueryChanged)="onGiftSearchQueryChanged($event)"
+  (confirmed)="onGiftConfirmed($event)"
+  (cancelled)="onGiftCancelled()"
+/>

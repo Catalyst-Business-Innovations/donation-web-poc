@@ -1,0 +1,71 @@
+.card--mb {
+  margin-bottom: 24px;
+}
+
+.card-title--mb {
+  margin-bottom: 16px;
+}
+
+.tier-track {
+  display: flex;
+  align-items: center;
+}
+
+.tier-stop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition);
+
+  &.achieved {
+    background: var(--secondary-light);
+  }
+
+  &.current {
+    background: var(--primary-light);
+    border: 2px solid var(--primary);
+  }
+}
+
+.ts-icon {
+  line-height: 1;
+}
+
+.ts-label {
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.ts-min {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+
+.tier-conn {
+  flex: 1;
+  height: 3px;
+  background: var(--gray-200);
+  border-radius: var(--radius-full);
+
+  &.filled {
+    background: var(--secondary);
+  }
+}
+
+.tier-hint {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.tier-hint__icon {
+  display: inline-flex;
+  vertical-align: middle;
+}

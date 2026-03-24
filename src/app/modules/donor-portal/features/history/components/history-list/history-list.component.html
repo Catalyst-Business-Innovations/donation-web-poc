@@ -1,0 +1,50 @@
+@for (d of donations(); track d.id) {
+  <div class="h-card" [class.expanded]="expandedId() === d.id">
+    <div class="hc-hdr" (click)="toggled.emit(d.id)">
+      <div class="hc-icon"><app-icon name="package" [size]="20"></app-icon></div>
+      <div class="hc-info">
+        <div class="hc-location">{{ d.locationName }}</div>
+        <div class="hc-timestamp">
+          {{ d.timestamp | date: 'EEEE, MMMM d, yyyy' }} at {{ d.timestamp | date: 'h:mm a' }}
+        </div>
+      </div>
+      <div class="hc-meta">
+        <div class="hc-items-count">{{ d.totalItems }} items</div>
+      </div>
+      <div class="hc-badges">
+        <span class="badge {{ d.statusBadgeClass }}">{{ d.statusLabel }}</span>
+        @if (d.loyaltyPointsEarned) {
+          <span class="hc-pts">+{{ d.loyaltyPointsEarned }} pts</span>
+        }
+      </div>
+      <span class="hc-chevron" [class.is-open]="expandedId() === d.id">
+        <app-icon name="chevron-down" [size]="14"></app-icon>
+      </span>
+    </div>
+
+    @if (expandedId() === d.id) {
+      <div class="hc-body">
+        <div class="hc-receipt-row">
+          <span class="hc-receipt-num">{{ d.receiptNumber }}</span>
+          <button class="btn btn-sm btn-secondary" (click)="downloadRequested.emit(d.id)">
+            <app-icon name="download" [size]="14" class="icon-mr-xs"></app-icon>
+            Download
+          </button>
+        </div>
+        @for (item of d.items; track $index) {
+          <div class="hc-item-row">
+            <span class="hc-item-name">{{ item.categoryName }}</span>
+            <span>{{ item.quantity }} items</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+
+@if (donations().length === 0) {
+  <div class="empty-state">
+    <div class="empty-state-icon"><app-icon name="package" [size]="40"></app-icon></div>
+    <div class="empty-state-title">No donations found</div>
+  </div>
+}

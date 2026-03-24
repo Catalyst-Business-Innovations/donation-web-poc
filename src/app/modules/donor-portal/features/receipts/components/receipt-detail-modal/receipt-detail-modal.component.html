@@ -1,0 +1,59 @@
+<app-modal [open]="!!receipt()" title="Tax Receipt Details" [showFooter]="false" (closed)="closed.emit()">
+  @if (receipt(); as r) {
+    <div class="receipt-modal">
+      <div class="receipt-modal__header">
+        <div class="receipt-modal__org">
+          <div class="receipt-modal__org-name">BRIJJWORKS THRIFT STORES</div>
+          <div class="receipt-modal__org-ein">Tax-Exempt Organization · EIN: 12-3456789</div>
+        </div>
+        <div class="receipt-modal__meta">
+          <div class="receipt-modal__meta-block">
+            <div class="receipt-modal__meta-label">Receipt Number</div>
+            <div class="mono receipt-modal__meta-value">{{ r.receiptNumber }}</div>
+          </div>
+          <div class="receipt-modal__meta-block receipt-modal__meta-block--right">
+            <div class="receipt-modal__meta-label">Date</div>
+            <div class="receipt-modal__meta-value">{{ r.timestamp | date: 'MMMM d, yyyy' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="receipt-modal__donor">
+        <div class="receipt-modal__section-title receipt-modal__section-title--sm">Donor Information</div>
+        <div class="receipt-modal__donor-text">
+          <div>{{ r.donorFirstName }} {{ r.donorLastName }}</div>
+          <div>{{ r.donorEmail }}</div>
+          <div>{{ r.donorPhone }}</div>
+        </div>
+      </div>
+
+      <div class="receipt-modal__details">
+        <div class="receipt-modal__section-title">Donation Details</div>
+        <div class="receipt-modal__detail-row">
+          <div class="receipt-modal__detail-label">Store</div>
+          <div class="receipt-modal__detail-value">{{ r.locationName }}</div>
+        </div>
+        <div class="receipt-modal__detail-row">
+          <div class="receipt-modal__detail-label">Total Items</div>
+          <div class="receipt-modal__detail-value">{{ r.totalItems }}</div>
+        </div>
+        <div class="receipt-modal__detail-separator"></div>
+      </div>
+
+      <div class="receipt-modal__disclaimer">
+        <strong>IRS Notice:</strong>
+        No goods or services were provided in exchange for this donation. The estimated values shown are provided for
+        guidance only. As the donor, you are responsible for determining the fair market value of your donation.
+      </div>
+
+      <div class="receipt-modal__actions">
+        <button class="btn btn-primary receipt-modal__actions-btn" (click)="downloadPdf.emit()">
+          <app-icon name="download" [size]="14"></app-icon> Download PDF
+        </button>
+        <button class="btn btn-secondary receipt-modal__actions-btn" (click)="emailReceipt.emit()">
+          <app-icon name="mail" [size]="14"></app-icon> Email Copy
+        </button>
+      </div>
+    </div>
+  }
+</app-modal>

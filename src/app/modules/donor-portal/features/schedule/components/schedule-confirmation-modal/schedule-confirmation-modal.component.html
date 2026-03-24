@@ -1,0 +1,63 @@
+<app-modal
+  [open]="open()"
+  title="Donation Scheduled!"
+  confirmLabel="Done"
+  [showCancel]="false"
+  (closed)="closed.emit()"
+  (confirmed)="closed.emit()"
+>
+  <div class="confirm-modal">
+    <div class="confirm-modal__ref">
+      <h3 class="confirm-modal__ref-label">Reference #</h3>
+      <div class="confirm-modal__ref-id">{{ confirmation().id }}</div>
+    </div>
+
+    <div class="confirm-modal__qr">
+      <div class="confirm-modal__qr-frame">
+        <app-qr-code [value]="confirmation().id" [size]="160"></app-qr-code>
+      </div>
+      <div class="confirm-modal__qr-hint">Scan at check-in to speed up processing</div>
+    </div>
+
+    <div class="confirm-modal__details">
+      <div class="confirm-modal__details-title">
+        <app-icon name="map-pin" [size]="14"></app-icon> Scheduled Donation Details
+      </div>
+      <div class="confirm-modal__details-grid">
+        <div class="confirm-modal__detail-row">
+          <span class="confirm-modal__detail-key">Store:</span>
+          <strong class="confirm-modal__detail-val">{{ confirmation().location }}</strong>
+        </div>
+        <div class="confirm-modal__detail-row">
+          <span class="confirm-modal__detail-key">Date:</span>
+          <strong class="confirm-modal__detail-val">{{ confirmation().date | date: 'MMMM d, yyyy' }}</strong>
+        </div>
+        <div class="confirm-modal__detail-row">
+          <span class="confirm-modal__detail-key">Time:</span>
+          <strong class="confirm-modal__detail-val">{{ confirmation().time }}</strong>
+        </div>
+        <div class="confirm-modal__detail-row">
+          <span class="confirm-modal__detail-key">Frequency:</span>
+          <strong class="confirm-modal__detail-val">{{ confirmation().recurring }}</strong>
+        </div>
+        @if (confirmation().items > 0) {
+          <div class="confirm-modal__detail-row">
+            <span class="confirm-modal__detail-key">Items in Cart:</span>
+            <strong class="confirm-modal__detail-val">{{ confirmation().items }}</strong>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="confirm-modal__notice">
+      <div class="confirm-modal__notice-inner">
+        <span class="confirm-modal__notice-icon"><app-icon name="check-circle" [size]="18"></app-icon></span>
+        <div class="confirm-modal__notice-text">
+          <strong>Confirmation sent!</strong>
+          Check your email for scheduled donation details and directions. You'll receive a reminder 24 hours before your
+          scheduled time.
+        </div>
+      </div>
+    </div>
+  </div>
+</app-modal>

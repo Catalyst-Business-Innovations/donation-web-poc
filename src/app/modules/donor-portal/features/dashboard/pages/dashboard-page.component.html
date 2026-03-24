@@ -1,0 +1,26 @@
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Welcome back, {{ donorStats.firstName }}!</div>
+    <div class="topbar-subtitle">Here's your impact summary</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-primary" routerLink="/donor/schedule">
+      Schedule Donation
+    </button>
+  </div>
+</div>
+
+<div class="page-content">
+  <app-loyalty-hero [donor]="donorStats" [tierDisplay]="tierDisplay" />
+
+  <app-active-campaigns-list [campaigns]="activeCampaigns()" />
+
+  <div class="dash-grid">
+    <app-recent-donations-card [donations]="recentDonations" />
+
+    <div class="side-col">
+      <app-impact-summary [items]="impactItems" />
+      <app-quick-actions-card (findStoreClicked)="onFindStore()" />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card {
+  &--mb {
+    margin-bottom: 24px;
+  }
+}
+
+.td--bold {
+  font-weight: 700;
+}

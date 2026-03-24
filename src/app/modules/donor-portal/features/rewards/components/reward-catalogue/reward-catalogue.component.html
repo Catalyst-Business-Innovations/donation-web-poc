@@ -1,0 +1,44 @@
+<div class="card card--mb">
+  <div class="card-title">Available Rewards</div>
+  <div class="card-subtitle card-subtitle--mb">Redeem your points for these rewards</div>
+
+  @if (rewards().length === 0) {
+    <div class="empty-state-inline">No rewards available at this time.</div>
+  } @else {
+    <div class="reward-catalogue">
+      @for (r of rewards(); track r.id) {
+        <div class="reward-card" [class.can-redeem]="r.canRedeem">
+          <div class="rc-header">
+            <span class="rc-type-badge">{{ r.rewardTypeLabel }}</span>
+            <div class="rc-header-meta">
+              @if (r.isGiftable) {
+                <span class="rc-gift-badge"><app-icon name="gift" [size]="10"></app-icon> Giftable</span>
+              }
+              <span class="rc-value">${{ r.value | number }}</span>
+            </div>
+          </div>
+          <div class="rc-body">
+            <div class="rc-name">{{ r.name }}</div>
+            <div class="rc-desc">{{ r.description }}</div>
+          </div>
+          <div class="rc-footer">
+            <div class="rc-points">
+              <app-icon name="star" [size]="14"></app-icon>
+              {{ r.pointsRequired | number }} pts
+            </div>
+            <div class="rc-actions">
+              @if (r.isGiftable) {
+                <button class="btn btn-secondary btn-sm" [disabled]="!r.canGift" (click)="giftClicked.emit(r)">
+                  <app-icon name="gift" [size]="13"></app-icon> Gift
+                </button>
+              }
+              <button class="btn btn-primary btn-sm" [disabled]="!r.canRedeem" (click)="redeemClicked.emit(r)">
+                Redeem
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

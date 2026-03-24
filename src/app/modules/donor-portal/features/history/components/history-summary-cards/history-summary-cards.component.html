@@ -1,0 +1,19 @@
+<div class="year-summary">
+  <div class="ys-stat">
+    <div class="ys-val">{{ summary().donations }}</div>
+    <div class="ys-lbl">Donations</div>
+  </div>
+  <div class="ys-div"></div>
+  <div class="ys-stat">
+    <div class="ys-val">{{ summary().items }}</div>
+    <div class="ys-lbl">Items</div>
+  </div>
+  <div class="ys-div"></div>
+  <div class="ys-stat">
+    <div class="ys-val">{{ summary().points }}</div>
+    <div class="ys-lbl">Points Earned</div>
+  </div>
+  <button class="btn btn-secondary ys-action" (click)="yearEndSummaryRequested.emit()">
+    Year-End Summary
+  </button>
+</div>

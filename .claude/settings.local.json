@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(for feature:*)",
+      "Bash(do rm:*)",
+      "Bash(done)",
+      "Bash(find . -name \"*.ts\" -exec grep -l \"models/state/\" {})",
+      "Bash(while read:*)",
+      "Bash(do sed:*)",
+      "Bash(do echo:*)",
+      "Read(//d/Projects/RCS/repos/donation/Donation.Web/$feature/**)"
+    ]
+  }
+}

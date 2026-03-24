@@ -1,0 +1,20 @@
+<div class="year-btns">
+  @for (yr of years(); track yr) {
+    <button
+      class="btn"
+      [class.btn-primary]="selectedYear() === yr"
+      [class.btn-secondary]="selectedYear() !== yr"
+      (click)="yearChanged.emit(yr)"
+    >
+      {{ yr }}
+    </button>
+  }
+  <button
+    class="btn"
+    [class.btn-primary]="selectedYear() === null"
+    [class.btn-secondary]="selectedYear() !== null"
+    (click)="yearChanged.emit(null)"
+  >
+    All Time
+  </button>
+</div>

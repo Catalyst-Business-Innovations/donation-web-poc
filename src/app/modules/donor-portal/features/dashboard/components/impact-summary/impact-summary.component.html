@@ -1,0 +1,12 @@
+<div class="card impact-card">
+  <div class="card-title card-title--spaced">Your Impact</div>
+  @for (item of items(); track item.label) {
+    <div class="impact-row">
+      <app-icon [name]="item.icon" [size]="26" class="impact-icon"></app-icon>
+      <div>
+        <div class="impact-value">{{ item.value }}</div>
+        <div class="impact-label">{{ item.label }}</div>
+      </div>
+    </div>
+  }
+</div>

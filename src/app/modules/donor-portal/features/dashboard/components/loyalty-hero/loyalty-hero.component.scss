@@ -1,0 +1,121 @@
+.loyalty-hero {
+  background: linear-gradient(135deg, var(--slate-bg), var(--slate-dark));
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  display: flex;
+  gap: 32px;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.lh-left {
+  flex: 1;
+}
+
+.lh-tier-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.lh-tier-icon {
+  font-size: 40px;
+}
+
+.lh-tier-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+
+.lh-since {
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+.lh-name {
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.lh-points {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.lh-pts-num {
+  font-size: 40px;
+  font-weight: 900;
+}
+
+.lh-pts-label {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.lh-progress {
+  max-width: 360px;
+}
+
+.lh-progress-hint {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 8px;
+}
+
+.lh-progress-hint-icon {
+  margin: 0 4px;
+}
+
+.lh-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  padding-left: 32px;
+}
+
+.lh-stat {
+  text-align: center;
+}
+
+.lh-sv {
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.lh-sl {
+  font-size: 11px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-bar {
+  &--muted {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+@media (max-width: 900px) {
+  .loyalty-hero {
+    flex-direction: column;
+  }
+
+  .lh-right {
+    flex-direction: row;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-left: 0;
+    padding-top: 16px;
+  }
+}

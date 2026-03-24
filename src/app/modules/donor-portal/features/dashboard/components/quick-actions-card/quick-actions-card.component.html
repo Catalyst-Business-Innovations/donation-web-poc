@@ -1,0 +1,19 @@
+<div class="card">
+  <div class="card-title card-title--spaced-sm">Quick Actions</div>
+  <button class="btn btn-primary quick-action-btn quick-action-btn--mb" routerLink="/donor/schedule">
+    <app-icon name="calendar" [size]="14" class="btn-icon"></app-icon>
+    Schedule Pickup
+  </button>
+  <button class="btn btn-secondary quick-action-btn quick-action-btn--mb" routerLink="/donor/receipts">
+    <app-icon name="file-text" [size]="14" class="btn-icon"></app-icon>
+    Download Tax Receipt
+  </button>
+  <button class="btn btn-secondary quick-action-btn quick-action-btn--mb" routerLink="/donor/rewards">
+    <app-icon name="star" [size]="14" class="btn-icon"></app-icon>
+    View Rewards
+  </button>
+  <button class="btn btn-ghost quick-action-btn" (click)="findStoreClicked.emit()">
+    <app-icon name="map-pin" [size]="14" class="btn-icon"></app-icon>
+    Find a Store
+  </button>
+</div>

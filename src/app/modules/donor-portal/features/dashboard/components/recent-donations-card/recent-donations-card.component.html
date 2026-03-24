@@ -1,0 +1,25 @@
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Recent Donations</div>
+      <div class="card-subtitle">Your last visits</div>
+    </div>
+    <a routerLink="/donor/history" class="btn btn-secondary btn-sm">View All</a>
+  </div>
+  @for (d of donations(); track d.id) {
+    <div class="don-row">
+      <div class="don-icon"><app-icon name="package" [size]="20"></app-icon></div>
+      <div class="don-content">
+        <div class="don-location">{{ d.locationName }}</div>
+        <div class="don-meta">
+          {{ d.timestamp | date: 'MMM d, yyyy' }} · {{ d.totalItems }} items
+        </div>
+      </div>
+      <div class="don-pts-col">
+        @if (d.loyaltyPointsEarned) {
+          <div class="don-pts">+{{ d.loyaltyPointsEarned }} pts</div>
+        }
+      </div>
+    </div>
+  }
+</div>

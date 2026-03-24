@@ -8,31 +8,31 @@ export const donorRoutes: Routes = [
     data: { breadcrumb: 'Dashboard' },
     canActivate: [donorAuthGuard],
     loadComponent: () =>
-      import('./features/dashboard/components/donor-dashboard.component').then(m => m.DonorDashboardComponent)
+      import('./features/dashboard/pages/dashboard-page.component').then(m => m.DashboardPageComponent)
   },
   {
     path: 'history',
     data: { breadcrumb: 'My Donations' },
     canActivate: [donorAuthGuard],
     loadComponent: () =>
-      import('./features/history/components/donation-history.component').then(m => m.DonationHistoryComponent)
+      import('./features/history/pages/history-page.component').then(m => m.HistoryPageComponent)
   },
   {
     path: 'receipts',
     data: { breadcrumb: 'Tax Receipts' },
     canActivate: [donorAuthGuard],
-    loadComponent: () => import('./features/receipts/components/receipts.component').then(m => m.ReceiptsComponent)
+    loadComponent: () => import('./features/receipts/pages/receipts-page.component').then(m => m.ReceiptsPageComponent)
   },
   {
     path: 'rewards',
     data: { breadcrumb: 'Loyalty & Rewards' },
     canActivate: [donorAuthGuard],
-    loadComponent: () => import('./features/rewards/components/rewards.component').then(m => m.RewardsComponent)
+    loadComponent: () => import('./features/rewards/pages/rewards-page.component').then(m => m.RewardsPageComponent)
   },
   {
     path: 'schedule',
     data: { breadcrumb: 'Schedule Donation' },
     canActivate: [donorAuthGuard],
-    loadComponent: () => import('./features/schedule/components/schedule.component').then(m => m.ScheduleComponent)
+    loadComponent: () => import('./features/schedule/pages/schedule-page.component').then(m => m.SchedulePageComponent)
   }
 ];

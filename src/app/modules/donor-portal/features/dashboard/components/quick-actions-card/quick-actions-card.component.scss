@@ -1,0 +1,18 @@
+.card-title {
+  &--spaced-sm {
+    margin-bottom: 12px;
+  }
+}
+
+.quick-action-btn {
+  width: 100%;
+  justify-content: flex-start;
+
+  &--mb {
+    margin-bottom: 8px;
+  }
+}
+
+.btn-icon {
+  margin-right: 8px;
+}

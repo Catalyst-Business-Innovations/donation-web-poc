@@ -1,0 +1,44 @@
+<app-modal
+  [open]="!!reward()"
+  title="Confirm Redemption"
+  confirmLabel="Confirm Redeem"
+  cancelLabel="Cancel"
+  [showCancel]="true"
+  (closed)="cancelled.emit()"
+  (confirmed)="confirmed.emit()"
+>
+  @if (reward(); as r) {
+    <div class="redeem-modal-body">
+      <div class="redeem-hero">
+        <div class="redeem-hero__type">
+          <span class="rc-type-badge rc-type-badge--lg">{{ r.rewardTypeLabel }}</span>
+        </div>
+        <h3 class="redeem-hero__name">{{ r.name }}</h3>
+        <p class="redeem-hero__desc">{{ r.description }}</p>
+      </div>
+      <div class="confirm-panel">
+        <div class="confirm-row">
+          <span class="confirm-label">Reward Value</span>
+          <span class="confirm-value confirm-value--primary">${{ r.value | number }}</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-label">Points Required</span>
+          <span class="confirm-value confirm-value--danger">{{ r.pointsRequired | number }} pts</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-label">Your Balance</span>
+          <span class="confirm-value confirm-value--secondary">{{ donorPoints() | number }} pts</span>
+        </div>
+        <hr class="confirm-divider" />
+        <div class="confirm-row">
+          <span class="confirm-label confirm-label--strong">After Redemption</span>
+          <span class="confirm-value confirm-value--info">{{ donorPoints() - r.pointsRequired | number }} pts</span>
+        </div>
+      </div>
+      <div class="warn-box">
+        <app-icon name="info" [size]="18"></app-icon>
+        <span class="warn-box__text"><strong>Note:</strong> Redemption cannot be undone. Points will be deducted immediately.</span>
+      </div>
+    </div>
+  }
+</app-modal>

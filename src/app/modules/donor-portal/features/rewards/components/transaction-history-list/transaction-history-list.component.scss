@@ -1,0 +1,78 @@
+.card-title--mb {
+  margin-bottom: 16px;
+}
+
+.txn-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--gray-100);
+  &:last-child { border-bottom: none; }
+}
+
+.txn-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.txn-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+.txn-meta {
+  font-size: 11px;
+  color: var(--gray-500);
+}
+
+.txn-points {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.txn-points__deducted {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--danger);
+}
+
+.txn-points__gift {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--secondary);
+}
+
+.txn-gift-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--secondary-light);
+  color: var(--secondary);
+
+  &--received {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+}
+
+.empty-state-inline {
+  text-align: center;
+  padding: 24px;
+  font-size: 13px;
+  color: var(--gray-400);
+}

@@ -1,0 +1,23 @@
+<div class="card card--mb">
+  <div class="card-title card-title--mb">Tier Progress</div>
+  <div class="tier-track">
+    @for (t of progress().stops; track t.tier) {
+      <div class="tier-stop" [class.current]="t.isCurrent" [class.achieved]="t.isAchieved">
+        <div class="ts-icon"><app-icon [name]="t.icon" [size]="20"></app-icon></div>
+        <div class="ts-label">{{ t.label }}</div>
+        <div class="ts-min">{{ t.minDonations }}+ visits</div>
+      </div>
+      @if (!t.isLast) {
+        <div class="tier-conn" [class.filled]="t.isAchieved"></div>
+      }
+    }
+  </div>
+  @if (progress().nextTierLabel) {
+    <div class="tier-hint">
+      You have <strong>{{ progress().totalDonations }} visits</strong>.
+      <strong>{{ progress().donationsToNext }}</strong> more to reach
+      <app-icon [name]="progress().nextTierIcon!" [size]="14" class="tier-hint__icon"></app-icon>
+      {{ progress().nextTierLabel }}.
+    </div>
+  }
+</div>

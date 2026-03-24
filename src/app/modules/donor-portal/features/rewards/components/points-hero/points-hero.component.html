@@ -1,0 +1,21 @@
+<div class="pts-hero">
+  <div class="ph-left">
+    <div class="ph-label">Available Points</div>
+    <div class="ph-num">{{ hero().availablePoints | number }}</div>
+    <div class="ph-rate">Earning at {{ hero().multiplier }}&times; rate ({{ hero().tierLabel }} tier)</div>
+  </div>
+  <div class="ph-right">
+    <div class="ph-stat">
+      <div class="ph-stat-value">{{ hero().catalogueCount }}</div>
+      <div class="ph-stat-label">Available Rewards</div>
+    </div>
+    <div class="ph-stat">
+      <div class="ph-stat-value">{{ hero().giftableCount }}</div>
+      <div class="ph-stat-label">Giftable</div>
+    </div>
+    <div class="ph-stat">
+      <div class="ph-stat-value">{{ hero().redemptionCount }}</div>
+      <div class="ph-stat-label">Redemptions</div>
+    </div>
+  </div>
+</div>

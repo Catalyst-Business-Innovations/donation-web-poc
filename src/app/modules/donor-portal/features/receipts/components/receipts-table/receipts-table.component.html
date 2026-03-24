@@ -1,0 +1,41 @@
+<div class="card card--mb">
+  <div class="card-header">
+    <div class="card-title">Receipts</div>
+  </div>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Receipt #</th>
+          <th>Date</th>
+          <th>Store</th>
+          <th>Items</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (d of receipts(); track d.id) {
+          <tr>
+            <td class="mono">{{ d.receiptNumber }}</td>
+            <td>{{ d.timestamp | date: 'MMM d, yyyy' }}</td>
+            <td>{{ d.locationName }}</td>
+            <td class="td--bold">{{ d.totalItems }}</td>
+            <td>
+              <div class="table-actions">
+                <button class="btn-icon" (click)="viewRequested.emit(d.id)" title="View Receipt">
+                  <app-icon name="eye" size="14" />
+                </button>
+                <button class="btn-icon" (click)="downloadRequested.emit(d.id)" title="Download">
+                  <app-icon name="download" size="14" />
+                </button>
+                <button class="btn-icon" (click)="emailRequested.emit(d.id)" title="Email">
+                  <app-icon name="send" size="14" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

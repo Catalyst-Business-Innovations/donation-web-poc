@@ -1,0 +1,130 @@
+.card--mb {
+  margin-bottom: 24px;
+}
+
+.card-subtitle--mb {
+  margin-bottom: 16px;
+}
+
+.reward-catalogue {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.reward-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition);
+  opacity: 0.55;
+
+  &.can-redeem {
+    opacity: 1;
+    &:hover {
+      box-shadow: var(--shadow-md);
+    }
+  }
+}
+
+.rc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px 0;
+}
+
+.rc-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rc-type-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.rc-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--gray-900);
+}
+
+.rc-body {
+  padding: 8px 16px 16px;
+  flex: 1;
+}
+
+.rc-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 4px;
+}
+
+.rc-desc {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+.rc-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-top: 1px solid var(--gray-100);
+  background: var(--gray-50);
+}
+
+.rc-points {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.rc-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rc-gift-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--secondary-light);
+  color: var(--secondary);
+}
+
+.empty-state-inline {
+  text-align: center;
+  padding: 24px;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+@media (max-width: 900px) {
+  .reward-catalogue {
+    grid-template-columns: 1fr;
+  }
+}

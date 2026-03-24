@@ -1,0 +1,42 @@
+<div class="loyalty-hero">
+  <div class="lh-left">
+    <div class="lh-tier-row">
+      <span class="lh-tier-icon"><app-icon [name]="tierDisplay().tier.icon" [size]="28"></app-icon></span>
+      <div>
+        <div class="lh-tier-label">{{ tierDisplay().tier.label }} Member</div>
+        <div class="lh-since">Member since {{ donor().joinDate | date: 'MMM yyyy' }}</div>
+      </div>
+    </div>
+    <div class="lh-name">{{ donor().firstName }} {{ donor().lastName }}</div>
+    <div class="lh-points">
+      <span class="lh-pts-num">{{ donor().loyaltyPoints | number }}</span>
+      <span class="lh-pts-label">loyalty points</span>
+    </div>
+    @if (tierDisplay().nextTier; as nextTier) {
+      <div class="lh-progress">
+        <div class="lh-progress-hint">
+          {{ tierDisplay().donationsToNext }} more visits to
+          <app-icon [name]="nextTier.icon" [size]="14" class="lh-progress-hint-icon"></app-icon>
+          {{ nextTier.label }}
+        </div>
+        <div class="progress-bar progress-bar--muted">
+          <div class="progress-fill gradient" [style.width]="tierDisplay().progress + '%'"></div>
+        </div>
+      </div>
+    }
+  </div>
+  <div class="lh-right">
+    <div class="lh-stat">
+      <div class="lh-sv">{{ donor().totalDonations }}</div>
+      <div class="lh-sl">Donations</div>
+    </div>
+    <div class="lh-stat">
+      <div class="lh-sv">${{ donor().lifetimeValue | number }}</div>
+      <div class="lh-sl">Est. Donated</div>
+    </div>
+    <div class="lh-stat">
+      <div class="lh-sv">{{ tierDisplay().tier.pointsMultiplier }}×</div>
+      <div class="lh-sl">Points Rate</div>
+    </div>
+  </div>
+</div>

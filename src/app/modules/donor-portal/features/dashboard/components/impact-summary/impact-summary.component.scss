@@ -1,0 +1,31 @@
+.impact-card {
+  background: linear-gradient(135deg, var(--success-50), var(--success-100)) !important;
+}
+
+.impact-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.impact-icon {
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.impact-value {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.impact-label {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+
+.card-title {
+  &--spaced {
+    margin-bottom: 16px;
+  }
+}
