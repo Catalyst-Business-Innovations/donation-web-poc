@@ -5,12 +5,12 @@
       <img src="../../../assets/brijjlogo.svg" alt="Brijjworks" class="sl-logo-img" />
       <div class="sl-logo-text">
         <div class="sl-logo-brand">Brijjworks</div>
-        <div class="sl-logo-sub">{{ moduleLabel }}</div>
+        <div class="sl-logo-sub">{{ moduleLabel() }}</div>
       </div>
     </div>
 
-    <nav class="sl-nav">
-      @for (sec of sections; track sec.title) {
+    <nav class="sl-nav" aria-label="Staff navigation">
+      @for (sec of sections(); track sec.title) {
         <div class="sl-section">
           <div class="sl-section-title">{{ sec.title }}</div>
           @for (item of sec.items; track item.route) {
@@ -31,27 +31,35 @@
   <div class="sl-main">
     <!-- Navbar -->
     <header class="sl-navbar">
-      <h4 class="sl-navbar-title">{{ activeCrumb }}</h4>
+      <h4 class="sl-navbar-title">{{ activeCrumb() }}</h4>
 
-      <div class="sl-profile-wrap" (click)="toggleDropdown($event)">
+      <div
+        class="sl-profile-wrap"
+        role="button"
+        tabindex="0"
+        [attr.aria-haspopup]="'menu'"
+        [attr.aria-expanded]="dropdownOpen()"
+        (click)="toggleDropdown($event)"
+        (keydown)="onKeydown($event)"
+      >
         <div class="sl-profile">
-          <div class="sl-avatar">{{ userInitials }}</div>
+          <div class="sl-avatar">{{ userInitials() }}</div>
           <div class="sl-user-info">
-            <div class="sl-user-name">{{ userName }}</div>
-            <div class="sl-user-role">{{ userRole }}</div>
+            <div class="sl-user-name">{{ userName() }}</div>
+            <div class="sl-user-role">{{ userRole() }}</div>
           </div>
-          <div class="sl-arrow" [class.open]="dropdownOpen">
+          <div class="sl-arrow" [class.open]="dropdownOpen()">
             <app-icon name="chevron-down" [size]="14"></app-icon>
           </div>
         </div>
 
-        @if (dropdownOpen) {
-          <div class="sl-dropdown" (click)="$event.stopPropagation()">
-            @if (storeName) {
-              <div class="sl-dd-header">{{ storeName }}</div>
+        @if (dropdownOpen()) {
+          <div class="sl-dropdown" role="menu" (click)="$event.stopPropagation()">
+            @if (storeName()) {
+              <div class="sl-dd-header">{{ storeName() }}</div>
             }
-            @if (logoutRoute) {
-              <a [routerLink]="logoutRoute" class="sl-dd-item sl-dd-danger">Sign Out</a>
+            @if (logoutRoute()) {
+              <a [routerLink]="logoutRoute()" class="sl-dd-item sl-dd-danger" role="menuitem">Sign Out</a>
             }
           </div>
         }

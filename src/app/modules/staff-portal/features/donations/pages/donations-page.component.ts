@@ -2,9 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@a
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastService } from '@core/services/toast.service';
-import { MockDataService } from '@core/services/mock-data.service';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { DonationMethod, DonationStatus, Donation } from '@core/models/domain.models';
+import { DonationMethod, DonationStatus } from '@core/models/domain.models';
 import { DonationsService } from '../services/donations.service';
 import { DonationTab } from '../models/donations.enum';
 import {
@@ -40,7 +39,6 @@ export class DonationsPageComponent {
   private readonly donationsService = inject(DonationsService);
   protected readonly AT = DonationMethod;
   protected readonly DS = DonationStatus;
-  private readonly mockData = inject(MockDataService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -70,11 +68,8 @@ export class DonationsPageComponent {
 
   // ── Completed tab ──────────────────────────────────────────────────────────
   protected readonly donQuery = signal('');
-  private readonly _localDonations = signal<Donation[]>([...this.mockData.donations]);
 
-  readonly filteredCompleted = computed(() =>
-    this.donationsService.getCompletedDonations(this.donQuery(), this._localDonations())
-  );
+  readonly filteredCompleted = computed(() => this.donationsService.getCompletedDonations(this.donQuery()));
 
   // ── Link modal ─────────────────────────────────────────────────────────────
   protected readonly linkingDonation = signal<CompletedDonationState | null>(null);
@@ -145,9 +140,8 @@ export class DonationsPageComponent {
     const donation = this.linkingDonation();
     if (!donation) return;
 
-    const updated = this.donationsService.linkDonor(donation.id, donorId);
+    const updated = this.donationsService.linkDonorAndRefresh(donation.id, donorId);
     if (updated) {
-      this._localDonations.update(list => list.map(d => (d.id === updated.id ? updated : d)));
       const donor = this.linkResults().find(d => d.id === donorId);
       this.toast.success(
         'Linked!',

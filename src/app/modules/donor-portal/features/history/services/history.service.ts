@@ -1,11 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { MockDataService } from '@core/services/mock-data.service';
+import { CurrentDonorService } from '@core/services/current-donor.service';
 import { DonationHistoryItemState, HistorySummaryState } from '../models/history.state';
 import { mapDonationToHistoryItem, mapDonationsToSummary } from '../models/history.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class HistoryService {
   private readonly mockData = inject(MockDataService);
+  private readonly currentDonor = inject(CurrentDonorService);
 
   getDonations(year: number | null): DonationHistoryItemState[] {
     const donations = this.mockData.donations;
@@ -20,6 +22,6 @@ export class HistoryService {
   }
 
   getDonor() {
-    return this.mockData.donors[0];
+    return this.currentDonor.donor();
   }
 }

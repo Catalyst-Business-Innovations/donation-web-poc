@@ -1,4 +1,5 @@
 import { AppEnvironment } from 'src/app/shared/models/enums';
+import { AppEnvironmentConfig } from './environment.interface';
 
 const domainName = 'dev.rcscbs.com';
 
@@ -16,4 +17,4 @@ export const environment = {
   imsUrl: `https://inventory.${domainName}`,
   imsApiUrl: `https://inventory-api.${domainName}/api`,
   environmentName: 'dev'
-};
+} satisfies AppEnvironmentConfig;

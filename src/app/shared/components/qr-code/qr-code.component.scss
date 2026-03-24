@@ -1,0 +1,21 @@
+:host {
+  display: inline-block;
+}
+
+.qr-loading,
+.qr-error {
+  background: #f3f3f3;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  span {
+    font-size: 11px;
+    color: #999;
+  }
+}
+
+.qr-error span {
+  color: #dc2626;
+}

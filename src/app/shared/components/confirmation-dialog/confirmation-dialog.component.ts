@@ -1,5 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -7,32 +6,40 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './confirmation-dialog.component.html',
   styleUrls: ['./confirmation-dialog.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfirmationDialogComponent {
-  @Input() title: string = 'Confirm';
-  @Input() message: string = 'Are you sure?';
-  @Input() confirmText: string = 'Yes';
-  @Input() cancelText: string = 'No';
-  @Input() confirmButtonClass: string = 'btn-primary';
-  @Input() isVisible: boolean = false;
-  @Input() showTextarea: boolean = false;
-  @Input() textareaLabel: string = '';
-  @Input() textareaPlaceholder: string = '';
-  @Input() textareaValue: string = '';
-  @Input() textareaRequired: boolean = false;
+  readonly title = input('Confirm');
+  readonly message = input('Are you sure?');
+  readonly confirmText = input('Yes');
+  readonly cancelText = input('No');
+  readonly confirmButtonClass = input('btn-primary');
+  readonly isVisible = input(false);
+  readonly showTextarea = input(false);
+  readonly textareaLabel = input('');
+  readonly textareaPlaceholder = input('');
+  readonly textareaValue = input('');
+  readonly textareaRequired = input(false);
 
-  @Output() confirmed = new EventEmitter<string | void>();
-  @Output() cancelled = new EventEmitter<void>();
-  @Output() textareaValueChange = new EventEmitter<string>();
+  readonly confirmed = output<string | void>();
+  readonly cancelled = output<void>();
+  readonly textareaValueChange = output<string>();
 
-  get isConfirmDisabled(): boolean {
-    return this.textareaRequired && this.showTextarea && !this.textareaValue.trim();
+  protected textareaModel = '';
+
+  protected isConfirmDisabled = computed(() => {
+    return this.textareaRequired() && this.showTextarea() && !this.textareaModel.trim();
+  });
+
+  onTextareaChange(value: string): void {
+    this.textareaModel = value;
+    this.textareaValueChange.emit(value);
   }
 
   onConfirm(): void {
-    if (this.showTextarea) {
-      this.confirmed.emit(this.textareaValue);
+    if (this.showTextarea()) {
+      this.confirmed.emit(this.textareaModel);
     } else {
       this.confirmed.emit();
     }
@@ -44,6 +51,12 @@ export class ConfirmationDialogComponent {
 
   onBackdropClick(event: MouseEvent): void {
     if (event.target === event.currentTarget) {
+      this.onCancel();
+    }
+  }
+
+  onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
       this.onCancel();
     }
   }

@@ -4,12 +4,12 @@
       <img src="../../../assets/brijjlogo.svg" alt="Brijjworks" class="logo-img" />
       <div>
         <div class="logo-title">Brijjworks</div>
-        <div class="logo-sub">{{ moduleLabel }}</div>
+        <div class="logo-sub">{{ moduleLabel() }}</div>
       </div>
     </div>
 
-    <nav class="sidebar-nav">
-      @for (sec of sections; track sec.title) {
+    <nav class="sidebar-nav" aria-label="Donor navigation">
+      @for (sec of sections(); track sec.title) {
         <div class="nav-section">
           <div class="nav-section-title">{{ sec.title }}</div>
           @for (item of sec.items; track item.route) {
@@ -29,25 +29,33 @@
   <div class="donor-main">
     <!-- Navbar -->
     <header class="donor-navbar">
-      <h4 class="donor-navbar-title">{{ activeCrumb }}</h4>
+      <h4 class="donor-navbar-title">{{ activeCrumb() }}</h4>
 
-      <div class="donor-profile-wrap" (click)="toggleDropdown($event)">
+      <div
+        class="donor-profile-wrap"
+        role="button"
+        tabindex="0"
+        [attr.aria-haspopup]="'menu'"
+        [attr.aria-expanded]="dropdownOpen()"
+        (click)="toggleDropdown($event)"
+        (keydown)="onKeydown($event)"
+      >
         <div class="donor-profile">
-          <div class="donor-avatar">{{ userInitials }}</div>
+          <div class="donor-avatar">{{ userInitials() }}</div>
           <div class="donor-user-info">
-            <div class="donor-user-name">{{ userName }}</div>
-            <div class="donor-user-role">{{ userRole }}</div>
+            <div class="donor-user-name">{{ userName() }}</div>
+            <div class="donor-user-role">{{ userRole() }}</div>
           </div>
-          <div class="donor-arrow" [class.open]="dropdownOpen">
+          <div class="donor-arrow" [class.open]="dropdownOpen()">
             <app-icon name="chevron-down" [size]="14"></app-icon>
           </div>
         </div>
 
-        @if (dropdownOpen) {
-          <div class="donor-dropdown" (click)="$event.stopPropagation()">
-            <div class="donor-dd-header">{{ moduleLabel }}</div>
-            @if (logoutRoute) {
-              <a [routerLink]="logoutRoute" class="donor-dd-item donor-dd-danger">Sign Out</a>
+        @if (dropdownOpen()) {
+          <div class="donor-dropdown" role="menu" (click)="$event.stopPropagation()">
+            <div class="donor-dd-header">{{ moduleLabel() }}</div>
+            @if (logoutRoute()) {
+              <a [routerLink]="logoutRoute()" class="donor-dd-item donor-dd-danger" role="menuitem">Sign Out</a>
             }
           </div>
         }

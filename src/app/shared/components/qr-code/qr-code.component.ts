@@ -1,36 +1,40 @@
-import { Component, Input, OnChanges, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angular/core';
 import QRCode from 'qrcode';
 
 @Component({
   selector: 'app-qr-code',
   standalone: true,
-  template: `
-    @if (dataUrl()) {
-      <img [src]="dataUrl()" [width]="size" [height]="size" alt="QR Code" style="display: block;" />
-    } @else {
-      <div
-        [style.width.px]="size"
-        [style.height.px]="size"
-        style="background: #f3f3f3; border-radius: 4px; display: flex; align-items: center; justify-content: center;"
-      >
-        <span style="font-size: 11px; color: #999">Loading…</span>
-      </div>
-    }
-  `
+  templateUrl: './qr-code.component.html',
+  styleUrl: './qr-code.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class QrCodeComponent implements OnChanges {
-  @Input() value = '';
-  @Input() size = 160;
+export class QrCodeComponent {
+  readonly value = input('');
+  readonly size = input(160);
 
   protected dataUrl = signal('');
+  protected errorMessage = signal('');
 
-  ngOnChanges(): void {
-    if (!this.value) return;
-    QRCode.toDataURL(this.value, {
-      width: this.size,
-      margin: 1,
-      color: { dark: '#000000', light: '#ffffff' },
-      errorCorrectionLevel: 'M'
-    }).then(url => this.dataUrl.set(url));
+  constructor() {
+    effect(() => {
+      const val = this.value();
+      const sz = this.size();
+      if (!val) {
+        this.dataUrl.set('');
+        return;
+      }
+      this.errorMessage.set('');
+      QRCode.toDataURL(val, {
+        width: sz,
+        margin: 1,
+        color: { dark: '#000000', light: '#ffffff' },
+        errorCorrectionLevel: 'M'
+      })
+        .then((url) => this.dataUrl.set(url))
+        .catch(() => {
+          this.dataUrl.set('');
+          this.errorMessage.set('Failed to generate QR code');
+        });
+    });
   }
 }

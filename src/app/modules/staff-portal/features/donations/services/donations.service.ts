@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MockDataService } from '@core/services/mock-data.service';
 import { DonationMethod, DonationStatus, Donation } from '@core/models/domain.models';
 import {
@@ -20,6 +20,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class DonationsService {
   private readonly mockData = inject(MockDataService);
+  private readonly _localDonations = signal<Donation[]>([...this.mockData.donations]);
 
   getScheduledDonations(
     query: string,
@@ -50,9 +51,9 @@ export class DonationsService {
     return this.mockData.getScheduledDonations() as ScheduledDonationResponse[];
   }
 
-  getCompletedDonations(query: string, donations: Donation[]): CompletedDonationState[] {
+  getCompletedDonations(query: string): CompletedDonationState[] {
     const q = query.toLowerCase();
-    return donations
+    return this._localDonations()
       .filter(d => {
         return (
           !q ||
@@ -86,5 +87,13 @@ export class DonationsService {
 
   linkDonor(donationId: number, donorId: number): Donation | null {
     return this.mockData.associateDonorToDonation(donationId, donorId);
+  }
+
+  linkDonorAndRefresh(donationId: number, donorId: number): Donation | null {
+    const updated = this.mockData.associateDonorToDonation(donationId, donorId);
+    if (updated) {
+      this._localDonations.update(list => list.map(d => (d.id === updated.id ? updated : d)));
+    }
+    return updated;
   }
 }

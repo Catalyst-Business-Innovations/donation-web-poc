@@ -103,7 +103,7 @@ export function mapDonorToSearchResult(d: DonorSearchResponse): DonorSearchResul
     id: d.id,
     firstName: d.firstName,
     lastName: d.lastName,
-    initials: `${d.firstName[0]}${d.lastName[0]}`,
+    initials: `${d.firstName?.[0] ?? ''}${d.lastName?.[0] ?? ''}`,
     phone: d.phone,
     loyaltyPoints: d.loyaltyPoints
   };

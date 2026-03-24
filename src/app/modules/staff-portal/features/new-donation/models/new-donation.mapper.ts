@@ -5,7 +5,7 @@ export function mapDonorToSelected(d: Donor): SelectedDonor {
   return {
     id: d.id,
     displayName: `${d.firstName} ${d.lastName}`,
-    initials: `${d.firstName[0]}${d.lastName[0]}`.toUpperCase(),
+    initials: `${d.firstName?.[0] ?? ''}${d.lastName?.[0] ?? ''}`.toUpperCase(),
     tier: d.loyaltyTier,
     points: d.loyaltyPoints,
     totalDonations: d.totalDonations,

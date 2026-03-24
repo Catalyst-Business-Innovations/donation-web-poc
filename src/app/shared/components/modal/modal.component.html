@@ -1,27 +1,45 @@
-@if (open) {
-  <div class="modal-overlay" (click)="onOverlayClick($event)">
+@if (open()) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)" role="presentation">
     <div
       class="modal"
-      [class.modal-lg]="size === 'lg'"
-      [class.modal-sm]="size === 'sm'"
+      [class.modal-lg]="size() === 'lg'"
+      [class.modal-sm]="size() === 'sm'"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="'modal-title'"
       (click)="$event.stopPropagation()"
     >
       <div class="modal-header">
-        <div class="modal-title">{{ title }}</div>
-        <button class="modal-close" (click)="closed.emit()"><app-icon name="close" size="20" /></button>
+        <div class="modal-title" id="modal-title">{{ title() }}</div>
+        <button
+          type="button"
+          class="modal-close"
+          aria-label="Close dialog"
+          (click)="closed.emit()"
+        >
+          <app-icon name="close" size="20" />
+        </button>
       </div>
 
-      <div class="modal-body">
+      <div class="modal-body" id="modal-body">
         <ng-content />
       </div>
 
-      @if (showFooter) {
+      @if (showFooter()) {
         <div class="modal-footer">
-          @if (showCancel) {
-            <button class="btn btn-secondary" (click)="closed.emit()">{{ effectiveCancelLabel }}</button>
+          @if (showCancel()) {
+            <button type="button" class="btn btn-secondary" (click)="closed.emit()">
+              {{ cancelLabel() }}
+            </button>
           }
-          <button class="btn btn-{{ confirmVariant }}" [disabled]="confirmDisabled" (click)="confirmed.emit()">
-            {{ effectiveConfirmLabel }}
+          <button
+            type="button"
+            class="btn btn-{{ confirmVariant() }}"
+            [disabled]="confirmDisabled()"
+            [attr.aria-disabled]="confirmDisabled()"
+            (click)="confirmed.emit()"
+          >
+            {{ confirmLabel() }}
           </button>
         </div>
       }

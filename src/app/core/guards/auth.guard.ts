@@ -1,6 +1,8 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { CanActivateFn, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { ToastService } from '../services/toast.service';
+import { STORAGE_KEYS } from '../constants/storage-keys';
 
 /**
  * Auth Guard to protect routes that require authentication
@@ -14,7 +16,7 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
   const publicRoutes = ['/home'];
 
   // Check if the current route is public
-  const isPublicRoute = publicRoutes.some(publicRoute => state.url.startsWith(publicRoute));
+  const isPublicRoute = publicRoutes.some((publicRoute) => state.url.startsWith(publicRoute));
 
   if (isPublicRoute) {
     return true;
@@ -23,7 +25,7 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
   // Check if user is authenticated (has valid token from Company app)
   if (!authService.isAuthenticated()) {
     // Store the attempted URL for redirecting after login
-    sessionStorage.setItem('redirectUrl', state.url);
+    sessionStorage.setItem(STORAGE_KEYS.REDIRECT_URL, state.url);
     // Redirect to Company app login
     authService.redirectToLogin();
     return false;
@@ -47,10 +49,12 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
  */
 export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const authService = inject(AuthService);
+  const toastService = inject(ToastService);
+  const router = inject(Router);
 
   // Check if user is authenticated first
   if (!authService.isAuthenticated()) {
-    sessionStorage.setItem('redirectUrl', state.url);
+    sessionStorage.setItem(STORAGE_KEYS.REDIRECT_URL, state.url);
     authService.redirectToLogin();
     return false;
   }
@@ -66,12 +70,12 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
   const requiredRoles = route.data['roles'] as string[];
   if (requiredRoles && requiredRoles.length > 0) {
     const userRole = userInfo.role?.toLowerCase();
-    const hasRole = requiredRoles.some(role => role.toLowerCase() === userRole);
+    const hasRole = requiredRoles.some((role) => role.toLowerCase() === userRole);
 
     if (!hasRole) {
-      // User doesn't have required role - show error
-      alert('Access denied. You do not have the required role to access this page.');
-      window.history.back();
+      // User doesn't have required role - show toast and navigate back
+      toastService.error('Access denied. You do not have the required role to access this page.');
+      router.navigate(['/']);
       return false;
     }
   }

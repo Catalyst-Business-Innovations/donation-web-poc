@@ -1,5 +1,6 @@
 import { Injectable, inject, computed } from '@angular/core';
 import { MockDataService } from '@core/services/mock-data.service';
+import { CurrentDonorService } from '@core/services/current-donor.service';
 import {
   PointsHeroState,
   TierProgressState,
@@ -17,23 +18,26 @@ import {
 @Injectable({ providedIn: 'root' })
 export class DonorRewardsService {
   private readonly mockData = inject(MockDataService);
-  private readonly donor = this.mockData.donors[0];
+  private readonly currentDonor = inject(CurrentDonorService);
 
-  readonly catalogue = computed<RewardCatalogueItemState[]>(() =>
-    this.mockData
-      .getAvailableRewardsForDonor(this.donor.id)
-      .map(r => mapRewardToCatalogueItem(r, this.donor.loyaltyPoints))
-  );
+  readonly catalogue = computed<RewardCatalogueItemState[]>(() => {
+    const donor = this.currentDonor.donor();
+    return this.mockData
+      .getAvailableRewardsForDonor(donor.id)
+      .map(r => mapRewardToCatalogueItem(r, donor.loyaltyPoints));
+  });
 
-  readonly txnHistory = computed<RewardTransactionState[]>(() =>
-    this.mockData.getRewardTransactionsForDonor(this.donor.id).map(mapTransactionToState)
-  );
+  readonly txnHistory = computed<RewardTransactionState[]>(() => {
+    const donor = this.currentDonor.donor();
+    return this.mockData.getRewardTransactionsForDonor(donor.id).map(mapTransactionToState);
+  });
 
   getHeroState(): PointsHeroState {
-    const tier = this.mockData.getTier(this.donor.loyaltyTier);
+    const donor = this.currentDonor.donor();
+    const tier = this.mockData.getTier(donor.loyaltyTier);
     const catalogue = this.catalogue();
     return {
-      availablePoints: this.donor.loyaltyPoints,
+      availablePoints: donor.loyaltyPoints,
       multiplier: tier.pointsMultiplier,
       tierLabel: tier.label,
       catalogueCount: catalogue.length,
@@ -43,38 +47,42 @@ export class DonorRewardsService {
   }
 
   getTierProgress(): TierProgressState {
-    return mapTiersToProgress(this.mockData.loyaltyTiers, this.donor.loyaltyTier, this.donor.totalDonations);
+    const donor = this.currentDonor.donor();
+    return mapTiersToProgress(this.mockData.loyaltyTiers, donor.loyaltyTier, donor.totalDonations);
   }
 
   getDonorPoints(): number {
-    return this.donor.loyaltyPoints;
+    return this.currentDonor.donor().loyaltyPoints;
   }
 
   searchDonors(query: string): DonorSearchResultState[] {
+    const donor = this.currentDonor.donor();
     const q = query.toLowerCase().trim();
     if (q.length < 2) return [];
     return this.mockData.donors
       .filter(
-        d => d.id !== this.donor.id && (`${d.firstName} ${d.lastName}`.toLowerCase().includes(q) || d.phone.includes(q))
+        d => d.id !== donor.id && (`${d.firstName} ${d.lastName}`.toLowerCase().includes(q) || d.phone.includes(q))
       )
       .slice(0, 6)
       .map(mapDonorToSearchResult);
   }
 
   redeemReward(rewardId: number): { success: boolean; pointsUsed: number; name: string } {
-    const def = this.mockData.getAvailableRewardsForDonor(this.donor.id).find(r => r.id === rewardId);
+    const donor = this.currentDonor.donor();
+    const def = this.mockData.getAvailableRewardsForDonor(donor.id).find(r => r.id === rewardId);
     if (!def) return { success: false, pointsUsed: 0, name: '' };
-    const txn = this.mockData.redeemReward(this.donor.id, def.id);
+    const txn = this.mockData.redeemReward(donor.id, def.id);
     return txn
       ? { success: true, pointsUsed: txn.pointsUsed, name: def.name }
       : { success: false, pointsUsed: 0, name: def.name };
   }
 
   giftReward(recipientId: number, rewardId: number): { success: boolean; recipientName: string; rewardName: string } {
-    const def = this.mockData.getAvailableRewardsForDonor(this.donor.id).find(r => r.id === rewardId);
+    const donor = this.currentDonor.donor();
+    const def = this.mockData.getAvailableRewardsForDonor(donor.id).find(r => r.id === rewardId);
     const recipient = this.mockData.donors.find(d => d.id === recipientId);
     if (!def || !recipient) return { success: false, recipientName: '', rewardName: '' };
-    const txn = this.mockData.giftReward(this.donor.id, recipientId, def.id);
+    const txn = this.mockData.giftReward(donor.id, recipientId, def.id);
     return txn
       ? { success: true, recipientName: `${recipient.firstName} ${recipient.lastName}`, rewardName: def.name }
       : { success: false, recipientName: '', rewardName: '' };

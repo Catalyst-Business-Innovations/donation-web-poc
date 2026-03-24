@@ -1,10 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, throwError, BehaviorSubject, timeout } from 'rxjs';
 import { catchError, filter, take, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
+
+/** Default request timeout in milliseconds (30 seconds) */
+const REQUEST_TIMEOUT_MS = 30_000;
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -32,21 +35,30 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     return next.handle(req).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          return this.handle401Error(req, next);
-        } else if (error.status === 403) {
-          this.handleForbiddenError();
-        } else if (error.status === 400) {
-          this.handleBadRequestError(error);
-        } else if (error.status === 404) {
-          this.handleNotFoundError();
-        } else if (error.status === 500) {
-          this.handleServerError();
+      timeout(REQUEST_TIMEOUT_MS),
+      catchError((error: HttpErrorResponse | Error) => {
+        // Handle timeout errors
+        if (error.name === 'TimeoutError') {
+          this.toastService.error('Request timed out. Please try again.');
+          return throwError(() => error);
+        }
+
+        if (error instanceof HttpErrorResponse) {
+          if (error.status === 401) {
+            return this.handle401Error(req, next);
+          } else if (error.status === 403) {
+            this.handleForbiddenError();
+          } else if (error.status === 400) {
+            this.handleBadRequestError(error);
+          } else if (error.status === 404) {
+            this.handleNotFoundError();
+          } else if (error.status === 500) {
+            this.handleServerError();
+          }
         }
 
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -56,8 +68,8 @@ export class AuthInterceptor implements HttpInterceptor {
   private addAuthHeader(request: HttpRequest<any>, token: string): HttpRequest<any> {
     return request.clone({
       setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
   }
 
@@ -74,7 +86,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
       if (refreshToken) {
         return this.authService.refreshAccessToken(refreshToken).pipe(
-          switchMap(response => {
+          switchMap((response) => {
             this.isRefreshing = false;
             this.authService.setAccessToken(response.accessToken);
             this.refreshTokenSubject.next(response.accessToken);
@@ -82,7 +94,7 @@ export class AuthInterceptor implements HttpInterceptor {
             // Retry original request with new token
             return next.handle(this.addAuthHeader(req, response.accessToken));
           }),
-          catchError(err => {
+          catchError((err) => {
             this.isRefreshing = false;
             this.authService.clearAuthData();
 
@@ -91,7 +103,7 @@ export class AuthInterceptor implements HttpInterceptor {
             this.authService.redirectToLogin();
 
             return throwError(() => err);
-          })
+          }),
         );
       } else {
         this.isRefreshing = false;
@@ -105,11 +117,11 @@ export class AuthInterceptor implements HttpInterceptor {
     } else {
       // If refresh is already in progress, queue the request
       return this.refreshTokenSubject.pipe(
-        filter(token => token !== null),
+        filter((token) => token !== null),
         take(1),
-        switchMap(token => {
+        switchMap((token) => {
           return next.handle(this.addAuthHeader(req, token!));
-        })
+        }),
       );
     }
   }
@@ -123,10 +135,16 @@ export class AuthInterceptor implements HttpInterceptor {
 
   /**
    * Handle 400 Bad Request error
+   * Sanitizes error messages before displaying to avoid exposing raw API internals.
    */
   private handleBadRequestError(error: HttpErrorResponse): void {
-    if (error.error?.message) {
-      this.toastService.error(error.error.message);
+    const rawMessage = error.error?.message;
+    if (rawMessage && typeof rawMessage === 'string') {
+      // Sanitize: strip anything that looks like a stack trace or internal detail
+      const sanitized = rawMessage.length > 200 ? rawMessage.substring(0, 200) + '...' : rawMessage;
+      this.toastService.error(sanitized);
+    } else {
+      this.toastService.error('The request could not be processed. Please check your input and try again.');
     }
   }
 
@@ -148,6 +166,6 @@ export class AuthInterceptor implements HttpInterceptor {
    * Check if route is public
    */
   private isPublicRoute(url: string): boolean {
-    return this.PUBLIC_ROUTES.some(route => url.includes(route));
+    return this.PUBLIC_ROUTES.some((route) => url.includes(route));
   }
 }

@@ -1,6 +1,7 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { STORAGE_KEYS } from '../../../../../core/constants/storage-keys';
 
 @Component({
   selector: 'app-donor-login',
@@ -19,7 +20,7 @@ export class DonorLoginComponent implements OnInit {
 
   ngOnInit(): void {
     // Clear any previous session when landing on login page
-    sessionStorage.removeItem('donor_authenticated');
+    sessionStorage.removeItem(STORAGE_KEYS.DONOR_AUTHENTICATED);
     sessionStorage.removeItem('donor_email');
   }
 
@@ -37,10 +38,10 @@ export class DonorLoginComponent implements OnInit {
         this.error.set('Invalid email or password. Please try again.');
       } else {
         // Store a minimal session token in sessionStorage for the guard to read
-        sessionStorage.setItem('donor_authenticated', 'true');
+        sessionStorage.setItem(STORAGE_KEYS.DONOR_AUTHENTICATED, 'true');
         sessionStorage.setItem('donor_email', this.email);
-        const returnUrl = sessionStorage.getItem('donor_return_url') || '/donor/dashboard';
-        sessionStorage.removeItem('donor_return_url');
+        const returnUrl = sessionStorage.getItem(STORAGE_KEYS.DONOR_RETURN_URL) || '/donor/dashboard';
+        sessionStorage.removeItem(STORAGE_KEYS.DONOR_RETURN_URL);
         this.router.navigateByUrl(returnUrl);
       }
     }, 600);

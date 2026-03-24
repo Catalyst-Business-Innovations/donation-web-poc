@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export type IconName =
@@ -60,18 +60,14 @@ export type IconName =
   templateUrl: './icon.component.html',
   styleUrls: ['./icon.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IconComponent {
-  @Input() name!: IconName;
-  @Input() width: string = '16';
-  @Input() height: string = '16';
-  @Input() strokeWidth: string = '2';
-  @Input() class: string = '';
+  readonly name = input.required<IconName>();
+  readonly size = input<number | string>(16);
+  readonly strokeWidth = input<string>('2');
 
-  @Input() set size(value: number | string) {
-    const sizeStr = value.toString();
-    this.width = sizeStr;
-    this.height = sizeStr;
-  }
+  readonly width = computed(() => this.size().toString());
+  readonly height = computed(() => this.size().toString());
 }

@@ -6,9 +6,11 @@ import { jwtDecode } from 'jwt-decode';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { RefreshTokenResponse, SignOutRequest, UserInfo, DecodedToken } from '../models/auth.models';
+import { STORAGE_KEYS } from '../constants/storage-keys';
+import { isSafeRedirectUrl } from '../utils/url-validator';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private http = inject(HttpClient);
@@ -16,12 +18,20 @@ export class AuthService {
   private cookieService = inject(CookieService);
 
   /**
+   * Check if the app is running on localhost
+   */
+  private isLocalhost(): boolean {
+    return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  }
+
+  /**
    * Redirect to Company app login
    * This app doesn't handle login - users login via Company app
    */
   redirectToLogin(): void {
     const currentUrl = window.location.href;
-    const loginUrl = `${environment.companyUrl}/shared/login?returnUrl=${encodeURIComponent(currentUrl)}`;
+    const returnUrl = isSafeRedirectUrl(currentUrl) ? currentUrl : '/';
+    const loginUrl = `${environment.companyUrl}/shared/login?returnUrl=${encodeURIComponent(returnUrl)}`;
     window.location.href = loginUrl;
   }
 
@@ -47,9 +57,12 @@ export class AuthService {
    * Tokens are shared via domain-scoped cookies set by Company app
    */
   setTokens(accessToken: string, refreshToken: string, sessionId: string): void {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!accessToken || !refreshToken || !sessionId) {
+      console.error('setTokens: all token values must be non-empty');
+      return;
+    }
 
-    if (isLocalhost) {
+    if (this.isLocalhost()) {
       this.cookieService.set('accessToken', accessToken, { path: '/' });
       this.cookieService.set('refreshToken', refreshToken, { path: '/' });
       this.cookieService.set('sessionId', sessionId, { path: '/' });
@@ -87,9 +100,12 @@ export class AuthService {
    * Update access token in cookie
    */
   setAccessToken(accessToken: string): void {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!accessToken) {
+      console.error('setAccessToken: token must be non-empty');
+      return;
+    }
 
-    if (isLocalhost) {
+    if (this.isLocalhost()) {
       this.cookieService.set('accessToken', accessToken, { path: '/' });
     } else {
       const domain = `.${environment.domainName}`;
@@ -124,14 +140,14 @@ export class AuthService {
    * Store user info in localStorage
    */
   setUserInfo(userInfo: UserInfo): void {
-    localStorage.setItem('user', JSON.stringify(userInfo));
+    localStorage.setItem(STORAGE_KEYS.USER_INFO, JSON.stringify(userInfo));
   }
 
   /**
    * Get user info from localStorage
    */
   getUserInfoFromStorage(): UserInfo | null {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem(STORAGE_KEYS.USER_INFO);
     if (!userStr) {
       return null;
     }
@@ -145,6 +161,7 @@ export class AuthService {
 
   /**
    * Check if user is authenticated
+   * Includes a 10-second buffer before token expiry to allow proactive refresh
    */
   isAuthenticated(): boolean {
     const token = this.getAccessToken();
@@ -154,26 +171,24 @@ export class AuthService {
 
     // Check if token is expired
     const decoded = this.decodeToken(token);
-    if (!decoded || !decoded['exp']) {
+    if (!decoded || !decoded.exp) {
       return false;
     }
 
-    const expirationTime = decoded['exp'] * 1000; // Convert to milliseconds
-    return Date.now() < expirationTime;
+    const expirationTime = decoded.exp * 1000; // Convert to milliseconds
+    return Date.now() < expirationTime - 10000; // 10s buffer before expiry
   }
 
   /**
    * Clear all authentication data
    */
   clearAuthData(): void {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
     // Clear localStorage
-    localStorage.removeItem('user');
+    localStorage.removeItem(STORAGE_KEYS.USER_INFO);
     sessionStorage.clear();
 
     // Delete cookies
-    if (isLocalhost) {
+    if (this.isLocalhost()) {
       this.cookieService.delete('accessToken', '/');
       this.cookieService.delete('refreshToken', '/');
       this.cookieService.delete('sessionId', '/');
@@ -207,12 +222,12 @@ export class AuthService {
           // Redirect to Company app after logout
           window.location.href = environment.companyUrl;
         },
-        error: error => {
+        error: (error) => {
           console.error('Logout error:', error);
           // Clear data even if API call fails
           this.clearAuthData();
           window.location.href = environment.companyUrl;
-        }
+        },
       });
     } else {
       this.clearAuthData();

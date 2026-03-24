@@ -1,6 +1,7 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { STORAGE_KEYS } from '../../../../../core/constants/storage-keys';
 
 @Component({
   selector: 'app-staff-login',
@@ -19,7 +20,7 @@ export class StaffLoginComponent implements OnInit {
 
   ngOnInit(): void {
     // Clear any previous session when landing on login page
-    sessionStorage.removeItem('staff_authenticated');
+    sessionStorage.removeItem(STORAGE_KEYS.STAFF_AUTHENTICATED);
     sessionStorage.removeItem('staff_username');
   }
 
@@ -36,10 +37,10 @@ export class StaffLoginComponent implements OnInit {
       if (this.password === 'wrong') {
         this.error.set('Invalid credentials. Please try again.');
       } else {
-        sessionStorage.setItem('staff_authenticated', 'true');
+        sessionStorage.setItem(STORAGE_KEYS.STAFF_AUTHENTICATED, 'true');
         sessionStorage.setItem('staff_username', this.username);
-        const returnUrl = sessionStorage.getItem('staff_return_url') || '/staff/new-donation';
-        sessionStorage.removeItem('staff_return_url');
+        const returnUrl = sessionStorage.getItem(STORAGE_KEYS.STAFF_RETURN_URL) || '/staff/new-donation';
+        sessionStorage.removeItem(STORAGE_KEYS.STAFF_RETURN_URL);
         this.router.navigateByUrl(returnUrl);
       }
     }, 600);

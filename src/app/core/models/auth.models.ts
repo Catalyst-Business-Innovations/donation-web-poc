@@ -38,5 +38,16 @@ export interface UserInfo {
 }
 
 export interface DecodedToken {
-  [key: string]: any;
+  exp?: number;
+  iat?: number;
+  nbf?: number;
+  iss?: string;
+  aud?: string | string[];
+  sub?: string;
+  userid?: string;
+  companyid?: string;
+  email?: string;
+  fullname?: string;
+  role?: string;
+  phonenumber?: string;
 }

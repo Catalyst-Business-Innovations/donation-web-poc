@@ -1,0 +1,29 @@
+@if (dataUrl()) {
+  <img
+    [src]="dataUrl()"
+    [width]="size()"
+    [height]="size()"
+    [alt]="'QR Code for ' + value()"
+    role="img"
+    style="display: block"
+  />
+} @else if (errorMessage()) {
+  <div
+    [style.width.px]="size()"
+    [style.height.px]="size()"
+    class="qr-error"
+    role="alert"
+  >
+    <span>{{ errorMessage() }}</span>
+  </div>
+} @else {
+  <div
+    [style.width.px]="size()"
+    [style.height.px]="size()"
+    class="qr-loading"
+    role="status"
+    aria-label="Loading QR code"
+  >
+    <span>Loading&#8230;</span>
+  </div>
+}

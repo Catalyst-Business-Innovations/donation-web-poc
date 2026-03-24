@@ -181,7 +181,7 @@ export class NewDonationPageComponent implements OnInit, OnDestroy {
     const d: SelectedDonor = {
       id: Date.now(),
       displayName: `${form.firstName} ${form.lastName}`,
-      initials: `${form.firstName[0]}${form.lastName[0]}`.toUpperCase(),
+      initials: `${form.firstName?.[0] ?? ''}${form.lastName?.[0] ?? ''}`.toUpperCase(),
       tier: DonorTier.Bronze,
       points: 0,
       totalDonations: 0

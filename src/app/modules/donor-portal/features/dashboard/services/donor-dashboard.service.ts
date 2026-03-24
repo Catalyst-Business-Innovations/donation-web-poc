@@ -1,5 +1,6 @@
 import { Injectable, inject, computed } from '@angular/core';
 import { MockDataService } from '@core/services/mock-data.service';
+import { CurrentDonorService } from '@core/services/current-donor.service';
 import { CampaignStatus } from '@core/models/domain.models';
 import {
   DonorStatsState,
@@ -21,23 +22,24 @@ import {
 @Injectable({ providedIn: 'root' })
 export class DonorDashboardService {
   private readonly mockData = inject(MockDataService);
+  private readonly currentDonor = inject(CurrentDonorService);
 
   getDonorStats(): DonorStatsState {
-    return mapDonorToStats(this.mockData.donors[0]);
+    return mapDonorToStats(this.currentDonor.donor());
   }
 
   getTierDisplay(): TierDisplayState {
-    const donor = this.mockData.donors[0];
+    const donor = this.currentDonor.donor();
     const tier = this.mockData.getTier(donor.loyaltyTier);
     return mapDonorToTierDisplay(donor, tier, this.mockData.loyaltyTiers);
   }
 
   getImpactItems(): ImpactItemState[] {
-    return mapDonorToImpactItems(this.mockData.donors[0]);
+    return mapDonorToImpactItems(this.currentDonor.donor());
   }
 
   getRecentDonations(): RecentDonationState[] {
-    const donor = this.mockData.donors[0];
+    const donor = this.currentDonor.donor();
     return this.mockData.getDonationsByDonor(donor.id).map(mapDonationToRecentDonation);
   }
 
@@ -49,6 +51,6 @@ export class DonorDashboardService {
   );
 
   getBadges(): BadgeState[] {
-    return mapDonorToBadges(this.mockData.donors[0]);
+    return mapDonorToBadges(this.currentDonor.donor());
   }
 }

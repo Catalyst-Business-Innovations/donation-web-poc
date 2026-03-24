@@ -5,6 +5,7 @@ import {
   DonorNavSection as NavSection
 } from '../../shared/components/donor-layout/donor-layout.component';
 import { MockDataService } from '../../core/services/mock-data.service';
+import { CurrentDonorService } from '../../core/services/current-donor.service';
 
 @Component({
   selector: 'app-donor-portal',
@@ -25,7 +26,8 @@ import { MockDataService } from '../../core/services/mock-data.service';
 })
 export class DonorPortalComponent {
   protected svc = inject(MockDataService);
-  protected donor = this.svc.donors[0];
+  private readonly currentDonor = inject(CurrentDonorService);
+  protected donor = this.currentDonor.donor();
   protected tierCfg = this.svc.getTier(this.donor.loyaltyTier);
   readonly sections: NavSection[] = [
     {
