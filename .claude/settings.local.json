@@ -2,20 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(npm run:*)",
-      "Bash(for feature:*)",
-      "Bash(do rm:*)",
-      "Bash(done)",
-      "Bash(find . -name \"*.ts\" -exec grep -l \"models/state/\" {})",
-      "Bash(while read:*)",
-      "Bash(do sed:*)",
-      "Bash(do echo:*)",
-      "Read(//d/Projects/RCS/repos/donation/Donation.Web/$feature/**)",
+      "Bash(npm start)",
+      "Bash(npm test)",
       "Bash(npx ng:*)",
       "Bash(npx prettier:*)",
-      "Bash(ls \"D:\\\\Projects\\\\RCS\\\\repos\\\\donation\\\\Donation.Web\\\\src\\\\app\\\\modules\\\\staff-portal\\\\features\\\\campaigns\\\\components\\\\campaigns.component\"*)",
-      "Bash(mv donor-management-page.component.ts donors-page.component.ts)",
-      "Bash(mv donor-management-page.component.html donors-page.component.html)",
-      "Bash(mv donor-management-page.component.scss donors-page.component.scss)"
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(rm *)",
+      "Bash(find *)",
+      "Bash(cd *)"
     ]
   }
 }

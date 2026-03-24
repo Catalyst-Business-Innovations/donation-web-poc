@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm start)",
+      "Bash(npm test)",
+      "Bash(npx ng:*)",
+      "Bash(npx prettier:*)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(rm *)",
+      "Bash(cat *)",
+      "Bash(find *)",
+      "Bash(cd *)",
+      "Bash(echo *)"
+    ],
+    "deny": []
+  },
+  "instructions": [
+    "Always follow docs/UI_GUIDELINES.md (v3.0) for all code generation",
+    "Every component must have 3 separate files: .ts, .html, .scss — never inline",
+    "All components must use ChangeDetectionStrategy.OnPush",
+    "Use signal-based input()/output()/model() — never @Input/@Output decorators",
+    "Use inject() — never constructor injection",
+    "Models folder must be flat — no sub-folders (state, request, response, mapper, enum files)",
+    "Services must call mapper functions — no inline mapping logic",
+    "Page components own the topbar — presentational components never render their own",
+    "After rewriting a feature, delete old monolithic files and update routes",
+    "Verify build with: npm run build -- --configuration=development"
+  ]
+}

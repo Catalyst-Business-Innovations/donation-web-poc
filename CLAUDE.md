@@ -34,10 +34,45 @@ npm run format
 
 The app has two completely separate portals with their own layouts, guards, and routes:
 
-- **Staff Portal** (`/staff`) — Operations: donations, presort, containers, donor management, campaigns, settings
-- **Donor Portal** (`/donor`) — Self-service: dashboard, donation history, receipts, loyalty rewards, scheduling
+- **Staff Portal** (`/staff`) — Operations: new-donation, donations, presort, containers, dashboard, donors, settings, campaigns
+- **Donor Portal** (`/donor`) — Self-service: dashboard, history, receipts, rewards, schedule
 
 Both portals lazy-load their child routes. The `staff-layout` and `donor-layout` shared components provide the shell UI for each portal.
+
+### Feature Architecture (Container/Presentational)
+
+Every feature follows the **UI-State-Mapper-API** architecture defined in [docs/UI_GUIDELINES.md](docs/UI_GUIDELINES.md):
+
+```
+modules/<portal>/features/<feature-name>/
+  pages/           # Container (route-level) components — inject service, own signals
+  components/      # Presentational components — input()/output() only, no service injection
+  services/        # Feature service — calls mappers, returns State models
+  models/          # FLAT folder — no sub-folders
+    feature.state.ts       # UI binding models
+    feature.request.ts     # API request contracts
+    feature.response.ts    # API response contracts
+    feature.mapper.ts      # Pure mapping functions
+    feature.enum.ts        # Feature-specific enums/constants
+```
+
+**Hard rules:**
+- Every component = 3 separate files (.ts, .html, .scss) — never inline templates/styles
+- All components use `ChangeDetectionStrategy.OnPush`
+- Signal-based `input()` / `output()` / `model()` — never `@Input()` / `@Output()`
+- `inject()` function — never constructor injection
+- Services call mapper functions — no inline mapping logic
+- Page components own the topbar — presentational components never render their own
+
+### Path Aliases (tsconfig.json)
+
+```
+@app/*    → src/app/*
+@core/*   → src/app/core/*
+@shared/* → src/app/shared/*
+@staff/*  → src/app/modules/staff-portal/features/*
+@donor/*  → src/app/modules/donor-portal/features/*
+```
 
 ### Authentication Model
 
@@ -45,24 +80,25 @@ This is a **token-consuming app** — it does not have its own login flow. Users
 
 - `AuthService` reads/validates the shared JWT cookie and handles token refresh
 - `AuthInterceptor` attaches Bearer tokens and manages a refresh queue to prevent race conditions on 401s
-- `staffTokenGuard` and `donorAuthGuard` protect their respective portals using `sessionStorage` flags (currently simulated — see TODO comments in guards)
+- `staffTokenGuard` and `donorAuthGuard` protect their respective portals
 - Login redirect goes to `companyUrl/login` with a `returnUrl` parameter
 
 ### State & Data
 
-- **`MockDataService`** provides all seed data in development. It is the single source of truth for domain objects (donors, donations, containers, locations, rewards, campaigns).
+- **`MockDataService`** provides all seed data in development. It is the single source of truth for domain objects.
+- **Feature services** wrap `MockDataService`, calling mapper functions to return State models.
 - **`StorageService`** persists mock data to `localStorage` with version management.
-- Angular **Signals** are used for reactive state (e.g., `ToastService` uses signals for toast queue).
-- No global state library (NgRx/Akita). State lives in services.
+- Angular **Signals** are used for reactive state. No global state library (NgRx/Akita).
 
-### Core Domain Models ([src/app/core/models/domain.models.ts](src/app/core/models/domain.models.ts))
+### Core Domain Models
 
-All enums, label maps, and interfaces are centralized here. Key concepts:
+All shared enums, label maps, and interfaces are in [src/app/core/models/domain.models.ts](src/app/core/models/domain.models.ts). Key concepts:
 - **Donor** with loyalty points and `DonorTier` (Bronze/Silver/Gold/Platinum)
 - **Donation** → **DonationItem** → **Container** pipeline
 - **RewardDefinition** / **RewardTransaction** for the loyalty rewards system
 - **Campaign** with block-based email builder (`EmailBlock[]`) and `CampaignTargetCriteria`
-- **AppConfig** controls system-wide toggles (cash acceptance, points calculation method, approval requirements)
+- **AppConfig** controls system-wide toggles
+- **AsyncStatus** type in [src/app/core/models/async-status.type.ts](src/app/core/models/async-status.type.ts)
 
 ### Environments
 
@@ -79,3 +115,7 @@ All environments share the same shape: `donationApiUrl`, `companyApiUrl`, `compa
 - **Strict TypeScript**: `strict: true`, strict Angular template checking, strict injection
 - **Default standalone: true** for all generated components (set in `angular.json`)
 - Component styles default to **SCSS**
+
+## Reference
+
+- [UI Guidelines SOP](docs/UI_GUIDELINES.md) — Full coding agent SOP for components, services, models, mappers
